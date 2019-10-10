@@ -1,6 +1,8 @@
 # Vision
 The vision team is responsible for processing images in order to extract information relevant to flight control.
 
+[Current Planning Document](https://docs.google.com/document/d/1123AFQ_xj2aAlCR1i5lCmx7I_2CbsMj6nA77rAYWCTs/edit)
+
 ## Directory Structure
 ```
     vision/
