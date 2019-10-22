@@ -9,18 +9,20 @@ import numpy as np
 # Import OpenCV for easy image rendering
 import cv2
 
+#Initialize resolution and framerate constants
+RESOLUTION_WIDTH = 640
+RESOLUTION_HEIGHT = 480
+FRAMERATE = 30
+
 # Create a pipeline
 pipeline = rs.pipeline()
 
 # Create a config and configure the pipeline to stream
-# different resolutions of color and depth streams
+# different resolutions of color and depth streams (hypothetically)
 config = rs.config()
-#config.enable_device("846112073537") #a (hopefully unique) serial number for a camera, enables config to get data from a specific camera
-#declare them as constants at the top of the program later
-#we can create a new 'config' for each camera?
-#I think it is, actually, unique, because most serial numbers are, and no data is taken if the number is changed
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+#config.enable_device("846112073537") #a unique serial number for a camera, enables config to get data from a specific camera
+config.enable_stream(rs.stream.depth, RESOLUTION_WIDTH, RESOLUTION_HEIGHT, rs.format.z16, FRAMERATE)
+config.enable_stream(rs.stream.color, RESOLUTION_WIDTH, RESOLUTION_HEIGHT, rs.format.bgr8, FRAMERATE)
 
 # Start streaming
 profile = pipeline.start(config)
@@ -41,7 +43,6 @@ align_to = rs.stream.color
 align = rs.align(align_to)
 
 # Streaming loop
-#try:
 while True:
     # Get frameset of color and depth
     frames = pipeline.wait_for_frames()
