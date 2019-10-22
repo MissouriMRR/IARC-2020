@@ -67,9 +67,6 @@ while True:
     depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
     bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
 
-    #print(depth_image_3d[0][0][0]) //gives value in mm(?), I'm not sure why I have to do 3 indices to get to a single number, since shouldn't the image just require x and y coordinates to get to a depth value?
-    #then again, this might not really be my job to figure out
-
     # Render images
     depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
     images = np.hstack((bg_removed, depth_colormap))
