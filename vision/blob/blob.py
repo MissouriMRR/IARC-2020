@@ -1,11 +1,37 @@
 from vision.blob.constants import ObjectType
 
 class Rectangle:
-    def __init__(self, top_left_coord, top_right_coord, bottom_right_coord, bottom_left_coord):
-        self.top_left_coord = top_left_coord
-        self.top_right_coord = top_right_coord
-        self.bottom_right_coord = bottom_right_coord
-        self.bottom_left_coord = bottom_left_coord
+    """
+    Defines a 3D rectangular prism using 8 (x, y, z) coordinates
+
+    Parameters
+    ----------
+    top_left_near: tuple[float]
+        top (-y), left (-x), and near (-z) coordinate
+    top_right_near: tuple[float]
+        top (-y), right (+x), and near (-z) coordinate
+    bottom_right_near: tuple[float]
+        bottom (+y), right (+x), and near (-z) coordinate
+    bottom_left_near: tuple[float]
+        bottom (+y), left (-x), and near (-z) coordinate
+    top_left_far: tuple[float]
+        top (-y), left (-x), and far (+z) coordinate
+    top_right_far: tuple[float]
+        top (-y), right (+x), and far (+z) coordinate
+    bottom_right_far: tuple[float]
+        bottom (+y), right (+x), and far (+z) coordinate
+    bottom_left_far: tuple[float]
+        bottom (+y), left (-x), and far (+z) coordinate
+    """
+    def __init__(self, top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far):
+        self.top_left_near = top_left_near
+        self.top_right_near = top_right_near
+        self.bottom_right_near = bottom_right_near
+        self.bottom_left_near = bottom_left_near
+        self.top_left_far = top_left_far
+        self.top_right_far = top_right_far
+        self.bottom_right_far = bottom_right_far
+        self.bottom_left_far = bottom_left_far
 
 class Blob:
     def __init__(self, bounding_box, object_type):
