@@ -1,51 +1,53 @@
-#rectangle object
-#environment object full of rectangle
-#iter function as generator
-#updater function
-#unique identifier of rectangles
-#submit pull reques when completing single thread
 
 class Rectangle:
     def __init__(self, vertices, type):
-        self.vertices = vertices
+        self.vertices = str(vertices)
         self.type = type
+
+    def __repr__(self):
+        return self.vertices
 
 
 if __name__ == '__main__':
-    rects = []
-    rect1 = Rectangle(4, ",")
-    rect2 = Rectangle(8, ",")
-    rect3 = Rectangle(2, ",")
-    rect4 = Rectangle(6, ",")
-    rect5 = Rectangle(7, ",")
-    rects.append(rect1)
-    rects.append(rect2)
-    rects.append(rect3)
-    rects.append(rect4)
-    rects.append(rect5)
-
-# information needs to be accessible/ function where generator gets called
+    rects = [
+        Rectangle(4, ","),
+        Rectangle(8, ","),
+        Rectangle(2, ","),
+        Rectangle(6, ","),
+        Rectangle(7, ",")
+    ]
 
 
+"""This class will manage the other objects in the environment"""
 class Environment:
 
+    #list of rectangles in environment
     def __init__(self):
         self.rects = []
 
+    #iterator of the rects list
     def __iter__(self):
         self.length = len(self.rects)
         i = 0
         while True:
             try:
-                i %= len(self.rects)
+                i %= self.length
                 yield self.rects[i]
                 i += 1
             except ZeroDivisionError:
                 yield None
 
+    #updates rects list
     def update(self, rects):
         self.rects = rects
 
-env = Environment()
-for i in env:
-    print(i)
+    #calls update function and iterates
+    def test(self, rects):
+        self.update(rects)
+
+
+if __name__ == "__main__":
+    env = Environment()
+    env.test(rects)
+    for i in range(0, len(env.rects)):
+        print(env.rects[i])
