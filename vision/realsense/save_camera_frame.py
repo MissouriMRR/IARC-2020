@@ -7,15 +7,11 @@ The files are all saved in the same directory as the program, and are named usin
 date and time at which the frames were taken, followed by either "-depthImage", "-colorImage",
 or "-depthScale" accordingly.
 """
-
-# First import the library
-import pyrealsense2 as rs
-# Import Numpy for easy array manipulation
-import numpy as np
-# Import OpenCV for easy image rendering
-import cv2
-# Import datetime for filename
 import datetime
+
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 
 
 def save_frame_on_press(width, height, framerate, serial_no=None):
@@ -73,7 +69,8 @@ def save_frame_on_press(width, height, framerate, serial_no=None):
         aligned_frames = align.process(frames)
 
         # Get aligned frames
-        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+        # aligned_depth_frame is a 640x480 depth image
+        aligned_depth_frame = aligned_frames.get_depth_frame()
         color_frame = aligned_frames.get_color_frame()
 
         # Validate that both frames are valid
@@ -85,23 +82,28 @@ def save_frame_on_press(width, height, framerate, serial_no=None):
 
         # Remove background - Set pixels further than clipping_distance to grey
         grey_color = 153
-        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))  # depth image is 1 channel, color is 3 channels
+        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
         bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
 
         # Render images
-        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+        depth_colormap = cv2.applyColorMap(
+            cv2.convertScaleAbs(depth_image, alpha=0.03),
+            cv2.COLORMAP_JET)
         images = np.hstack((bg_removed, depth_colormap))
+
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('Depth/Color Stream', images)
         key = cv2.waitKey(1)
+
         # Press the X button on the window to close the window
-        if (cv2.getWindowProperty('Depth/Color Stream', 0) == -1):
+        if cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
             cv2.destroyAllWindows()
             break
 
         # Press esc (27) or 'q' to take the pictures and close the window
         if key == ord('q') or key == 27:
             time = str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
+
             cv2.imwrite(f"{time}-colorImage.jpg", color_image)
             cv2.imwrite(f"{time}-depthImage.jpg", depth_image)
             with open(f"{time}-depthScale.txt", 'w') as file:

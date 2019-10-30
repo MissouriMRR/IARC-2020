@@ -11,18 +11,12 @@ To use the program, navigate to where it is stored, and type
 or
 "python read_bag.py --input bag_file_name.bag"
 """
-
-
-# First import library
-import pyrealsense2 as rs
-# Import Numpy for easy array manipulation
-import numpy as np
-# Import OpenCV for easy image rendering
-import cv2
-# Import argparse for command-line options
 import argparse
-# Import os.path for file path manipulation
 import os.path
+
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 
 
 class ReadBag:
@@ -35,7 +29,8 @@ class ReadBag:
 
         # Create a config object
         config = rs.config()
-        # Tell config that we will use a recorded device from file to be used by the pipeline through playback.
+        # Tell config that we will use a recorded device from file
+        # to be used by the pipeline through playback.
         rs.config.enable_device_from_file(config, args.input)
         # Configure the pipeline to stream the depth/color streams
 
@@ -56,7 +51,8 @@ class ReadBag:
             aligned_frames = align.process(frames)
 
             # Get aligned frames
-            aligned_depth_frame = aligned_frames.get_depth_frame()  # aligned_depth_frame is a 640x480 depth image
+            # aligned_depth_frame is a 640x480 depth image
+            aligned_depth_frame = aligned_frames.get_depth_frame()
             color_frame = aligned_frames.get_color_frame()
 
             depth_image = np.asanyarray(aligned_depth_frame.get_data())
@@ -97,11 +93,13 @@ if __name__ == '__main__':
     for depth_image, color_image in bagReader:
         # Remove background - Set pixels further than clipping_distance to grey
         grey_color = 153
-        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))  # depth is 1 channel, color is 3 channels
+        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
         bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
 
         # render depth/color images
-        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+        depth_colormap = cv2.applyColorMap(
+            cv2.convertScaleAbs(depth_image, alpha=0.03),
+            cv2.COLORMAP_JET)
         images = np.hstack((bg_removed, depth_colormap))
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('Depth/Color Stream', (WIDTH, int(HEIGHT / 2)))
