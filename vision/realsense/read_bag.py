@@ -20,29 +20,50 @@ import pyrealsense2 as rs
 
 
 class ReadBag:
-    def __init__(self, arg_input, screen_width=1280, screen_height=720, frame_rate=30):
-        self.input = arg_input
-        self.width = screen_width
-        self.height = screen_height
-        self.framerate = frame_rate
+    """
+    Read a realsense bag file with color and depth channels.
+
+    Parameters
+    ----------
+    filename: str
+        Name of .bag file to read.
+    """
+    def __init__(self, filename):
+        self.filename = filename
+
         self.pipeline = rs.pipeline()
 
         # Create a config object
-        config = rs.config()
+        self.config = rs.config()
         # Tell config that we will use a recorded device from file
         # to be used by the pipeline through playback.
-        rs.config.enable_device_from_file(config, args.input)
+        rs.config.enable_device_from_file(self.config, self.filename)
         # Configure the pipeline to stream the depth/color streams
 
         # ---------------format the string to use the depth/color type parameters--------------
-        config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.framerate)
-        config.enable_stream(rs.stream.color, self.width, self.height, rs.format.rgb8, self.framerate)
+        #self.width = screen_width
+        #self.height = screen_height
+        #self.framerate = frame_rate
+
+        #self.config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.framerate)
+        #self.config.enable_stream(rs.stream.color, self.width, self.height, rs.format.rgb8, self.framerate)
         # -----------------------------------------------------------------------------------
 
-        # Start streaming from file
-        self.pipeline.start(config)
-
     def __iter__(self):
+        """
+        Iterate through the bag file.
+        NOTE: This loops through the video continously.
+
+        Returns
+        -------
+        depth image[1 channel], color image[3 channel]
+        """
+        # Start streaming from file
+        self.pipeline.start(self.config)
+
+        align_to = rs.stream.color
+        align = rs.align(align_to)
+
         while True:
             # returns the next color/depth frame
             frames = self.pipeline.wait_for_frames()
@@ -60,7 +81,6 @@ class ReadBag:
             color_image = color_image[:, :, ::-1]  # shifts colors back to normal
 
             yield depth_image, color_image
-
 
 
 if __name__ == '__main__':
@@ -81,16 +101,11 @@ if __name__ == '__main__':
         raise FileNotFoundError("No input parameter has been given. For help type --help")
     # Check if the given file have bag extension
     if os.path.splitext(args.input)[1] != ".bag":
-        print("The given file is not of correct file format.")
-        print("Only .bag files are accepted")
-        exit()
-
-    align_to = rs.stream.color
-    align = rs.align(align_to)
+        raise ValueError("The given filename is not of correct file format, only .bag accepted")
 
     # self is passed as the first argument automatically, for both
-    bagReader = ReadBag(args.input, WIDTH, HEIGHT, FRAMES)
-    for depth_image, color_image in bagReader:
+    bag_reader = ReadBag(args.input)
+    for depth_image, color_image in bag_reader:
         # Remove background - Set pixels further than clipping_distance to grey
         grey_color = 153
         depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
