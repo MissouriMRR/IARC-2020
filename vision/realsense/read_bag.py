@@ -88,6 +88,8 @@ if __name__ == '__main__':
     HEIGHT = 720
     FRAMES = 30
 
+    CLIPPING = False
+
     # Create object for parsing command-line options
     parser = argparse.ArgumentParser(description="Read recorded bag file and display depth and color streams.\
                                      Remember to change the stream resolution, fps and format to match the recorded.\
@@ -115,7 +117,12 @@ if __name__ == '__main__':
         depth_colormap = cv2.applyColorMap(
             cv2.convertScaleAbs(depth_image, alpha=0.03),
             cv2.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+        
+        if CLIPPING:
+            images = np.hstack((bg_removed, depth_colormap))
+        else:
+            images = np.hstack((color_image, depth_colormap))
+        
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_NORMAL)
         cv2.resizeWindow('Depth/Color Stream', (WIDTH, int(HEIGHT / 2)))
         cv2.imshow('Depth/Color Stream', images)
