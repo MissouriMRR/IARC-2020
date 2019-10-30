@@ -15,7 +15,7 @@ if __name__ == '__main__':
     FRAMERATE = 30
 
     #Initalize clipping constants
-    CLIPPING = False
+    CLIPPING = True
     clipping_distance_in_meters = 4
 
     #Initialize serial number constant-- if empty, no serial number is specified
@@ -78,19 +78,23 @@ if __name__ == '__main__':
         grey_color = 153
         depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
         if CLIPPING:
-            bg_removed = np.where((depth_image > clipping_distance) | (depth_image <= 0),
+            bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0),
                                   grey_color, color_image)
-        else:
-            bg_removed = np.where((depth_image <= 0), grey_color, color_image)
 
         # Render images
         depth_colormap = cv2.applyColorMap(
             cv2.convertScaleAbs(depth_image, alpha=0.03),
             cv2.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+
+        if CLIPPING:
+            images = np.hstack((bg_removed, depth_colormap))
+        else:
+            images = np.hstack((color_image, depth_colormap))
+
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('Depth/Color Stream', images)
         key = cv2.waitKey(1)
+
         # Press esc or 'q' to close the image window
         if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
             cv2.destroyAllWindows()
