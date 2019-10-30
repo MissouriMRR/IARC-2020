@@ -18,7 +18,25 @@ import cv2
 import datetime
 
 
-def save_frame_on_press(width, height, framerate, serial_no):
+def save_frame_on_press(width, height, framerate, serial_no=None):
+    """
+    Enable the realsense camera and upon q/ESC press capture image.
+
+    Parameters
+    ----------
+    width: int
+        Camera res width.
+    height: int
+        Camera res height.
+    framerate: int
+        Images captures per second.
+    serial_no: str, default=None
+        Serial number of camera if want specific one.
+
+    Effects
+    -------
+    Saves color and depth images w/ date as title in current directory.
+    """
     # Create a pipeline
     pipeline = rs.pipeline()
 
@@ -96,4 +114,4 @@ def save_frame_on_press(width, height, framerate, serial_no):
 
 
 if __name__ == '__main__':
-    save_frame_on_press(640, 480, 30, '')
+    save_frame_on_press(width=640, height=480, framerate=30)
