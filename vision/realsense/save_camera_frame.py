@@ -80,16 +80,13 @@ def save_frame_on_press(width, height, framerate, serial_no=None):
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
 
-        # Remove background - Set pixels further than clipping_distance to grey
-        grey_color = 153
         depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
-        bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
 
         # Render images
         depth_colormap = cv2.applyColorMap(
             cv2.convertScaleAbs(depth_image, alpha=0.03),
             cv2.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+        images = np.hstack((color_image, depth_colormap))
 
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('Depth/Color Stream', images)
