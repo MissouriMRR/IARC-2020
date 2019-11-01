@@ -1,4 +1,4 @@
-from vision.blob.constants import ObjectType
+from vision.blob.object_type import ObjectType
 
 class Rectangle:
     """

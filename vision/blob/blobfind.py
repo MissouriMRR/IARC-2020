@@ -1,17 +1,44 @@
 import cv2
 import numpy as np
-import vision.blob.constants as constants
 from vision.blob.blob import Rectangle
 import os
+import json
 
 def configure_params():
     params = cv2.SimpleBlobDetector_Params()
 
-    params.filterByArea = True
-    params.maxArea = constants.MAX_AREA
+    with open('config.json', 'r') as config_file:
+        config = json.load(config_file)
 
-    params.minThreshold = constants.MIN_THRESHOLD
-    params.maxThreshold = constants.MAX_THRESHOLD
+        threshold_config = config['threshold']
+        if threshold_config['filter_by_threshold']:
+            params.minThreshold = threshold_config['min_threshold']
+            params.maxThreshold = threshold_config['max_threshold']
+            params.thresholdStep = threshold_config['threshold_step']
+
+        area_config = config['area']
+        params.filterByArea = area_config['filter_by_area']
+        params.minArea = area_config['min_area']
+        params.maxArea = area_config['max_area']
+
+        color_config = config['color']
+        params.filterByColor = color_config['filter_by_color']
+        params.blobColor = color_config['blob_color']
+
+        convexity_config = config['convexity']
+        params.filterByConvexity = convexity_config['filter_by_convexity']
+        params.minConvexity = convexity_config['min_convexity']
+        params.maxConvexity = convexity_config['max_convexity']
+
+        inertia_config = config['inertia_ratio']
+        params.filterByInertia = inertia_config['filter_by_inertia']
+        params.minInertiaRatio = inertia_config['min_inertia_ratio']
+        params.maxInertiaRatio = inertia_config['max_inertia_ratio']
+
+        occurrences_config = config['occurrences']
+        if occurrences_config['filter_by_occurrences']:
+            params.minDistBetweenBlobs = occurrences_config['min_dist_between_blobs']
+            params.minRepeatability = occurrences_config['min_repeatability']
 
     return params
 
