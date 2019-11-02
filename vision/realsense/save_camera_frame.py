@@ -80,8 +80,6 @@ def save_frame_on_press(width, height, framerate, serial_no=None):
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
 
-        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
-
         # Render images
         depth_colormap = cv2.applyColorMap(
             cv2.convertScaleAbs(depth_image, alpha=0.03),
