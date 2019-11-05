@@ -13,12 +13,14 @@ class ModuleKMeans:
     imgPath: string
         Reads in the image with this name to be used
     """
+    
     def __init__(self, imgPath):
         self.img = cv2.imread(imgPath)
         self.Z = self.img.reshape((-1, 3))
         self.Z = np.float32(self.Z)
 
 
+    def applyKMeans(self, K):
     """
     Applies the kmeans algorithm to the image
 
@@ -28,7 +30,7 @@ class ModuleKMeans:
         Number of centers to use for the kmeans algorithm
         (bigger K = more variety of colors)
     """
-    def applyKMeans(self, K):
+    
         self.criteria = (cv2.TERM_CRITERIA_EPS +
                          cv2.TERM_CRITERIA_MAX_ITER,
                          10, 1.0)
@@ -37,10 +39,11 @@ class ModuleKMeans:
                                                      cv2.KMEANS_RANDOM_CENTERS)
 
 
+    def displayFractal(self):
     """
     Displays the remapped image with simplified colors
     """
-    def displayFractal(self):
+    
         self.center = np.uint8(self.center)
         self.res = self.center[self.label.flatten()]
         self.res2 = self.res.reshape((self.img.shape))
@@ -50,6 +53,7 @@ class ModuleKMeans:
         cv2.destroyAllWindows()
 
 
+    def displayBinary(self, channels):
     """
     Displays the image with only specified channels being white
 
@@ -59,7 +63,7 @@ class ModuleKMeans:
         Channels specified in this parameter will be white while all
         others will be black
     """
-    def displayBinary(self, channels):
+    
         self.white = [255, 255, 255]
         self.black = [0, 0, 0]
 
