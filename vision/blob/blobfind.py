@@ -1,3 +1,7 @@
+"""
+Detects blobs in images using OpenCV's SimpleBlobDetector. Uses config.json to set detector params.
+"""
+
 import cv2
 import numpy as np
 from vision.blob.blob import Rectangle
@@ -9,6 +13,7 @@ def configure_params():
 
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
+        config_file.close()
 
         threshold_config = config['threshold']
         if threshold_config['filter_by_threshold']:
@@ -42,7 +47,7 @@ def configure_params():
 
     return params
 
-def find_blobs(image, logging=False):
+def find_blobs(image, **config):
     """
     Detects blobs in a given image
 
@@ -68,14 +73,19 @@ def find_blobs(image, logging=False):
     bounding_boxes = []
     for keypoint in keypoints:
         # find center and radius of keypoint
-        x_coord, y_coord = keypoint.pt[0], keypoint.pt[1]
+        center_x, center_y = keypoint.pt[0], keypoint.pt[1]
         radius = keypoint.size / 2
 
         # calculate coordinates for bounding box of each blob
-        top_left_near = (x_coord - radius, y_coord - radius, 0)
-        top_right_near = (x_coord + radius, y_coord - radius, 0)
-        bottom_right_near = (x_coord + radius, y_coord + radius, 0)
-        bottom_left_near = (x_coord - radius, y_coord + radius, 0)
+        pos_dx = center_x + radius
+        neg_dx = center_x - radius
+        pos_dy = center_y + radius
+        neg_dy = center_y - radius
+
+        top_left_near = (neg_dx, neg_dy, 0)
+        top_right_near = (pos_dx, neg_dy, 0)
+        bottom_right_near = (pos_dx, pos_dy, 0)
+        bottom_left_near = (neg_dx, pos_dy, 0)
 
         # With depth, these will be calculated differently
         top_left_far = top_left_near
@@ -88,15 +98,15 @@ def find_blobs(image, logging=False):
         bounding_boxes.append(bbox)
 
 
-    if logging:
-        im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(0, 225, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        print('Bounding boxes:', bounding_boxes)
-        cv2.imshow("Blobs", im_with_keypoints)
-        cv2.waitKey(0)
+    # if config.logging:
+    #     im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(0, 225, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    #     print('Bounding boxes:', bounding_boxes)
+    #     cv2.imshow("Blobs", im_with_keypoints)
+    #     cv2.waitKey(0)
 
     return bounding_boxes
 
 
 if __name__ == '__main__':
     for img in os.listdir('samples'):
-        find_blobs('samples/' + os.fsdecode(img), True)
+        find_blobs('samples/' + os.fsdecode(img), logging=True)
