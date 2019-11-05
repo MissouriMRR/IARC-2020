@@ -1,11 +1,8 @@
 
-class Rectangle:
-    def __init__(self, vertices, type):
-        self.vertices = str(vertices)
-        self.type = type
+from util import Rectangle
 
-    def __repr__(self):
-        return self.vertices
+
+"""The Environment class will manage the other objects in the environment"""
 
 
 if __name__ == '__main__':
@@ -18,7 +15,6 @@ if __name__ == '__main__':
     ]
 
 
-"""This class will manage the other objects in the environment"""
 class Environment:
 
     #list of rectangles in environment
@@ -27,11 +23,10 @@ class Environment:
 
     #iterator of the rects list
     def __iter__(self):
-        self.length = len(self.rects)
         i = 0
         while True:
             try:
-                i %= self.length
+                i %= len(self.rects)
                 yield self.rects[i]
                 i += 1
             except ZeroDivisionError:
