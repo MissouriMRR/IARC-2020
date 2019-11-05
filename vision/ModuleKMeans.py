@@ -21,15 +21,15 @@ class ModuleKMeans:
 
 
     def applyKMeans(self, K):
-    """
-    Applies the kmeans algorithm to the image
+        """
+        Applies the kmeans algorithm to the image
 
-    Parameters
-    ----------
-    K: int
-        Number of centers to use for the kmeans algorithm
-        (bigger K = more variety of colors)
-    """
+        Parameters
+        ----------
+        K: int
+            Number of centers to use for the kmeans algorithm
+            (bigger K = more variety of colors)
+        """
     
         self.criteria = (cv2.TERM_CRITERIA_EPS +
                          cv2.TERM_CRITERIA_MAX_ITER,
@@ -40,9 +40,9 @@ class ModuleKMeans:
 
 
     def displayFractal(self):
-    """
-    Displays the remapped image with simplified colors
-    """
+        """
+        Displays the remapped image with simplified colors
+        """
     
         self.center = np.uint8(self.center)
         self.res = self.center[self.label.flatten()]
@@ -54,15 +54,15 @@ class ModuleKMeans:
 
 
     def displayBinary(self, channels):
-    """
-    Displays the image with only specified channels being white
+        """
+        Displays the image with only specified channels being white
 
-    Parameters
-    ----------
-    channels: list of ints
-        Channels specified in this parameter will be white while all
-        others will be black
-    """
+        Parameters
+        ----------
+        channels: list of ints
+            Channels specified in this parameter will be white while all
+            others will be black
+        """
     
         self.white = [255, 255, 255]
         self.black = [0, 0, 0]
