@@ -7,18 +7,32 @@ The files are all saved in the same directory as the program, and are named usin
 date and time at which the frames were taken, followed by either "-depthImage", "-colorImage",
 or "-depthScale" accordingly.
 """
-
-# First import the library
-import pyrealsense2 as rs
-# Import Numpy for easy array manipulation
-import numpy as np
-# Import OpenCV for easy image rendering
-import cv2
-# Import datetime for filename
 import datetime
 
+import cv2
+import numpy as np
+import pyrealsense2 as rs
 
-def save_frame_on_press(width, height, framerate, serial_no):
+
+def save_frame_on_press(width, height, framerate, serial_no=None):
+    """
+    Enable the realsense camera and upon q/ESC press capture image.
+
+    Parameters
+    ----------
+    width: int
+        Camera res width.
+    height: int
+        Camera res height.
+    framerate: int
+        Images captures per second.
+    serial_no: str, default=None
+        Serial number of camera if want specific one.
+
+    Effects
+    -------
+    Saves color and depth images w/ date as title in current directory.
+    """
     # Create a pipeline
     pipeline = rs.pipeline()
 
@@ -55,7 +69,8 @@ def save_frame_on_press(width, height, framerate, serial_no):
         aligned_frames = align.process(frames)
 
         # Get aligned frames
-        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+        # aligned_depth_frame is a 640x480 depth image
+        aligned_depth_frame = aligned_frames.get_depth_frame()
         color_frame = aligned_frames.get_color_frame()
 
         # Validate that both frames are valid
@@ -65,25 +80,25 @@ def save_frame_on_press(width, height, framerate, serial_no):
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
 
-        # Remove background - Set pixels further than clipping_distance to grey
-        grey_color = 153
-        depth_image_3d = np.dstack((depth_image, depth_image, depth_image))  # depth image is 1 channel, color is 3 channels
-        bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
-
         # Render images
-        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+        depth_colormap = cv2.applyColorMap(
+            cv2.convertScaleAbs(depth_image, alpha=0.03),
+            cv2.COLORMAP_JET)
+        images = np.hstack((color_image, depth_colormap))
+
         cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
         cv2.imshow('Depth/Color Stream', images)
         key = cv2.waitKey(1)
+
         # Press the X button on the window to close the window
-        if (cv2.getWindowProperty('Depth/Color Stream', 0) == -1):
+        if cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
             cv2.destroyAllWindows()
             break
 
         # Press esc (27) or 'q' to take the pictures and close the window
         if key == ord('q') or key == 27:
             time = str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
+
             cv2.imwrite(f"{time}-colorImage.jpg", color_image)
             cv2.imwrite(f"{time}-depthImage.jpg", depth_image)
             with open(f"{time}-depthScale.txt", 'w') as file:
@@ -96,4 +111,4 @@ def save_frame_on_press(width, height, framerate, serial_no):
 
 
 if __name__ == '__main__':
-    save_frame_on_press(640, 480, 30, '')
+    save_frame_on_press(width=640, height=480, framerate=30)
