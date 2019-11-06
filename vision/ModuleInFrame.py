@@ -3,7 +3,7 @@ import numpy as np
 
 def ModuleInFrame(imgPath):
     '''
-    Determines if the Modules is in frame
+    Determines if the Module is in frame
 
     Parameters
     ----------
@@ -25,17 +25,17 @@ def ModuleInFrame(imgPath):
     img = cv2.imread(imgPath)
 
     # Grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(gray,(5,5),0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(5,5), sigmaX=0)
 
     # Laplacian Transform
-    laplacian = cv2.Laplacian(blur, cv2.CV_8U, ksize=3)
+    laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(np.around(laplacian))
 
     # Hough Circle Detection
-    circles = cv2.HoughCircles(laplacian, cv2.HOUGH_GRADIENT, 1, 8, param1=50, param2=40, minRadius=0, maxRadius=50)
+    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
     circles = np.uint16(np.around(circles))
 
     # Finding slopes between the circles
