@@ -2,21 +2,21 @@ import cv2
 import numpy as np
 
 def ModuleInFrame(imgPath):
-    '''
-    Checks if the module is in frame.
+'''
+Determines if the Modules is in frame
 
-    Parameters
-    ----------
-    imgPath, represents the path to the image that will be read in
+Parameters
+----------
+imgPath, is a string that is the ath of the image to be passed into the function
 
-    Raises
-    ------
-    Nothing
+Raises
+------
+Nothing
 
-    Returns
-    -------
-    IsInFrame, which will be false if the module isn't in frame, and true if it is.
-    '''
+Returns
+-------
+isInFrame, a bool, which is true if the module is in the frame and false if not in the frame
+'''
     img = cv2.imread(imgPath)
 
     # Grayscale
