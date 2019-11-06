@@ -7,7 +7,7 @@ def ModuleInFrame(imgPath):
 
     Parameters
     ----------
-    imgPath, is a string that is the ath of the image to be passed into the function
+    imgPath, is a string that is the path of the image to be passed into the function
 
     Raises
     ------
@@ -17,6 +17,11 @@ def ModuleInFrame(imgPath):
     -------
     isInFrame, a bool, which is true if the module is in the frame and false if not in the frame
     '''
+
+    # Ignore numpy warnings
+    np.seterr(all="ignore")
+
+    # Get target image
     img = cv2.imread(imgPath)
 
     # Grayscale
@@ -52,7 +57,7 @@ def ModuleInFrame(imgPath):
         for (key2, val2) in slopes.items():
             if(abs(key - key2) < .01 and key != key2):
                 parallels += 1
-    
+
     # Determine if module is in frame
     isInFrame = False
     if(parallels > 300):
