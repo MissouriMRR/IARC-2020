@@ -1,5 +1,5 @@
 """
-Detects blobs in images using OpenCV's SimpleBlobDetector. Uses config.json to set detector params.
+Detects blobs in images using OpenCV's SimpleBlobDetector.
 """
 
 import cv2
@@ -8,12 +8,17 @@ from vision.blob.blob import Rectangle
 import os
 import json
 
-def configure_params():
+
+def import_params():
     params = cv2.SimpleBlobDetector_Params()
 
     with open('config.json', 'r') as config_file:
         config = json.load(config_file)
         config_file.close()
+
+        for category in config:
+            for attr in category:
+                setattr(params, attr, config[category][attr])
 
         threshold_config = config['threshold']
         if threshold_config['filter_by_threshold']:
@@ -47,66 +52,76 @@ def configure_params():
 
     return params
 
-def find_blobs(image, **config):
+
+class BlobFinder:
     """
-    Detects blobs in a given image
+    Constructs a BlobFinder object with an image, logging, and params
 
     Parameters
     ----------
-    image: string
-        path to an image that can be interpreted by cv2.imread
-    logging: bool
-        whether to print a list of detected bounding boxes in the image
+    image: np array
+        image to detect blobs in, as a np array
+    config: kwargs
+        configuration options, such as blob detector params
+    """
+    def __init__(self, image, **config):
+        self.image = image
+        if 'params' in config:
+            self.params = config['params']
+        else:
+            self.params = import_params()
+
+    def update_image(self, image):
+        self.image = image
+
+    def update_params(self, params):
+        self.params = params
+
+    """
+    Detects blobs in the image provided in the constructor
 
     Returns
     -------
     list[Rectangle]
         a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
     """
-    image = cv2.imread(image)
+    def find(self):
+        blob_detector = cv2.SimpleBlobDetector_create(self.params)
+        keypoints = blob_detector.detect(self.image)
 
-    params = configure_params()
-    blob_detector = cv2.SimpleBlobDetector_create(params)
+        bounding_boxes = []
+        for keypoint in keypoints:
+            # find center and radius of keypoint
+            center_x, center_y = keypoint.pt[0], keypoint.pt[1]
+            radius = keypoint.size / 2
 
-    keypoints = blob_detector.detect(image)
+            # calculate coordinates for bounding box of each blob
+            pos_dx = center_x + radius
+            neg_dx = center_x - radius
+            pos_dy = center_y + radius
+            neg_dy = center_y - radius
 
-    bounding_boxes = []
-    for keypoint in keypoints:
-        # find center and radius of keypoint
-        center_x, center_y = keypoint.pt[0], keypoint.pt[1]
-        radius = keypoint.size / 2
+            top_left_near = (neg_dx, neg_dy, 0)
+            top_right_near = (pos_dx, neg_dy, 0)
+            bottom_right_near = (pos_dx, pos_dy, 0)
+            bottom_left_near = (neg_dx, pos_dy, 0)
 
-        # calculate coordinates for bounding box of each blob
-        pos_dx = center_x + radius
-        neg_dx = center_x - radius
-        pos_dy = center_y + radius
-        neg_dy = center_y - radius
+            # With depth, these will be calculated differently
+            top_left_far = top_left_near
+            top_right_far = top_right_near
+            bottom_right_far = bottom_right_near
+            bottom_left_far = bottom_left_near
 
-        top_left_near = (neg_dx, neg_dy, 0)
-        top_right_near = (pos_dx, neg_dy, 0)
-        bottom_right_near = (pos_dx, pos_dy, 0)
-        bottom_left_near = (neg_dx, pos_dy, 0)
+            # create Rectangle and add to list of bounding boxes
+            bbox = Rectangle(top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far,
+                             top_right_far, bottom_right_far, bottom_left_far)
+            bounding_boxes.append(bbox)
 
-        # With depth, these will be calculated differently
-        top_left_far = top_left_near
-        top_right_far = top_right_near
-        bottom_right_far = bottom_right_near
-        bottom_left_far = bottom_left_near
-
-        # create Rectangle and add to list of bounding boxes
-        bbox = Rectangle(top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far)
-        bounding_boxes.append(bbox)
-
-
-    # if config.logging:
-    #     im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(0, 225, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    #     print('Bounding boxes:', bounding_boxes)
-    #     cv2.imshow("Blobs", im_with_keypoints)
-    #     cv2.waitKey(0)
-
-    return bounding_boxes
+        return bounding_boxes
 
 
 if __name__ == '__main__':
     for img in os.listdir('samples'):
-        find_blobs('samples/' + os.fsdecode(img), logging=True)
+        image = cv2.imread('samples/' + os.fsdecode(img))
+        blob_finder = BlobFinder(image, params=import_params())
+        bboxes = blob_finder.find()
