@@ -24,6 +24,9 @@ def ModuleInFrame(imgPath):
     # Get target image
     img = cv2.imread(imgPath)
 
+    # Remove depth channel
+    img.reshape((-1, 3))
+
     # Grayscale
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
