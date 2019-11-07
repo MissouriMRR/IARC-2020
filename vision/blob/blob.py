@@ -2,7 +2,7 @@ from vision.blob.object_type import ObjectType
 
 class Rectangle:
     """
-    Defines a 3D rectangular prism using 8 (x, y, z) coordinates
+    Constructs a 3D rectangular prism using 8 (x, y, z) coordinates
 
     Parameters
     ----------
@@ -34,6 +34,16 @@ class Rectangle:
         self.bottom_left_far = bottom_left_far
 
 class Blob:
+    """
+    Constructs a Rectangle associated with an object type/label
+
+    Parameters
+    ----------
+    bounding_box: Rectangle
+        defines the 3D space taken up by the blob
+    object_type: ObjectType
+        enum that describes/labels the blob
+    """
     def __init__(self, bounding_box, object_type):
         if not isinstance(bounding_box, Rectangle):
             print('bounding_box should be a Rectangle, got', bounding_box)
