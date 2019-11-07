@@ -1,37 +1,37 @@
 {
   "threshold": {
-    "filter_by_threshold": true,
-    "min_threshold": 50,
-    "max_threshold": 220,
-    "threshold_step": 10
+    "filterByThreshold": true,
+    "minThreshold": 50,
+    "maxThreshold": 220,
+    "thresholdStep": 10
   },
   "area": {
-    "filter_by_area": true,
-    "min_area": 100,
-    "max_area": 2000000
+    "filterByArea": true,
+    "minArea": 100,
+    "maxArea": 2000000
   },
   "circularity": {
-    "filter_by_circularity": true,
-    "min_circularity": 0.785,
-    "max_circularity": 0.95
+    "filterByCircularity": true,
+    "minCircularity": 0.785,
+    "maxCircularity": 0.95
   },
   "color": {
-    "filter_by_color": false,
-    "blob_color": 0
+    "filterByColor": false,
+    "blobColor": 0
   },
   "convexity": {
-    "filter_by_convexity": false,
-    "min_convexity": 0,
-    "max_convexity": 1
+    "filterByConvexity": false,
+    "minConvexity": 0,
+    "maxConvexity": 1
   },
   "inertia_ratio": {
-    "filter_by_inertia": false,
-    "min_inertia_ratio": 0,
-    "max_inertia_ratio": 1
+    "filterByInertia": false,
+    "minInertiaRatio": 0,
+    "maxInertiaRatio": 1
   },
   "occurrences": {
-    "filter_by_occurrences": false,
-    "min_dist_between_blobs": 10,
-    "min_repeatability": 2
+    "filterByOccurrences": false,
+    "minDistBetweenBlobs": 10,
+    "minRepeatability": 2
   }
 }
