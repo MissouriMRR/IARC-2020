@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 def ModuleInFrame(imgPath):
-    '''
+    """
     Determines if the Module is in frame
 
     Parameters
@@ -16,7 +16,7 @@ def ModuleInFrame(imgPath):
     Returns
     -------
     isInFrame, a bool, which is true if the module is in the frame and false if not in the frame
-    '''
+    """
 
     # Ignore numpy warnings
     np.seterr(all="ignore")
