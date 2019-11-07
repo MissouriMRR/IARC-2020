@@ -16,8 +16,10 @@ class TestModuleInFrame(unittest.TestCase):
         """
 
         results = []
-        for pic in ["D_Img1.jpg", "D_Img2.jpg", "D_Img3.jpg"]:
+        expected_results = [True, True, True, True]
+        for pic in ["Block1.png", "Block2.png", "Block3.jpg", "Block4.jpg"]:
             results.append(mif(pic))
+        self.assertListEqual(results, expected_results)
         return results
 
 if __name__ == '__main__':
