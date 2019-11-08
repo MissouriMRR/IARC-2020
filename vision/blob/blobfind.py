@@ -4,9 +4,10 @@ Detects blobs in images using OpenCV's SimpleBlobDetector.
 import os
 import sys
 
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, parent_dir)
-sys.path.insert(0, os.path.dirname(parent_dir))
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import json
