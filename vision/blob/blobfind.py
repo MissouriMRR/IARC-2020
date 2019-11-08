@@ -1,55 +1,31 @@
 """
 Detects blobs in images using OpenCV's SimpleBlobDetector.
 """
-
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import cv2
 from vision.blob.blob import Rectangle
-import os
 import json
-
 
 def import_params():
     params = cv2.SimpleBlobDetector_Params()
 
-    with open('config.json', 'r') as config_file:
+    with open(os.path.join('vision', 'blob', 'config.json'), 'r') as config_file:
         config = json.load(config_file)
         config_file.close()
 
         for category in config:
-            setattr(params, 'status', config[category]['filter'])
-            for attr in category:
-                setattr(params, attr, config[category][attr])
+            category_enabled = config[category]['enable']
+            if category_enabled:
+                if hasattr(params, category):
+                    setattr(params, category, config[category]['enable'])
+                for attr in config[category]:
+                    if hasattr(params, attr):
+                        setattr(params, attr, config[category][attr])
 
-        threshold_config = config['threshold']
-        if threshold_config['filter_by_threshold']:
-            params.minThreshold = threshold_config['min_threshold']
-            params.maxThreshold = threshold_config['max_threshold']
-            params.thresholdStep = threshold_config['threshold_step']
-
-        area_config = config['area']
-        params.filterByArea = area_config['filter_by_area']
-        params.minArea = area_config['min_area']
-        params.maxArea = area_config['max_area']
-
-        color_config = config['color']
-        params.filterByColor = color_config['filter_by_color']
-        params.blobColor = color_config['blob_color']
-
-        convexity_config = config['convexity']
-        params.filterByConvexity = convexity_config['filter_by_convexity']
-        params.minConvexity = convexity_config['min_convexity']
-        params.maxConvexity = convexity_config['max_convexity']
-
-        inertia_config = config['inertia_ratio']
-        params.filterByInertia = inertia_config['filter_by_inertia']
-        params.minInertiaRatio = inertia_config['min_inertia_ratio']
-        params.maxInertiaRatio = inertia_config['max_inertia_ratio']
-
-        occurrences_config = config['occurrences']
-        if occurrences_config['filter_by_occurrences']:
-            params.minDistBetweenBlobs = occurrences_config['min_dist_between_blobs']
-            params.minRepeatability = occurrences_config['min_repeatability']
-
+        print(params.minThreshold)
     return params
 
 
@@ -61,16 +37,16 @@ class BlobFinder:
     ----------
     image: np array
         image to detect blobs in, as a np array
-    config: kwargs
-        configuration options, such as blob detector params
+    params: SimpleBlobDetector_Params
+        blob detector params object
     """
-    def __init__(self, image, **config):
+    def __init__(self, image, params=None):
         self.image = image
         self.keypoints = []
-        if 'params' in config:
-            self.params = config['params']
-        else:
+        if params is None:
             self.params = import_params()
+        else:
+            self.params = params
 
     def update_image(self, image):
         self.image = image

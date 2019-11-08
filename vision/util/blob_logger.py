@@ -1,3 +1,5 @@
+"""Utility for logging blobs detected in an image"""
+
 import cv2
 import numpy as np
 try:
@@ -7,13 +9,17 @@ except ImportError:
 
 def log_blobs(blob_finder):
     """
-    Utility to show the detected blobs in an image and print the bounding boxes
+    Shows the detected blobs in an image and print the bounding boxes
 
     Parameters
     ----------
     blob_finder: BlobFinder
         BlobFinder object that contains an image and potentially params
     """
+
+    if not isinstance(blob_finder, BlobFinder):
+        exit(f"Expected argument of type BlobFinder, got {type(blob_finder)} instead")
+
     image = blob_finder.image
     bounding_boxes = blob_finder.find()
     keypoints = blob_finder.keypoints
