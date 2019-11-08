@@ -1,3 +1,7 @@
+"""
+This file contains the ModuleInFrame function to detect if the module is in an image
+"""
+
 import cv2
 import numpy as np
 
@@ -8,10 +12,6 @@ def ModuleInFrame(imgPath):
     Parameters
     ----------
     imgPath, is a string that is the path of the image to be passed into the function
-
-    Raises
-    ------
-    Nothing
 
     Returns
     -------
