@@ -1,3 +1,7 @@
+"""
+This file is used for testing ModuleInFrame
+"""
+
 import unittest
 from ModuleInFrame import ModuleInFrame as mif
 
@@ -5,10 +9,6 @@ class TestModuleInFrame(unittest.TestCase):
     def test_ModuleInFrame(self):
         """
         Testing ModuleInFrame
-        
-        Settings
-        --------
-        None
 
         Returns
         -------
