@@ -3,16 +3,21 @@ Detects blobs in images using OpenCV's SimpleBlobDetector.
 """
 import os
 import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, os.path.dirname(parent_dir))
+
 import cv2
-from vision.blob.blob import Rectangle
 import json
 
-def import_params():
+from vision.blob.blob import Rectangle
+
+
+def import_params(filename=os.path.join('vision', 'blob', 'config.json')):
     params = cv2.SimpleBlobDetector_Params()
 
-    with open(os.path.join('vision', 'blob', 'config.json'), 'r') as config_file:
+    with open(filename, 'r') as config_file:
         config = json.load(config_file)
         config_file.close()
 
@@ -99,7 +104,14 @@ class BlobFinder:
 
 
 if __name__ == '__main__':
-    for img in os.listdir('samples'):
-        image = cv2.imread('samples/' + os.fsdecode(img))
-        blob_finder = BlobFinder(image, params=import_params())
+    if os.path.isdir("vision"):
+        prefix = os.path.join('vision', 'blob')
+    elif os.path.isdir('blob'):
+        prefix = 'blob'
+    else:
+        prefix = ''
+
+    for img in os.listdir(os.path.join(prefix, 'samples')):
+        image = cv2.imread(os.path.join(prefix, 'samples', os.fsdecode(img)))
+        blob_finder = BlobFinder(image, params=import_params(os.path.join(prefix, 'config.json')))
         bboxes = blob_finder.find()
