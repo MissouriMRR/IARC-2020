@@ -3,7 +3,6 @@ Detects blobs in images using OpenCV's SimpleBlobDetector.
 """
 
 import cv2
-import numpy as np
 from vision.blob.blob import Rectangle
 import os
 import json
@@ -17,6 +16,7 @@ def import_params():
         config_file.close()
 
         for category in config:
+            setattr(params, 'status', config[category]['filter'])
             for attr in category:
                 setattr(params, attr, config[category][attr])
 
@@ -66,6 +66,7 @@ class BlobFinder:
     """
     def __init__(self, image, **config):
         self.image = image
+        self.keypoints = []
         if 'params' in config:
             self.params = config['params']
         else:
@@ -88,6 +89,7 @@ class BlobFinder:
     def find(self):
         blob_detector = cv2.SimpleBlobDetector_create(self.params)
         keypoints = blob_detector.detect(self.image)
+        self.keypoints = keypoints
 
         bounding_boxes = []
         for keypoint in keypoints:
