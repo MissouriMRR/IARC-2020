@@ -26,6 +26,7 @@ class TestDetectRussianWord(unittest.TestCase):
                     0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0,]
         matched = []
+        output = []
         
         vision_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -35,6 +36,16 @@ class TestDetectRussianWord(unittest.TestCase):
                 matched.append(1)
             else:
                 matched.append(0)
+
+        for i in range(0,len(matched)):
+            if(expected[i] == matched[i]):
+                output["good"]
+            else:
+                output["bad"]
+        
+        #array used to identify which image fails or passes
+        for i in range(0,len(output)):
+            print("image",i, output[i])
 
 
         self.assertLessEqual(list(expected), list(matched))
