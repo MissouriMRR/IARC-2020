@@ -8,7 +8,7 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-from vision.blob.blobfind import BlobFinder
+from vision.blob.blobfind import BlobFinder, import_params
 
 
 class TestBlobbing(unittest.TestCase):
@@ -44,7 +44,7 @@ class TestBlobbing(unittest.TestCase):
             with self.subTest(i=img):
                 img_file = os.path.join(prefix, 'samples', img)
                 img_file = cv2.imread(img_file)
-                detector = BlobFinder(img_file)
+                detector = BlobFinder(img_file, params=import_params(filename=os.path.join(prefix, 'config.json')))
                 bounding_boxes = detector.find()
                 self.assertEqual(len(bounding_boxes), expected_blobs[img], msg=f"Expected {expected_blobs[img]} blobs, found {len(bounding_boxes)} in image {img}")
 
