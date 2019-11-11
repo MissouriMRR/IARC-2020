@@ -39,9 +39,9 @@ class TestDetectRussianWord(unittest.TestCase):
 
         for i in range(0,len(matched)):
             if(expected[i] == matched[i]):
-                output["good"]
+                output.append[1]
             else:
-                output["bad"]
+                output.append[0]
         
         #array used to identify which image fails or passes
         for i in range(0,len(output)):
