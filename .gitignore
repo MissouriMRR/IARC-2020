@@ -1,3 +1,10 @@
+# Vision
+vision_images/
+vision_videos/
+*.jpg
+*.png
+*.bag
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
