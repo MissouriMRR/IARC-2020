@@ -2,10 +2,7 @@
 
 import cv2
 import numpy as np
-try:
-    from vision.blob.blobfind import BlobFinder
-except ImportError:
-    from blob.blobfind import BlobFinder
+
 
 def plot_blobs(keypoints, image):
     """
