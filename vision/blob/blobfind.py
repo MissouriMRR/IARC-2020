@@ -11,7 +11,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
-from vision.interface import Rectangle
+from vision.rectangle import Rectangle
 import json
 
 
