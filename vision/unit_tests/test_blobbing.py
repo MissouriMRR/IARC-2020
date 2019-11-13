@@ -1,6 +1,7 @@
 import unittest
 import os
 import sys
+import json
 import cv2
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -33,18 +34,19 @@ class TestBlobbing(unittest.TestCase):
             "oranges.png": 1,
             "sampleobj.png": 1
         }
-        if os.path.isdir("vision"):
-            prefix = os.path.join('vision', 'blob')
-        elif os.path.isdir('blob'):
-            prefix = 'blob'
-        else:
-            prefix = ''
+        prefix = 'vision' if os.path.isdir("vision") else ''
+
+        config_filename=os.path.join(prefix, 'blob', 'config.json')
+        with open(config_filename, 'r') as config_file:
+            raw_config = json.load(config_file)
+
+        config = import_params(raw_config)
 
         for filename, expected in expected_blobs.items():
             with self.subTest(i=filename):
-                img_file = os.path.join(prefix, 'samples', filename)
+                img_file = os.path.join(prefix, 'vision_images', 'blob', filename)
                 img_file = cv2.imread(img_file)
-                detector = BlobFinder(img_file, params=import_params(filename=os.path.join(prefix, 'config.json')))
+                detector = BlobFinder(img_file, params=config)
                 bounding_boxes = detector.find()
                 self.assertEqual(len(bounding_boxes), expected_blobs[filename], msg=f"Expected {expected_blobs[filename]} blobs, found {len(bounding_boxes)} in image {filename}")
 
