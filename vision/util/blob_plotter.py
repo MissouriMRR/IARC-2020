@@ -7,28 +7,30 @@ try:
 except ImportError:
     from blob.blobfind import BlobFinder
 
-def log_blobs(blob_finder):
+def plot_blobs(keypoints, image):
     """
     Shows the detected blobs in an image and print the bounding boxes
 
     Parameters
     ----------
-    blob_finder: BlobFinder
-        BlobFinder object that contains an image and potentially params
+    keypoints: list[Keypoint]
+        list of keypoint objects (obtainable from BlobFinder.keypoints)
+        in the future, this should be changed to a list of Rectangle bounding boxes
+    image: np.ndarray
+        image to detect blobs in
     """
 
-    if not isinstance(blob_finder, BlobFinder):
-        exit(f"Expected argument of type BlobFinder, got {type(blob_finder)} instead")
+    if type(keypoints) is not list:
+        raise ValueError(f"Expected list of Keypoints, got {type(keypoints)} instead")
+    if not isinstance(image, np.ndarray):
+        raise ValueError(f"Expected argument of type BlobFinder, got {type(image)} instead")
 
-    image = blob_finder.image
-    bounding_boxes = blob_finder.find()
-    keypoints = blob_finder.keypoints
     im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # print formatted list of bouding boxes
     print('[')
-    for bbox in bounding_boxes:
-        print('\t', bbox)
+    for bbox in keypoints:
+        print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
     print(']')
 
     # show image with circles indicating where blobs were detected
