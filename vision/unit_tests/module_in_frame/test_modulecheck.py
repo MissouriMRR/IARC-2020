@@ -2,8 +2,12 @@
 This file is used for testing ModuleInFrame
 """
 
+import os, sys
 import unittest
-from ModuleInFrame import ModuleInFrame as mif
+from vision.module_in_frame.ModuleInFrame import ModuleInFrame as mif
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) 
 
 class TestModuleInFrame(unittest.TestCase):
     def test_ModuleInFrame(self):
