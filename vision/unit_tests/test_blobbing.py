@@ -17,8 +17,8 @@ class TestBlobbing(unittest.TestCase):
 
         Settings
         --------
-        expected_blobs: list[int]
-            expected blobs to be found in each image
+        expected_blobs: dict{string: int}
+            number of expected blobs (value) to be found in each image (key)
 
         Returns
         -------
@@ -34,13 +34,13 @@ class TestBlobbing(unittest.TestCase):
         }
         vision_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-        for i, img in enumerate(os.listdir('vision/blob/samples')):
-            with self.subTest(i=img):
-                img_file = os.path.join(vision_folder, 'blob', 'samples', img)
+        for filename, expected in expected_blobs.items():
+            with self.subTest(i=filename):
+                img_file = os.path.join(vision_folder, 'blob', 'samples', filename)
                 img_file = cv2.imread(img_file)
                 detector = BlobFinder(img_file)
                 bounding_boxes = detector.find()
-                self.assertEqual(len(bounding_boxes), expected_blobs[img], msg=f"Expected {expected_blobs[img]} blobs, found {len(bounding_boxes)} in image {img}")
+                self.assertEqual(len(bounding_boxes), expected_blobs[filename], msg=f"Expected {expected_blobs[filename]} blobs, found {len(bounding_boxes)} in image {filename}")
 
 if __name__ == '__main__':
     unittest.main()
