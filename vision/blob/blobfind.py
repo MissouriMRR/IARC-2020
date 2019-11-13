@@ -14,6 +14,7 @@ import numpy as np
 from vision.interface import Rectangle
 import json
 
+
 def import_params(config):
     if type(config) is not dict:
         raise ValueError(f"When importing params, config should be a dictionary, got {type(config)} instead")
@@ -48,7 +49,7 @@ class BlobFinder:
     def __init__(self, image, params=None):
         self.image = image
         self.keypoints = []
-        self.params = import_params() if params is None else params
+        self.params = params
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
     @property
@@ -65,6 +66,7 @@ class BlobFinder:
         """
         if not isinstance(value, np.ndarray):
             raise ValueError("Requires image as np.ndarray")
+
         self._image = value
 
     @property
@@ -81,6 +83,7 @@ class BlobFinder:
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
             raise ValueError("Requires instance of SimpleBlobDetector_Params")
+
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
@@ -130,16 +133,22 @@ class BlobFinder:
 
 
 if __name__ == '__main__':
-    if os.path.isdir("vision"):
-        prefix = os.path.join('vision', 'blob')
-    elif os.path.isdir('blob'):
-        prefix = 'blob'
-    else:
-        prefix = ''
+    from vision.util.blob_plotter import plot_blobs
 
-    for img in os.listdir(os.path.join(prefix, 'samples')):
-        image = cv2.imread(os.path.join(prefix, 'samples', os.fsdecode(img)))
-        with open(os.path.join('vision', 'blob', 'config.json'), 'r') as config_file:
-            config = json.load(config_file)
+    prefix = 'vision' if os.path.isdir("vision") else ''
+    img_folder = os.path.join(prefix, 'vision_images', 'blob')
+    config_filename = os.path.join(prefix, 'blob', 'config.json')
+
+    with open(config_filename, 'r') as config_file:
+        config = json.load(config_file)
+
+    for img in os.listdir(img_folder):
+        if img[-4:] not in ['.png', '.jpg']:
+            continue
+
+        image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
+
         blob_finder = BlobFinder(image, params=import_params(config))
         bboxes = blob_finder.find()
+
+        plot_blobs(blob_finder.keypoints, image)
