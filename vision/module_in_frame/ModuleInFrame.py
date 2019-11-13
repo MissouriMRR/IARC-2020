@@ -43,15 +43,14 @@ def ModuleInFrame(img):
     circles = np.reshape(circles, (np.shape(circles)[1], 3))
 
     # Finding slopes between the circles
-    slopes = []    
-    for (x, y, r) in circles:
-        for (iX, iY, iR) in circles:
+    slopes = []
+    for x, y, r in circles:
+        for iX, iY, iR in circles:
             m = (iY - y) / (iX - x)
-            
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
                 slopes.append(m)
-
+    
     # Bucket sorting slopes to group parallels
     slopes = np.array(np.abs(slopes))
     upper = np.amax(slopes) 
