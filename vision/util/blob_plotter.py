@@ -20,7 +20,7 @@ def plot_blobs(keypoints, image):
         image to detect blobs in
     """
 
-    if type(keypoints) is not list:
+    if not isinstance(keypoints, list):
         raise ValueError(f"Expected list of Keypoints, got {type(keypoints)} instead")
     if not isinstance(image, np.ndarray):
         raise ValueError(f"Expected argument of type BlobFinder, got {type(image)} instead")
