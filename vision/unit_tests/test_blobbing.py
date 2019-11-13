@@ -36,7 +36,7 @@ class TestBlobbing(unittest.TestCase):
         }
         prefix = 'vision' if os.path.isdir("vision") else ''
 
-        config_filename=os.path.join(prefix, 'blob', 'config.json')
+        config_filename = os.path.join(prefix, 'blob', 'config.json')
         with open(config_filename, 'r') as config_file:
             raw_config = json.load(config_file)
 
@@ -44,11 +44,14 @@ class TestBlobbing(unittest.TestCase):
 
         for filename, expected in expected_blobs.items():
             with self.subTest(i=filename):
-                img_file = os.path.join(prefix, 'vision_images', 'blob', filename)
-                img_file = cv2.imread(img_file)
+                img_filename = os.path.join(prefix, 'vision_images', 'blob', filename)
+                img_file = cv2.imread(img_filename)
+
                 detector = BlobFinder(img_file, params=config)
                 bounding_boxes = detector.find()
-                self.assertEqual(len(bounding_boxes), expected_blobs[filename], msg=f"Expected {expected_blobs[filename]} blobs, found {len(bounding_boxes)} in image {filename}")
+
+                self.assertEqual(len(bounding_boxes), expected, msg=f"Expected {expected} blobs, found {len(bounding_boxes)} in image {filename}")
+
 
 if __name__ == '__main__':
     unittest.main()

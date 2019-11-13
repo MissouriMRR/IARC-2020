@@ -1,14 +1,17 @@
 import unittest
 import os
 import sys
-import cv2
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 try:
     from vision.blob.blobfind import import_params
 except ImportError:
     from blob.blobfind import import_params
+
 
 class TestParamsImport(unittest.TestCase):
     def test_params_import(self):
@@ -25,7 +28,6 @@ class TestParamsImport(unittest.TestCase):
         list[bool]
             whether the expected number of blobs in each image equals the detected number of blobs
         """
-        vision_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         sample_config = {
             "filterByArea": {
                 "enable": True,
@@ -39,12 +41,15 @@ class TestParamsImport(unittest.TestCase):
         params = import_params(sample_config)
 
         for category, settings in sample_config.items():
-            self.assertTrue('enable' in sample_config[category], msg=f"Expected key 'enable' in category {category}")
             enabled = sample_config[category]['enable']
+
             for param, value in settings.items():
-                with self.subTest(i=category):
-                    if hasattr(params, param) and enabled:
-                        self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
+                if param == 'enable':
+                    self.assertEqual(getattr(params, category), value, msg=f"Expected attribute '{category}' to have value '{value}', got '{getattr(params, category)}' instead")
+
+                elif enabled:
+                    self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
+
 
 if __name__ == '__main__':
     unittest.main()
