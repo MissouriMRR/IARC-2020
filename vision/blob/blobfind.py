@@ -6,26 +6,27 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import cv2
-from vision.blob.blob import Rectangle
+import numpy as np
+from vision.interface import Rectangle
 import json
 
-def import_params():
+def import_params(config):
+    if type(config) is not dict:
+        raise ValueError(f"When importing params, config should be a dictionary, got {type(config)} instead")
+
     params = cv2.SimpleBlobDetector_Params()
 
-    with open(os.path.join('vision', 'blob', 'config.json'), 'r') as config_file:
-        config = json.load(config_file)
-        config_file.close()
+    for category in config:
+        if 'enable' not in config[category]:
+            raise ValueError(f"Category '{category}' is missing an 'enable' attribute")
+        category_enabled = config[category]['enable']
+        if category_enabled:
+            if hasattr(params, category):
+                setattr(params, category, config[category]['enable'])
+            for attr in config[category]:
+                if hasattr(params, attr):
+                    setattr(params, attr, config[category][attr])
 
-        for category in config:
-            category_enabled = config[category]['enable']
-            if category_enabled:
-                if hasattr(params, category):
-                    setattr(params, category, config[category]['enable'])
-                for attr in config[category]:
-                    if hasattr(params, attr):
-                        setattr(params, attr, config[category][attr])
-
-        print(params.minThreshold)
     return params
 
 
@@ -43,28 +44,53 @@ class BlobFinder:
     def __init__(self, image, params=None):
         self.image = image
         self.keypoints = []
-        if params is None:
-            self.params = import_params()
-        else:
-            self.params = params
+        self.params = import_params() if params is None else params
+        self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def update_image(self, image):
-        self.image = image
+    @property
+    def image(self):
+        """
+        This function is called every time self.image is run.
+        """
+        return self._image
 
-    def update_params(self, params):
-        self.params = params
+    @image.setter
+    def image(self, value):
+        """
+        Defines behavior of self.image = value.
+        """
+        if not isinstance(value, np.ndarray):
+            raise ValueError("Requires image as np.ndarray")
+        self._image = value
 
-    """
-    Detects blobs in the image provided in the constructor
+    @property
+    def params(self):
+        """
+        This function is called every time self.params is run.
+        """
+        return self._params
 
-    Returns
-    -------
-    list[Rectangle]
-        a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
-    """
+    @params.setter
+    def params(self, value):
+        """
+        Defines behavior of self.params = value.
+        """
+        if not isinstance(value, cv2.SimpleBlobDetector_Params):
+            raise ValueError("Requires instance of SimpleBlobDetector_Params")
+        self._params = value
+        self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
+
     def find(self):
-        blob_detector = cv2.SimpleBlobDetector_create(self.params)
-        keypoints = blob_detector.detect(self.image)
+        """
+        Detects blobs in the image provided in the constructor
+
+        Returns
+        -------
+        list[Rectangle]
+            a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
+        """
+
+        keypoints = self.blob_detector.detect(self.image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -90,9 +116,10 @@ class BlobFinder:
             bottom_right_far = bottom_right_near
             bottom_left_far = bottom_left_near
 
+            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+
             # create Rectangle and add to list of bounding boxes
-            bbox = Rectangle(top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far,
-                             top_right_far, bottom_right_far, bottom_left_far)
+            bbox = Rectangle(vertices, None)
             bounding_boxes.append(bbox)
 
         return bounding_boxes
@@ -101,5 +128,7 @@ class BlobFinder:
 if __name__ == '__main__':
     for img in os.listdir('samples'):
         image = cv2.imread('samples/' + os.fsdecode(img))
-        blob_finder = BlobFinder(image, params=import_params())
+        with open(os.path.join('vision', 'blob', 'config.json'), 'r') as config_file:
+            config = json.load(config_file)
+        blob_finder = BlobFinder(image, params=import_params(config))
         bboxes = blob_finder.find()
