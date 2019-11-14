@@ -18,7 +18,7 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-
+    
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -43,21 +43,25 @@ def ModuleInFrame(img):
     circles = np.reshape(circles, (np.shape(circles)[1], 3))
 
     # Finding slopes between the circles
-    slopes = []
+    slopes = np.array([])
     for x, y, r in circles:
         for iX, iY, iR in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
-                slopes.append(m)
+                slopes = np.append(slopes, m)
+    
+    # Converting slopes to degrees
+    slopes = np.degrees(np.arctan(slopes))
     
     # Bucket sorting slopes to group parallels
-    slopes = np.array(np.abs(slopes))
-    upper = np.amax(slopes) 
-    lower = np.amin(slopes)
+    upper_bound = np.amax(slopes)
+    lower_bound = np.amin(slopes)
     BUCKET_MODIFIER = 1
-    num_buckets = np.int32(upper - lower) * BUCKET_MODIFIER
-    buckets, _ = np.histogram(slopes, num_buckets, (lower, upper))
+    num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
+    
+    buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
     
     # Determine if any bucket of slopes is big enough
-    return any(buckets > 25)
+    MIN_SLOPES_IN_BUCKET = 15
+    return any(buckets > MIN_SLOPES_IN_BUCKET)
