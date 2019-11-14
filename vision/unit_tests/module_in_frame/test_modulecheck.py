@@ -19,11 +19,15 @@ class TestModuleInFrame(unittest.TestCase):
         """
 
         results = []
-        expected_results = [True, True, True, True]
-        for pic in ["Block1.png", "Block2.png", "Block3.jpg", "Block4.jpg"]:
-            results.append(mif(pic))
-        self.assertListEqual(results, expected_results)
-        return results
+        expected_results = {
+            "Block1.png" : True,
+            "Block2.png" : True,
+            "Block3.jpg" : True,
+            "Block4.jpg" : True
+        }
+        for pic in expected_results.keys():
+            results.append(mif(cv2.imread(pic)))
+        self.assertListEqual(results, list(expected_results.values()))
 
 if __name__ == '__main__':
         unittest.main()
