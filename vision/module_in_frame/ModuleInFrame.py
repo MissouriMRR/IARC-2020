@@ -34,7 +34,7 @@ def ModuleInFrame(img):
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(laplacian)
-
+    
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
     circles = np.uint16(circles)
@@ -57,7 +57,7 @@ def ModuleInFrame(img):
     # Bucket sorting slopes to group parallels
     upper_bound = np.amax(slopes)
     lower_bound = np.amin(slopes)
-    BUCKET_MODIFIER = 1
+    BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
     num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
     
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
