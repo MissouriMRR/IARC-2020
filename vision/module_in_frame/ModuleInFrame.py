@@ -2,6 +2,11 @@
 This file contains the ModuleInFrame function to detect if the module is in an image
 """
 
+# Constants
+BLUR_SIZE = 5 # Blur kernel size
+BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
+MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
+
 import cv2
 import numpy as np
 
@@ -18,7 +23,7 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-    
+
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -29,7 +34,7 @@ def ModuleInFrame(img):
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(src=gray, ksize=(5,5), sigmaX=0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE,BLUR_SIZE), sigmaX=0)
 
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
@@ -57,11 +62,9 @@ def ModuleInFrame(img):
     # Bucket sorting slopes to group parallels
     upper_bound = np.amax(slopes)
     lower_bound = np.amin(slopes)
-    BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
     num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
     
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
     
     # Determine if any bucket of slopes is big enough
-    MIN_SLOPES_IN_BUCKET = 15
     return any(buckets > MIN_SLOPES_IN_BUCKET)
