@@ -6,13 +6,14 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import unittest
+import cv2
 from vision.module_in_frame.ModuleInFrame import ModuleInFrame as mif
 
 class TestModuleInFrame(unittest.TestCase):
     def test_ModuleInFrame(self):
         """
         Testing ModuleInFrame
-
+        
         Returns
         -------
         ndarray[bool] which images the module was detected in
