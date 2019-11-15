@@ -1,8 +1,6 @@
 # Vision
 The vision team is responsible for processing images in order to extract information relevant to flight control.
 
-[Current Planning Document](https://docs.google.com/document/d/1123AFQ_xj2aAlCR1i5lCmx7I_2CbsMj6nA77rAYWCTs/edit)
-
 ## Directory Structure
 ```
     vision/
@@ -16,6 +14,12 @@ The vision team is responsible for processing images in order to extract informa
             main.py
             README.md
             requirements.txt
+        vision_images/  # Downloaded from team drive(see below)
+            blob/
+            ...
+        vision_videos/  # Downloaded from team drive(see below)
+            blob/
+            ...
         unit_tests/
             blob/
                 test_classification.py  <- Follows Unit Testing specs from below
@@ -25,6 +29,15 @@ The vision team is responsible for processing images in order to extract informa
         main.py  <- Will bootstrap all vision code
         README.md  <- This file.
 ```
+
+
+## Images
+*Images & Videos should never be commited into any part of the repo at any time!*
+
+Uploading Images & Videos: Upload all content to the MRR Team Drive in *IARC Mission 9/vision_images or videos* then to the respective project folder.
+
+Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/vision_images or videos* and save it in your copy of the repository as *IARC-2020/vision/vision_images (or _videos)*. Code and unit tests should work as if all content is located in these folders.
+
 
 ## Documentation
 #### Code Files

@@ -38,7 +38,19 @@ class TestDetectRussianWord(unittest.TestCase):
                 matched.append(0)
 
         for i in range(0,len(matched)):
+<<<<<<< HEAD
             self.assertEqual(expected[i], matched[i], msg=f"Failed at image {filename}")
+=======
+            if(expected[i] == matched[i]):
+                output.append[1]
+            else:
+                output.append[0]
+        
+        #array used to identify which image fails or passes
+        for i in range(0,len(output)):
+            print("image",i, output[i])
+
+>>>>>>> 8dc784ab4bcef5f7ecfbce456cbaf8eb7c0db325
 
         self.assertListEqual(list(expected), list(matched))
 
