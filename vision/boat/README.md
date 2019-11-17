@@ -7,10 +7,10 @@
  ## (2) Download tesseract-lang (to use Russian)
  	brew install tesseract-lang
  ## (3) Download Python wrapper
-    pip install pytesseract
+  pip install pytesseract
 
  # Using Linux/Windows
  ## (1) Download tesseract and language
     sudo apt-get install tesseract-ocr-[rus]
  ## (2) Download Python wrapper
-      pip install pytesseract
+    pip install pytesseract
