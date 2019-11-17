@@ -11,7 +11,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
-from vision.rectangle import Rectangle
+from vision.bounding_box import BoundingBox
 import json
 
 
@@ -133,7 +133,7 @@ class BlobFinder:
             vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
-            bbox = Rectangle(vertices, None)
+            bbox = BoundingBox(vertices, None)
             bounding_boxes.append(bbox)
 
         return bounding_boxes
