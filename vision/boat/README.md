@@ -4,9 +4,9 @@
  # Using Mac and Homebrew<br/>
  ## (1) Downlaod tesseract:<br/>
  	brew install tesseract
- ## (2) Download tesseract-lang (to use Russian)<br/>
+ ## (2) Download tesseract-lang (to use Russian)
  	brew install tesseract-lang
- ## (3) Download Python wrapper<br/>
+ ## (3) Download Python wrapper
     pip install pytesseract
 
  # Using Linux/Windows
