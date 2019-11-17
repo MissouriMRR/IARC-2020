@@ -21,13 +21,16 @@ class TestModuleInFrame(unittest.TestCase):
 
         results = []
         expected_results = {
-            "Block1.png" : True,
-            "Block2.png" : True,
+            "Block1.jpg" : True,
+            "Block2.jpg" : True,
             "Block3.jpg" : True,
             "Block4.jpg" : True
         }
-        for pic in expected_results.keys():
-            results.append(mif(cv2.imread(pic)))
+        print(os.getcwd())
+        for picname in expected_results.keys():
+            picpath = os.path.join('vision', 'vision_images', 'module', picname)
+            results.append(mif(cv2.imread(picpath)))
+       
         self.assertListEqual(results, list(expected_results.values()))
 
 if __name__ == '__main__':
