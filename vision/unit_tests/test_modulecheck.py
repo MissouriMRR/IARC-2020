@@ -30,7 +30,7 @@ class TestModuleInFrame(unittest.TestCase):
         for picname in expected_results.keys():
             picpath = os.path.join('vision', 'vision_images', 'module', picname)
             results.append(mif(cv2.imread(picpath)))
-       
+
         self.assertListEqual(results, list(expected_results.values()))
 
 if __name__ == '__main__':
