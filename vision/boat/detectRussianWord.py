@@ -10,18 +10,17 @@ import time
 
 def detect_russian_word(imagePNG):
     """
-        Function to detect words pulled from images
-        -------
+    Function to detect words pulled from images
+    -------
 
-        Returns
-        -------
-        True if text grabbed from image matches 'модули иртибот'.
-        False if not.
+    Returns
+    -------
+    True if text grabbed from image matches 'модули иртибот'.
+    False if not.
     """
 
     #filter image
-    originalImage = cv2.imread(imagePNG)
-    (thresh, filterImage) = cv2.threshold(np.mean(originalImage, axis=2), 127, 255, cv2.THRESH_BINARY)
+    (thresh, filterImage) = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
     
     #shows what the filtered image looks like
     #cv2.imshow('img', filterImage)
@@ -44,6 +43,7 @@ def detect_russian_word(imagePNG):
 if __name__== "__main__":
     import os
     start = time.time()
-    detect_russian_word("resources/image0.png")
+    originalImage = cv2.imread("imagePNG")
+    detect_russian_word(originalImage)
     end = time.time()
     print(end - start)
