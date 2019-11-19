@@ -21,17 +21,16 @@ class ModuleKMeans:
         Decides the weight of each channel in the image
     """
 
-    def __init__(self, imgPath, channel_weights=[1., 1., 1.]):
-        self.img = cv2.imread(imgPath)
-        self.pixelData = self.img.reshape((-1, 3))
-        self.pixelData = np.float32(self.pixelData)
-        self.pixelData *= channel_weights
-        self.defaultCriteria = (cv2.TERM_CRITERIA_EPS +
-                                cv2.TERM_CRITERIA_MAX_ITER,
-                                10, 1.0)
+    def __init__(self, channel_weights=[1., 1., 1.]):
+        self.channel_weights = channel_weights
+
+        
 
 
-    def applyKMeans(self, K, criteria=0, attempts=10,
+
+
+
+    def applyKMeans(self, image, K, criteria=0, attempts=10,
                     flags=cv2.KMEANS_RANDOM_CENTERS):
         """
         Applies the kmeans algorithm to the image
@@ -63,8 +62,22 @@ class ModuleKMeans:
             kmeans++ center initialization, respectively)
         """
 
+        self.img = image
+
+        if len(self.img.shape) == 3 and self.img.shape[-1] == len(self.channel_weights):
+            raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got {self.img.shape[-1]}")
+
+        if len(self.img.shape) == 2 and len(self.channel_weights) > 1:
+            raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got 1")
+
+        self.pixelData = self.img.reshape((-1, len(self.channel_weights)))
+        self.pixelData = np.float32(self.pixelData)
+        self.pixelData *= self.channel_weights
+
         if criteria == 0:
-            criteria = self.defaultCriteria
+            criteria = (cv2.TERM_CRITERIA_EPS +
+                        cv2.TERM_CRITERIA_MAX_ITER,
+                        10, 1.0)
 
 
         self.compactness,self.label,self.center = cv2.kmeans(self.pixelData, K,
@@ -118,9 +131,11 @@ if __name__ == "__main__":
 
     Test images must be put in a file called vision_images
     """
+    import os
 
-    img = ModuleKMeans("vision_images/blocks1.jpg")
-    img.applyKMeans(3)
+    image = cv2.imread(os.path.join("vision_images", "blocks1.jpg"))
+    img = ModuleKMeans()
+    img.applyKMeans(image, 3)
     channels = [0, 1]
     img.displayFractal()
     img.displayBinary(channels)
