@@ -2,12 +2,11 @@
 This class is designed to take an image and binarize it based on what colors
 we need to see.
 """
-
 import numpy as np
 import cv2
 
-class ModuleKMeans:
 
+class ModuleKMeans:
     """
     Applies the kmeans algorithm to an image and displays a remapped
     version of the image showing either the remapped colors or a black
@@ -23,12 +22,6 @@ class ModuleKMeans:
 
     def __init__(self, channel_weights=[1., 1., 1.]):
         self.channel_weights = channel_weights
-
-        
-
-
-
-
 
     def applyKMeans(self, image, K, criteria=0, attempts=10,
                     flags=cv2.KMEANS_RANDOM_CENTERS):
@@ -64,7 +57,7 @@ class ModuleKMeans:
 
         self.img = image
 
-        if len(self.img.shape) == 3 and self.img.shape[-1] == len(self.channel_weights):
+        if len(self.img.shape) == 3 and self.img.shape[-1] != len(self.channel_weights):
             raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got {self.img.shape[-1]}")
 
         if len(self.img.shape) == 2 and len(self.channel_weights) > 1:
@@ -79,13 +72,11 @@ class ModuleKMeans:
                         cv2.TERM_CRITERIA_MAX_ITER,
                         10, 1.0)
 
-
-        self.compactness,self.label,self.center = cv2.kmeans(self.pixelData, K,
+        self.compactness, self.label, self.center = cv2.kmeans(self.pixelData, K,
                                                              None, criteria,
                                                              attempts, flags)
 
         return self.compactness, self.label, self.center
-
 
     def displayFractal(self):
         """
@@ -99,7 +90,6 @@ class ModuleKMeans:
         cv2.imshow('display', self.display)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-
 
     def displayBinary(self, channels):
         """
@@ -125,6 +115,7 @@ class ModuleKMeans:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+
 if __name__ == "__main__":
     """
     Testing Fractal and Binary KMeans Display
@@ -133,9 +124,17 @@ if __name__ == "__main__":
     """
     import os
 
-    image = cv2.imread(os.path.join("vision_images", "blocks1.jpg"))
-    img = ModuleKMeans()
-    img.applyKMeans(image, 3)
-    channels = [0, 1]
-    img.displayFractal()
-    img.displayBinary(channels)
+    prefix = 'vision' if os.path.isdir('vision') else ''
+    filename = os.path.join(prefix, "vision_images", "module", "blocks1.jpg")
+    image = cv2.imread(filename)
+    if image is None:
+        print(f'Failed to read image: {filename}')
+        exit()
+
+    print(image.shape)
+
+    kmeans = ModuleKMeans()
+    kmeans.applyKMeans(image, 3)
+
+    kmeans.displayFractal()
+    kmeans.displayBinary(channels=[0, 1])
