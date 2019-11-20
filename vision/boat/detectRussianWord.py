@@ -6,7 +6,7 @@ from pytesseract import Output
 import pytesseract
 import numpy as np
 import cv2
-import time
+
 
 def detect_russian_word(imagePNG):
     """
@@ -29,21 +29,31 @@ def detect_russian_word(imagePNG):
     #function from library: pytesseract to grab text from image
     text = pytesseract.image_to_string(filterImage, lang="rus")
     #print(text)
-    
+
     russianWord = 'модули иртибот'
     #print(russianWord)
-    
-    if (text == russianWord):
-        #print("Match")
-        return True
-    else :
-        #print("Not Match")
-        return False
+
+    """ Debug
+    d = pytesseract.image_to_data(filterImage, output_type=Output.DICT)
+    n_boxes = len(d['level'])
+    for i in range(n_boxes):
+        (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+        cv2.rectangle(imagePNG, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    cv2.imshow('img', imagePNG)
+    cv2.waitKey(0)
+    """
+
+    return text == russianWord
+
 
 if __name__== "__main__":
+    import time
     import os
     start = time.time()
-    originalImage = cv2.imread("imagePNG")
-    detect_russian_word(originalImage)
-    end = time.time()
-    print(end - start)
+
+    originalImage = cv2.imread(os.path.join('vision', 'vision_images', 'boat', 'russianWord0.png'))
+    result = detect_russian_word(originalImage)
+
+    print("Result:", result)
+    print("Time:", time.time() - start)

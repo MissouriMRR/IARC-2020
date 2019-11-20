@@ -22,14 +22,17 @@ class TestDetectRussianWord(unittest.TestCase):
         """
         # Ensure 'модули иртибот' is found within image
         expected = {
-            'boat1.jpg': 1,
+            'russianWord0.png': 1,
             'notboat.jpg': 0
         }
 
-        vision_folder = 'vision' if os.isdir('vision') else ''
+        vision_folder = 'vision' if os.path.isdir('vision') else ''
 
         for filename, expected_result in expected.items():
-            image = cv2.imread(os.path.join(vision_folder, filename))
+            image = cv2.imread(os.path.join(vision_folder, 'vision_images', 'boat', filename))
+            if image is None:
+                self.fail(f"Failed to read: {filename}")
+
             result = detect_russian_word(image)
             self.assertEqual(expected_result, result, msg=f"Failed at image {filename}")
 
