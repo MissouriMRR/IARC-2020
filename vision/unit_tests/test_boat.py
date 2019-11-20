@@ -3,7 +3,7 @@ import os
 import cv2
 from vision.boat.detectRussianWord import detect_russian_word
 
-class TestDetectRussianWord(unittest.TestCase):      
+class TestDetectRussianWord(unittest.TestCase):
     def test_detect_russian(self):
         """
         Testing vision.boat.detectRussianWord
@@ -36,6 +36,6 @@ class TestDetectRussianWord(unittest.TestCase):
             result = detect_russian_word(image)
             self.assertEqual(expected_result, result, msg=f"Failed at image {filename}")
 
-    
+
 if __name__ == '__main__':
     unittest.main()

@@ -2,7 +2,6 @@
 This program grabs text from an image and compares it with 'модули иртибот'.
 It returns 'Match' if it identifies 'модули иртибот' and 'Not Match' when it doesnt.
 """
-from pytesseract import Output
 import pytesseract
 import numpy as np
 import cv2
@@ -20,8 +19,8 @@ def detect_russian_word(imagePNG):
     """
 
     #filter image
-    (thresh, filterImage) = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
-    
+    _, filterImage = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
+
     #shows what the filtered image looks like
     #cv2.imshow('img', filterImage)
     #cv2.waitKey(0)
@@ -47,7 +46,7 @@ def detect_russian_word(imagePNG):
     return text == russianWord
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     import time
     import os
     start = time.time()
