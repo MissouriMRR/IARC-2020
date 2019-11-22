@@ -1,3 +1,5 @@
+cv2
 numpy
-opencv-python
 pyrealsense2
+os.path
+argparse
