@@ -5,10 +5,11 @@ The Realsense class is a child class of the camera, designed to be used for real
 import cv2
 import numpy as np
 import pyrealsense2 as rs
-import camera
+import template
+from util import save_camera_frame
 
 
-class Realsense(camera.Camera):
+class Realsense(template.Camera):
     """
     Creates a realsense camera object
 
@@ -127,7 +128,11 @@ class Realsense(camera.Camera):
 
             cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
             cv2.imshow('Depth/Color Stream', images)
+
             key = cv2.waitKey(1)
+
+            if key == ord('c'):
+                save_camera_frame(depth_image, color_image)
 
             # Press esc or 'q' to close the image window
             if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
@@ -135,3 +140,4 @@ class Realsense(camera.Camera):
                 break
 
         self.pipeline.stop()
+

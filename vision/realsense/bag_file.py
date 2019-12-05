@@ -5,10 +5,10 @@ The BagFile class is a child class of the camera, designed to be used for pre-re
 import cv2
 import numpy as np
 import pyrealsense2 as rs
-import camera
+import template
 
 
-class BagFile(camera.Camera):
+class BagFile(template.Camera):
     """
     Creates a bag file reader object
 
@@ -109,3 +109,4 @@ class BagFile(camera.Camera):
             if key == ord('q') or key == 27 or cv2.getWindowProperty("Depth/Color Stream", 0) == -1:
                 cv2.destroyAllWindows()
                 break
+
