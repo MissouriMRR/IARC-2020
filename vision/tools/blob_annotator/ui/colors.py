@@ -1,3 +1,6 @@
+"""
+Colors to be used in ui.
+"""
 from enum import Enum
 
 

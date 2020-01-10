@@ -1,3 +1,6 @@
+"""
+ui window.
+"""
 import cv2
 
 

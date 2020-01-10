@@ -1,5 +1,5 @@
 """
-Image annotator.
+Graphical image annotator.
 """
 import sys
 import os
@@ -9,12 +9,11 @@ import xml.etree.ElementTree as ET
 from enum import Enum
 
 import cv2
-import numpy as np
 
-from colors import Colors
-from ui.Window import Window
-from geometry.ResizableBox import ResizableBox
-from tools.GeneratePascalVocAnnotations import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
+from ui.colors import Colors
+from ui.window import Window
+from ui.geometry import ResizableBox
+from tools.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
 
 
 class Annotation(object):
@@ -84,6 +83,7 @@ class Annotation(object):
         return saved_annotations
 
 
+# TODO merge color maps and labels
 class ColorMaps(Enum):
     FORTNITE = [(200, 150, 120), (0, 200, 255), (255, 200, 0)]
 
@@ -314,7 +314,7 @@ class PascalVocAnnotator(object):
 
 
 if __name__ == '__main__':
-    DATASET_PATH = os.path.join("..", "vision_images", "blob")
+    DATASET_PATH = os.path.join("..", "..", "vision_images", "blob")
 
     with PascalVocAnnotator(DATASET_PATH) as annotator:
         while annotator.update():

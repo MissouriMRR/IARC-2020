@@ -262,7 +262,7 @@ class ResizableBox(object):
 
 
 if __name__ == '__main__':
-    from Window import Window
+    from window import Window
 
     # create a white canvas
     w, h = (512, 512)
