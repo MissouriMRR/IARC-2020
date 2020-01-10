@@ -1,0 +1,20 @@
+{
+    "controls": {
+        "NEXT": "n",
+        "PREV": "p",
+        "CLEAR": "c",
+        "UNDO": "u",
+        "CHANGE_TAG": "t"
+    },
+    "labels": {
+        "player": {
+            "color": [200, 150, 120]
+        },
+        "ammo box": {
+            "color": [0, 200, 255]
+        },
+        "chest": {
+            "color": [255, 200, 0]
+        }
+    }
+}

@@ -14,6 +14,7 @@ from ui.colors import Colors
 from ui.window import Window
 from ui.geometry import ResizableBox
 from tools.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
+from json import load as jsonload
 
 
 class Annotation(object):
@@ -70,7 +71,6 @@ class Annotation(object):
 
     @staticmethod
     def load_annotations(path_to_image_folder, color_map, annotation_dir=ANNOTATION_DEFAULT_DIR):
-        color_map = color_map.value if hasattr(color_map, 'value') else color_map
         path = os.path.join(path_to_image_folder, annotation_dir)
         saved_annotations = {}
 
@@ -83,15 +83,6 @@ class Annotation(object):
         return saved_annotations
 
 
-# TODO merge color maps and labels
-class ColorMaps(Enum):
-    FORTNITE = [(200, 150, 120), (0, 200, 255), (255, 200, 0)]
-
-
-class ObjectLabels(Enum):
-    FORTNITE = ['player', 'ammo box', 'chest']
-
-
 class PascalVocAnnotator(object):
     """Annotates images in the Pascal VOC annotation format."""
     WINDOW_TITLE = 'Annotator'
@@ -99,20 +90,17 @@ class PascalVocAnnotator(object):
     SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
     ENABLE_AI_ASSISTED_ANNOTATIONS = True
 
-    NEXT_KEY = 'n'
-    PREV_KEY = 'p'
-    CLEAR_KEY = 'c'
-    UNDO_KEY = 'u'
-    CHANGE_OBJECT_TAG = 't'
 
-    def __init__(self, path_to_image_folder=TEST_DIRECTORY, obj_labels=ObjectLabels.FORTNITE, color_map=ColorMaps.FORTNITE):
+    def __init__(self, path_to_image_folder=TEST_DIRECTORY):
+        with open('config.json', 'r') as configfile:
+            data = jsonload(configfile)
+        
+        self.controls = data['controls']
+        self.labels = list(data['labels'].keys())
+        self.color_map = {key: value['color'] for key, value in data['labels'].items()}
+
         if not os.path.isdir(path_to_image_folder):
             raise ValueError('The path "{}" is not a valid directory!'.format(path_to_image_folder))
-
-        self._colors = color_map if not hasattr(color_map, 'value') else color_map.value
-        self._obj_labels = obj_labels if not hasattr(obj_labels, 'value') else obj_labels.value
-        
-        assert len(self._colors) >= len(self._obj_labels), 'Not enough colors for the number of tags available!'
 
         self._path_to_image_folder = path_to_image_folder
         self._paths = [os.path.join(path_to_image_folder, file) for file in os.listdir(self.path_to_image_folder) 
@@ -121,9 +109,8 @@ class PascalVocAnnotator(object):
         self._num_paths = len(self._paths)
         self._current_image = None
 
-        self._num_labels = len(self._obj_labels)
-        self._color_map = {label: self._colors[i] for i, label in enumerate(self._obj_labels)}
-        self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self._color_map)
+        self._num_labels = len(self.labels)
+        self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self.color_map)
         self._window = None
         self.tag_index = 0
         self._annotations = []
@@ -134,11 +121,11 @@ class PascalVocAnnotator(object):
         self.index = 0
 
         self._key_events = {
-            PascalVocAnnotator.NEXT_KEY: self._next,
-            PascalVocAnnotator.PREV_KEY: self._prev,
-            PascalVocAnnotator.CHANGE_OBJECT_TAG: self._next_tag,
-            PascalVocAnnotator.UNDO_KEY: self._undo,
-            PascalVocAnnotator.CLEAR_KEY: self._clear
+            self.controls['NEXT']: self._next,
+            self.controls['PREV']: self._prev,
+            self.controls['CHANGE_TAG']: self._next_tag,
+            self.controls['UNDO']: self._undo,
+            self.controls['CLEAR']: self._clear
         }
         
     def __enter__(self):
@@ -238,7 +225,7 @@ class PascalVocAnnotator(object):
             self._annotations = []
             
             if self._can_guess and PascalVocAnnotator.ENABLE_AI_ASSISTED_ANNOTATIONS:
-                self._annotations = Annotation.make_guess(img, self._color_map)
+                self._annotations = Annotation.make_guess(img, list(self.color_map.values()))
 
         self._changed = False
 
@@ -252,11 +239,11 @@ class PascalVocAnnotator(object):
             value = self._num_labels - 1
 
         self._tag_index = value % self._num_labels
-        self._current_color = self._colors[self.tag_index]
+        self._current_color = self.color_map[self.labels[self.tag_index]]
 
     @property
     def tag(self):
-        return self._obj_labels[self.tag_index]
+        return self.labels[self.tag_index]
 
     def show_tag(self, img):
         font = cv2.FONT_HERSHEY_SIMPLEX
