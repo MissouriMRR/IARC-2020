@@ -54,7 +54,7 @@ class Rectangle(Shape):
     def area(self):
         return self.w * self.h
 
-    @property 
+    @property
     def x1(self):
         return self.x + self.w
 
@@ -96,7 +96,7 @@ class Circle(Shape):
 
     def is_inside(self, x, y):
         return (self.x-x)**2+(self.y-y)**2<=self.radius**2
-   
+
     def get_bounds(self):
         return Rectangle(self.x-self.radius, self.y-self.radius, self.diameter, self.diameter)
 
@@ -149,7 +149,7 @@ class ResizableBox(object):
     def x(self, value):
         delta_x = value - self._box.x
         self._box.x = value
-        
+
         for circle in self._circles:
             circle.x += delta_x
 
@@ -231,7 +231,7 @@ class ResizableBox(object):
                     self._selected_handle = None
 
                 for circle in self._circles:
-                    if circle.is_inside(x,y):
+                    if circle.is_inside(x, y):
                         self._selected_handle = circle
                         self._handle_colors[circle] = self._darker_handle_color
 

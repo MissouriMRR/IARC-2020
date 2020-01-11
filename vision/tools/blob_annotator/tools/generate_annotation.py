@@ -32,7 +32,7 @@ def _generate_object_annotation(obj_name, bbox, width, height):
     obj.append(_generate_xml_element_with_text('name', obj_name))
     obj.append(_generate_xml_element_with_text('truncated', 0))
     obj.append(_generate_xml_element_with_text('difficult', 0))
-    
+
     bndbox = etree.Element('bndbox')
     bndbox.append(_generate_xml_element_with_text('xmin', min(max(0, xmin), width)))
     bndbox.append(_generate_xml_element_with_text('ymin', min(max(0, ymin), height)))
@@ -45,6 +45,7 @@ def _generate_object_annotation(obj_name, bbox, width, height):
 def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, img_path, overwrite=False):
     """
     Generates a Pascal VOC annotation file for `img` with the specified parameters
+
     Parameters
     ----------
     img: numpy.ndarray
@@ -103,7 +104,7 @@ def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, 
     img_file_name, img_extension = os.path.splitext(img_path)
     img = cv2.imread(img_path)
     assert img is not None, 'generate_pascvalvoc_annotation_from_image_file(): could not read image at %s' % (img_path,)
-    
+
     if annotation_dir is None:
         generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, img_file_name + '.xml', overwrite=overwrite)
     else:
@@ -113,13 +114,13 @@ def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, 
 
         if not os.path.exists(annotation_folder):
             os.mkdir(annotation_folder)
-        
+
         generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, os.path.join(annotation_folder, img_name) + '.xml', img_path, overwrite=overwrite)
 
 
 if __name__ == '__main__':
     # unit test
-    TEST_IMG_NAME = '/home/christopher/2017-08-18 20:04:52.210357.jpg'
+    TEST_IMG_NAME = ''
     obj_names = ['red roomba', 'green roomba']
     bboxes = np.array([[548, 472, 878, 753], [697, 293, 982, 531]])
     generate_pascvalvoc_annotation_from_image_file(TEST_IMG_NAME, obj_names, bboxes, annotation_dir=ANNOTATION_DEFAULT_DIR)
