@@ -19,7 +19,7 @@ from vision.blob.blobfind import BlobFinder, import_params
 
 
 class TestBlobbing(unittest.TestCase):
-    def tst_finding_blobs(self):
+    def test_finding_blobs(self):
         """
         Tests that the expected number of blobs is found
 
