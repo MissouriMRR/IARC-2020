@@ -1,7 +1,7 @@
 # Use pillow to create images and then place the given image on it at varying points
-
 from os import listdir, remove
-from PIL import Image
+import cv2
+import numpy as np
 
 
 BG_W = 1920
@@ -15,7 +15,7 @@ GRANULARITY = 4
 
 
 def fresh_background():
-    return Image.new('RGBA', (BG_W, BG_H), (255, 255, 255, 255))
+    return 255 * np.ones((BG_W, BG_H, 4))
 
 
 def generate(img, out_dir):
@@ -35,7 +35,7 @@ def generate(img, out_dir):
 
 def generate_directory(directory, out_dir):
     for filename in listdir(directory):
-        img = Image.open(directory + filename, 'r')
+        img = cv2.imread(directory + filename)
 
         generate(img, out_dir)
 
