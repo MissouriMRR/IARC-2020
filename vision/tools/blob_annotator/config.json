@@ -7,14 +7,8 @@
         "CHANGE_TAG": "t"
     },
     "labels": {
-        "player": {
+        "blob": {
             "color": [200, 150, 120]
-        },
-        "ammo box": {
-            "color": [0, 200, 255]
-        },
-        "chest": {
-            "color": [255, 200, 0]
         }
     }
 }
