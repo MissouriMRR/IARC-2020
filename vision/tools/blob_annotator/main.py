@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
-import xml.etree.ElementTree as ET
+import lxml.etree as ET
 from json import load as jsonload
 
 import cv2
@@ -100,7 +100,7 @@ class PascalVocAnnotator(object):
 
         ## Read image
         if not os.path.isdir(path_to_image_folder):
-            raise ValueError(f'The path "{path_to_image_folder}" is not a valid directory!')
+            raise ValueError(f"The path \'{path_to_image_folder}\' is not a valid directory!")
 
         self._path_to_image_folder = path_to_image_folder
         self._paths = [os.path.join(path_to_image_folder, filename) for filename in os.listdir(self.path_to_image_folder)

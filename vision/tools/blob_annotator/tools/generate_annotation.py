@@ -61,7 +61,7 @@ def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, 
     height, width, depth = img.shape
 
     root = etree.Element(ROOT_NAME)
-    
+
     size = etree.Element('size')
     size.append(_generate_xml_element_with_text('width', width))
     size.append(_generate_xml_element_with_text('height', height))
