@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 import xml.etree.ElementTree as ET
-from enum import Enum
+from json import load as jsonload
 
 import cv2
 
@@ -14,7 +14,6 @@ from ui.colors import Colors
 from ui.window import Window
 from ui.geometry import ResizableBox
 from tools.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
-from json import load as jsonload
 
 
 class Annotation(object):
@@ -48,11 +47,7 @@ class Annotation(object):
         self._resizable_box.draw(img, self.color)
 
     @staticmethod
-    def make_guess(img, *kwargs):
-        return []#annotations
-
-    @staticmethod
-    def parse_annotation(path, color_map):    
+    def parse_annotation(path, color_map):
         tree = ET.parse(path)
         root = tree.getroot()
         annotations = []
@@ -66,11 +61,14 @@ class Annotation(object):
 
             color = color_map[label]
             annotations.append(Annotation(x, y, color, label, x1-x, y1-y))
-    
+
         return annotations, path
 
     @staticmethod
     def load_annotations(path_to_image_folder, color_map, annotation_dir=ANNOTATION_DEFAULT_DIR):
+        """
+        Load previously made annotations from file.
+        """
         path = os.path.join(path_to_image_folder, annotation_dir)
         saved_annotations = {}
 
@@ -87,36 +85,36 @@ class PascalVocAnnotator(object):
     """Annotates images in the Pascal VOC annotation format."""
     WINDOW_TITLE = 'Annotator'
     TEST_DIRECTORY = 'test_images'
+    CONFIG_PATH = 'config.json'
     SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
-    ENABLE_AI_ASSISTED_ANNOTATIONS = True
 
 
     def __init__(self, path_to_image_folder=TEST_DIRECTORY):
-        with open('config.json', 'r') as configfile:
+        ## Read config
+        with open(self.CONFIG_PATH, 'r') as configfile:
             data = jsonload(configfile)
-        
+
         self.controls = data['controls']
         self.labels = list(data['labels'].keys())
         self.color_map = {key: value['color'] for key, value in data['labels'].items()}
 
+        ## Read image
         if not os.path.isdir(path_to_image_folder):
-            raise ValueError('The path "{}" is not a valid directory!'.format(path_to_image_folder))
+            raise ValueError(f'The path "{path_to_image_folder}" is not a valid directory!')
 
         self._path_to_image_folder = path_to_image_folder
-        self._paths = [os.path.join(path_to_image_folder, file) for file in os.listdir(self.path_to_image_folder) 
-                       if os.path.splitext(file)[1] in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS]
-        self._paths.sort(key = lambda path: os.path.getmtime(path))
-        self._num_paths = len(self._paths)
+        self._paths = [os.path.join(path_to_image_folder, filename) for filename in os.listdir(self.path_to_image_folder)
+                       if os.path.splitext(filename)[1] in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS]
+        self._paths.sort(key=lambda path: os.path.getmtime(path))
+
         self._current_image = None
 
-        self._num_labels = len(self.labels)
         self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self.color_map)
         self._window = None
         self.tag_index = 0
         self._annotations = []
         self._annotation_in_progress = None
         self._changed = False
-        self._can_guess = True
 
         self.index = 0
 
@@ -127,11 +125,20 @@ class PascalVocAnnotator(object):
             self.controls['UNDO']: self._undo,
             self.controls['CLEAR']: self._clear
         }
-        
+
+        ## Print controls
+        print("Controls")
+        for key, value in self._key_events.items():
+            print(f"{value.__name__}: {key}")
+
+        print()
+
     def __enter__(self):
         self._window = Window(PascalVocAnnotator.WINDOW_TITLE, cv2.WND_PROP_FULLSCREEN).__enter__()
+
         self._window.set_property(cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         self._window.set_mouse_callback(self.on_mouse_event)
+
         return self
 
     def __exit__(self, *params):
@@ -157,18 +164,12 @@ class PascalVocAnnotator(object):
         return self._index
 
     @property
-    def current_image(self):
-        return self._current_image
-
-    @property
     def current_path(self):
         return self.paths[self.index]
 
     @property
-    def current_color(self):
-
-        color = self._current_color.value if hasattr(self._current_color, 'value') else self._current_color
-        return color
+    def current_image(self):
+        return self._current_image
 
     @current_image.setter
     def current_image(self, value):
@@ -209,10 +210,7 @@ class PascalVocAnnotator(object):
 
         self._remove_annotation_file_when_empty()
 
-        if value < 0:
-            value = self._num_paths - 1
-
-        value = value % self._num_paths
+        value = value % len(self._paths)
         self._index = value
         current_path = self._paths[self.index]
         img = cv2.imread(current_path)
@@ -223,9 +221,6 @@ class PascalVocAnnotator(object):
             self._annotations = self._saved_annotations[key]
         else:
             self._annotations = []
-            
-            if self._can_guess and PascalVocAnnotator.ENABLE_AI_ASSISTED_ANNOTATIONS:
-                self._annotations = Annotation.make_guess(img, list(self.color_map.values()))
 
         self._changed = False
 
@@ -235,32 +230,37 @@ class PascalVocAnnotator(object):
 
     @tag_index.setter
     def tag_index(self, value):
-        if value < 0:
-            value = self._num_labels - 1
+        self._tag_index = value % len(self.labels)
 
-        self._tag_index = value % self._num_labels
-        self._current_color = self.color_map[self.labels[self.tag_index]]
+    @property
+    def current_color(self):
+        return self.color_map[self.labels[self.tag_index]]
 
     @property
     def tag(self):
         return self.labels[self.tag_index]
 
     def show_tag(self, img):
+        """
+        Display tag in use on top of screen.
+        """
         font = cv2.FONT_HERSHEY_SIMPLEX
         font_scale = 1
         thickness = 2
         margin = 5
         outline_thickness = 5
-        color = self.current_color
 
-        text = 'Active tag: {}'.format(self.tag)
-        size, baseline = cv2.getTextSize(text, font, font_scale, thickness)
-        text_w, text_h = size
+        text = f'Active tag: {self.tag}'
+        (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
         origin = (margin, margin + text_h)
-        cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value, thickness+outline_thickness)
-        cv2.putText(img, text, origin, font, font_scale, color, thickness)
+        cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
+                    thickness+outline_thickness)
+        cv2.putText(img, text, origin, font, font_scale, self.current_color, thickness)
 
     def update(self):
+        """
+        Refresh the whole screen and process actions.
+        """
         check_key_press = lambda key: self._window.was_key_pressed(key)
         frame = self._current_image.copy()
 
@@ -273,31 +273,35 @@ class PascalVocAnnotator(object):
 
         if self._annotation_in_progress is not None:
             self._annotation_in_progress.draw(frame)
-        
+
         self.show_tag(frame)
 
         self._window.draw(frame)
         return not self._window.should_quit
 
     def on_mouse_event(self, event, x, y, flags, params):
+        """
+        Process mouse press events.
+        """
         for annotation in self._annotations:
             processed = annotation.on_mouse_event(event, x, y, flags, params)
 
             if processed:
                 self._changed = True
-                return            
+                return
 
         if event == cv2.EVENT_LBUTTONDOWN and (not self._annotation_in_progress):
             self._annotation_in_progress = Annotation(x, y, self.current_color, self.tag)
+
         elif event == cv2.EVENT_LBUTTONUP and self._annotation_in_progress:
             self._annotations.insert(0, self._annotation_in_progress)
             self._annotation_in_progress = None
+
         elif event == cv2.EVENT_MOUSEMOVE and self._annotation_in_progress:
             self._annotation_in_progress.box.w = abs(x - self._annotation_in_progress.box.x)
             self._annotation_in_progress.box.h = abs(y - self._annotation_in_progress.box.y)
 
-        if self._annotation_in_progress:
-            self._changed = True
+        self._changed |= bool(self._annotation_in_progress)
 
 
 if __name__ == '__main__':
