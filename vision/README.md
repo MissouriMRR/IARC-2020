@@ -4,10 +4,64 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Quick Links
 
+[Getting Started](#getting-started)
+
 [Directory Structure](#directory-structure)
+
 [Storing Images](#storing-images)
+
 [Documentation](#documentation)
+
 [Unit Testing](#unit-testing)
+
+## Getting Started
+
+1. Clone this repository
+
+```bash
+    git clone https://github.com/MissouriMRR/IARC-2020
+```
+
+2. Install pip requirements
+
+```bash
+    pip install -r requirements.txt
+```
+
+3. (For Vision Tests) Download the test images from the team drive.
+
+3a. Ask leadership for access to the MRR team drive.
+
+3b. In google drive, click the shared drives link and open the Multirotor Robot folder.
+
+3c. Navigate to IARC Mission 9/.
+
+3d. Download vision_images folder as a whole.
+
+3e. Extract the zip file into the repo -- IARC-2020/vision/vision_images
+
+4. (Optional) Run unit tests.
+
+```bash
+    ./unit_tests/runall.sh
+```
+
+5. Contributing
+
+5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
+
+5b. In any project, choose an issue from the To do section.
+
+5c. Create a plan for solving this issue and get approved by leadership.
+
+5d. Checkout respective branch in repository and write code.
+
+5e. When finished, go to the repository website and submit a pull request.
+
+5f. Have pull request reviewed.
+
+5g. Merge branch into develop when approved.
+
 
 ## Directory Structure
 
