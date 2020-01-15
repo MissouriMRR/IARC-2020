@@ -2,6 +2,13 @@
 
 The vision team is responsible for processing images in order to extract information relevant to flight control.
 
+## Quick Links
+
+[Directory Structure](#directory-structure)
+[Storing Images](#storing-images)
+[Documentation](#documentation)
+[Unit Testing](#unit-testing)
+
 ## Directory Structure
 
 ```python
@@ -32,7 +39,7 @@ The vision team is responsible for processing images in order to extract informa
         README.md  <- This file.
 ```
 
-## Images
+## Storing Images
 
 *Images & Videos should never be commited into any part of the repo at any time!*
 
