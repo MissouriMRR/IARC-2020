@@ -7,7 +7,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import unittest
 import cv2
-from vision.module_in_frame.ModuleInFrame import ModuleInFrame as mif
+from vision.module.in_frame import ModuleInFrame as mif
+
 
 class TestModuleInFrame(unittest.TestCase):
     def test_ModuleInFrame(self):
@@ -29,7 +30,13 @@ class TestModuleInFrame(unittest.TestCase):
         print(os.getcwd())
         for picname in expected_results.keys():
             picpath = os.path.join('vision', 'vision_images', 'module', picname)
-            results.append(mif(cv2.imread(picpath)))
+            
+            image = cv2.imread(picpath)
+
+            if image is None:
+                raise FileNotFoundError(f"Could not read {picpath}!")
+
+            results.append(mif(image))
        
         self.assertListEqual(results, list(expected_results.values()))
 

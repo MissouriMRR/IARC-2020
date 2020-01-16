@@ -1,5 +1,5 @@
 import unittest
-from vision.module.ModuleKMeans import ModuleKMeans as mkm
+from vision.module.detector import ModuleKMeans as mkm
 
 
 class TestKMeans(unittest.TestCase):
