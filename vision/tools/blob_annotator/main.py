@@ -13,7 +13,7 @@ import cv2
 from ui.colors import Colors
 from ui.window import Window
 from ui.geometry import ResizableBox
-from tools.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
+from annotation.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
 
 
 class Annotation(object):
