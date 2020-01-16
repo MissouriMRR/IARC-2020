@@ -1,7 +1,7 @@
 import unittest
 import os
 import cv2
-from vision.boat.detectRussianWord import detect_russian_word
+from vision.boat.detect_words import detect_russian_word
 
 class TestDetectRussianWord(unittest.TestCase):
     def test_detect_russian(self):
