@@ -6,6 +6,8 @@ Algorithms relating to the boat, the mast and the russian words on mast.
 
 Download pytesseract for OCR (optical character recognition)
 
+* IMPORTANT: * Make sure to install extra language pack for Uzbek(Cyrilic)
+
 *Using Mac and Homebrew*
 (1) Downlaod tesseract
 
