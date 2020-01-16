@@ -29,7 +29,7 @@ class TestModuleInFrame(unittest.TestCase):
         }
         print(os.getcwd())
         for picname in expected_results.keys():
-            picpath = os.path.join('vision', 'vision_images', 'module', picname)
+            picpath = os.path.join('vision_images', 'module', picname)
             
             image = cv2.imread(picpath)
 
