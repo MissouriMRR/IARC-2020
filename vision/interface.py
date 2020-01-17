@@ -1,5 +1,6 @@
-
-"""The Environment class will manage the other objects in the environment"""
+"""
+The Environment class will manage the other objects in the environment
+"""
 
 
 class Environment:
