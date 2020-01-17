@@ -4,11 +4,11 @@
 
 class Environment:
 
-    #list of rectangles in environment
+    # list of rectangles in environment
     def __init__(self):
         self.bounding_boxes = []
 
-    #iterator of the rects list
+    # iterator of the bounding boxes list
     def __iter__(self):
         i = 0
         while True:
@@ -19,7 +19,6 @@ class Environment:
             except ZeroDivisionError:
                 yield None
 
-
-    #updates rects list
+    # updates bounding boxes list
     def update(self, bounding_boxes):
         self.bounding_boxes = bounding_boxes
