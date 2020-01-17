@@ -35,8 +35,8 @@ class Pipeline:
         """
         Method that takes the given video file and environment, and updates the environment with detected blobs.
         """
-        for self.vid_len, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
-            if self.vid_len == 98:
+        for self.alg_time, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
+            if self.alg_time == 98:
                 break
             blob_finder = BlobFinder(color_image, params=import_params(config))
             bboxes = blob_finder.find()
@@ -58,5 +58,5 @@ if __name__ == '__main__':
 
     video_file_name = os.path.join('vision_videos', 'module', 'sampleFrames.bag')
 
-    the_pipe = Pipeline(video_file_name, env, 98)
+    the_pipe = Pipeline(video_file_name, env)
     the_pipe.run_algorithm()
