@@ -10,15 +10,33 @@ from vision.util.blob_plotter import plot_blobs
 
 
 class Pipeline:
+    """
+    This is a pipeline class that takes in a video, runs a blob detection algorithm, and updates the blobs to the
+    environment class.
 
-    def __init__(self, vid_file, env):
+    Parameters
+    -------------
+    vid_file <.bag>
+    A video file that the algorithm can act upon
+
+    env <Environment>
+    The environment interface that is used by flight code. The pipeline updates the interface.
+
+    alg_time <int>
+    An integer value that corresponds to how long the video loops.
+    """
+
+    def __init__(self, vid_file, env, alg_time=98):
         self.vid_file = vid_file
         self.env = env
+        self.alg_time = alg_time
 
     def run_algorithm(self):
-
-        for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
-            if i == 98:
+        """
+        Method that takes the given video file and environment, and updates the environment with detected blobs.
+        """
+        for self.vid_len, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
+            if self.vid_len == 98:
                 break
             blob_finder = BlobFinder(color_image, params=import_params(config))
             bboxes = blob_finder.find()
@@ -40,5 +58,5 @@ if __name__ == '__main__':
 
     video_file_name = os.path.join('vision_videos', 'module', 'sampleFrames.bag')
 
-    the_pipe = Pipeline(video_file_name, env)
+    the_pipe = Pipeline(video_file_name, env, 98)
     the_pipe.run_algorithm()
