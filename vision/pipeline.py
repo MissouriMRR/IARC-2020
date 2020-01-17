@@ -7,13 +7,13 @@ import json
 from vision.realsense.read_bag import ReadBag
 from vision.blob.blobfind import import_params, BlobFinder
 from vision.util.blob_plotter import plot_blobs
-from vision.interface import Environment
 
 
 class Pipeline:
 
-    def __init__(self, vid_file):
+    def __init__(self, vid_file, env):
         self.vid_file = vid_file
+        self.env = env
 
     def run_algorithm(self):
 
@@ -28,6 +28,9 @@ class Pipeline:
 
 
 if __name__ == '__main__':
+
+    from vision.interface import Environment
+
     prefix = 'vision' if os.path.isdir("vision") else ''
     config_filename = os.path.join(prefix, 'blob', 'config.json')
     env = Environment()
@@ -37,5 +40,5 @@ if __name__ == '__main__':
 
     video_file_name = os.path.join('vision_videos', 'module', 'sampleFrames.bag')
 
-    the_pipe = Pipeline(video_file_name)
+    the_pipe = Pipeline(video_file_name, env)
     the_pipe.run_algorithm()
