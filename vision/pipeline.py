@@ -35,8 +35,8 @@ class Pipeline:
         """
         Method that takes the given video file and environment, and updates the environment with detected blobs.
         """
-        for self.alg_time, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
-            if self.alg_time == 98:
+        for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
+            if i == self.alg_time:
                 break
             blob_finder = BlobFinder(color_image, params=import_params(config))
             bboxes = blob_finder.find()
