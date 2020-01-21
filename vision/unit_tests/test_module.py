@@ -1,13 +1,17 @@
 """
-This file is used for testing ModuleInFrame
+For testing all module algorithms.
 """
-
 import os, sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path += [parent_dir]
+sys.path += [os.path.dirname(parent_dir)]
+
 import unittest
 import cv2
-from vision.module_in_frame.ModuleInFrame import ModuleInFrame as mif
+
+from vision.module.in_frame import ModuleInFrame as mif
+from vision.module.detector import ModuleKMeans as mkm
+
 
 class TestModuleInFrame(unittest.TestCase):
     def test_ModuleInFrame(self):
@@ -28,10 +32,21 @@ class TestModuleInFrame(unittest.TestCase):
         }
         print(os.getcwd())
         for picname in expected_results.keys():
-            picpath = os.path.join('vision', 'vision_images', 'module', picname)
-            results.append(mif(cv2.imread(picpath)))
+            picpath = os.path.join('vision_images', 'module', picname)
+            
+            image = cv2.imread(picpath)
+
+            if image is None:
+                raise FileNotFoundError(f"Could not read {picpath}!")
+
+            results.append(mif(image))
        
         self.assertListEqual(results, list(expected_results.values()))
+
+
+class TestKMeans(unittest.TestCase):
+    pass
+
 
 if __name__ == '__main__':
         unittest.main()

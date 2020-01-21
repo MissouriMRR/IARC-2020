@@ -51,7 +51,11 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    originalImage = cv2.imread(os.path.join('vision', 'vision_images', 'boat', 'russianWord0.png'))
+    originalImage = cv2.imread(os.path.join('vision_images', 'boat', 'russianWord0.png'))
+
+    if originalImage is None:
+        raise FileNotFoundError("Could not read image!")
+
     result = detect_russian_word(originalImage)
 
     print("Result:", result)
