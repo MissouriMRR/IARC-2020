@@ -65,7 +65,7 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Directory Structure
 
-```python
+```
     vision/
         obstacle/
             ...
