@@ -7,7 +7,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import cv2
 import json
 import timeit
-from vision.blob.blobfind import BlobFinder, import_params
+from vision.blob.blobfind import BlobFinder
+from vision.util.import_params import import_params
 
 prefix = 'vision' if os.path.isdir("vision") else ''
 img_folder = os.path.join(prefix, 'vision_images', 'blob')
