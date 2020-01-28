@@ -72,7 +72,7 @@ class BlobFinder:
         Defines behavior of self.image = value.
         """
         if not isinstance(value, np.ndarray):
-            raise ValueError("Requires image as np.ndarray")
+            raise ValueError(f"Requires image as np.ndarray, got {type(value)}")
 
         self._image = value
 
@@ -89,7 +89,7 @@ class BlobFinder:
         Defines behavior of self.params = value.
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
-            raise ValueError("Requires instance of SimpleBlobDetector_Params")
+            raise ValueError(f"Requires instance of SimpleBlobDetector_Params, got {type(value)}")
 
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
@@ -154,6 +154,7 @@ if __name__ == '__main__':
             continue
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
+
 
         blob_finder = BlobFinder(image, params=import_params(config))
         bboxes = blob_finder.find()

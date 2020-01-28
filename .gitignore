@@ -4,6 +4,7 @@ vision_videos/
 *.jpg
 *.png
 *.bag
+*.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
