@@ -31,7 +31,7 @@ while True:
     if key == 27:
         break
 '''
-img = cv2.imread('IARC-2020/vision/Classification/resources/pylon.png')
+img = cv2.imread('IARC-2020/vision/pylon/resources/pylon.png')
 
 # It converts the BGR color space of image to HSV color space 
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV) 
