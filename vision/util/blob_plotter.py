@@ -3,7 +3,6 @@
 import cv2
 import numpy as np
 
-
 def plot_blobs(keypoints, image):
     """
     Shows the detected blobs in an image and print the bounding boxes
