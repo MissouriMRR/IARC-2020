@@ -5,11 +5,17 @@ The Realsense class is a child class of the camera, designed to be used for real
 import cv2
 import numpy as np
 import pyrealsense2 as rs
-import template
-from util import save_camera_frame
+try:
+    from vision.realsense.template import Camera
+except ImportError:
+    from template import Camera
+try:
+    from vision.util.take_picture import save_camera_frame
+except:
+    from take_picture import save_camera_frame
 
 
-class Realsense(template.Camera):
+class Realsense(Camera):
     """
     Creates a realsense camera object
 
@@ -51,19 +57,10 @@ class Realsense(template.Camera):
         """
         Iterates through each depth/color frame in the object
 
-        Parameters
-        ------------
-        self: Realsense object
-            automatically passed, you do not need to input it as an argument
-
-        Raises
-        ------------
-        NotImplementedError: if called on a base camera object
-
         Returns
         -----------
         depth image: np array, 1 channel
-        color image: np array, 3 channels
+        color image: np array, 3 channels (in RGB format)
         """
         # Start streaming from file
         profile = self.pipeline.start(self.config)
@@ -97,31 +94,28 @@ class Realsense(template.Camera):
 
             yield depth_image, color_image
 
-    def display_in_window(self):
+    def display_in_window(self, clipping=False):
         """
         Displays the depth/color image streams on repeat, separately, in one window
 
         Parameters
-        ---------------
-        self: Realsense object
-            this does not need to be passed as an argument, passed automatically
-
-        Raises
-        ------------------
-        NotImplementedError: if called from a based camera class
+        -------
+        clipping: boolean
+            defaults to false, can be set true to remove data from the images
+            beyond a given distance from the camera
         """
         for depth_image, color_image in self:
             # Remove background - Set pixels further than clipping_distance to grey
             grey_color = 153
             depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
-            bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
 
             # Render images
             depth_colormap = cv2.applyColorMap(
                 cv2.convertScaleAbs(depth_image, alpha=0.03),
                 cv2.COLORMAP_JET)
 
-            if self.CLIPPING:
+            if clipping:
+                bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
                 images = np.hstack((bg_removed, depth_colormap))
             else:
                 images = np.hstack((color_image, depth_colormap))

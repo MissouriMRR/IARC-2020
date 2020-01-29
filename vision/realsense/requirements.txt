@@ -1,6 +1,3 @@
-cv2
+opencv-python
 numpy
 pyrealsense2
-os.path
-argparse
-datetime

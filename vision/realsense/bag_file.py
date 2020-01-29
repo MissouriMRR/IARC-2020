@@ -5,10 +5,13 @@ The BagFile class is a child class of the camera, designed to be used for pre-re
 import cv2
 import numpy as np
 import pyrealsense2 as rs
-import template
+try:
+    from vision.realsense.template import Camera
+except ImportError:
+    from template import Camera
 
 
-class BagFile(template.Camera):
+class BagFile(Camera):
     """
     Creates a bag file reader object
 
@@ -29,8 +32,6 @@ class BagFile(template.Camera):
 
         self.filename = filename
 
-        self.CLIPPING = False
-
         self.pipeline = rs.pipeline()
 
         # Create a config object
@@ -46,7 +47,9 @@ class BagFile(template.Camera):
 
         Returns
         -------
-        depth image[1 channel], color image[3 channel]
+        depth image[1 channel]: numpy array
+        color image[3 channel]: numpy array
+            in RGB format
         """
         # Start streaming from file
         self.pipeline.start(self.config)
@@ -72,31 +75,28 @@ class BagFile(template.Camera):
 
             yield depth_image, color_image
 
-    def display_in_window(self):
+    def display_in_window(self, clipping=False):
         """
         Displays the depth/color image streams on repeat, separately, in one window
 
         Parameters
-        ---------------
-        self: BagFile object
-            this does not need to be passed as an argument, passed automatically
-
-        Raises
-        ------------------
-        NotImplementedError: if called from a based camera class
+        -------
+        clipping: boolean
+            defaults to false, can be set true to remove data from the images
+            beyond a given distance from the camera
         """
         for depth_image, color_image in self:
             # Remove background - Set pixels further than clipping_distance to grey
             grey_color = 153
             depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
-            bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
 
             # render depth/color images
             depth_colormap = cv2.applyColorMap(
                 cv2.convertScaleAbs(depth_image, alpha=0.03),
                 cv2.COLORMAP_JET)
 
-            if self.CLIPPING:
+            if clipping:
+                bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
                 images = np.hstack((bg_removed, depth_colormap))
             else:
                 images = np.hstack((color_image, depth_colormap))

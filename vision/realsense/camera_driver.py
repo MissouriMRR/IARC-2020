@@ -14,10 +14,10 @@ must be in the same directory, or you need to manually change their location
 in the import section
 """
 
-import os.path
-import argparse
-import realsense
-import bag_file
+# import os.path
+# import argparse
+# import realsense
+# import bag_file
 # import sim_camera ---> unnecessary of now
 
 #######################################################
