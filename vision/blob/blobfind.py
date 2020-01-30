@@ -26,28 +26,10 @@ class BlobFinder:
     params: SimpleBlobDetector_Params
         blob detector params object
     """
-    def __init__(self, image, params=None):
-        self.image = image
+    def __init__(self, params=None):
         self.keypoints = []
         self.params = params
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
-
-    @property
-    def image(self):
-        """
-        This function is called every time self.image is run.
-        """
-        return self._image
-
-    @image.setter
-    def image(self, value):
-        """
-        Defines behavior of self.image = value.
-        """
-        if not isinstance(value, np.ndarray):
-            raise ValueError(f"Requires image as np.ndarray, got {type(value)}")
-
-        self._image = value
 
     @property
     def params(self):
@@ -85,7 +67,7 @@ class BlobFinder:
         if not isinstance(image, np.ndarray):
             raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
 
-        keypoints = self.blob_detector.detect(self.image)
+        keypoints = self.blob_detector.detect(image)
         self.keypoints = keypoints
 
         bounding_boxes = []
