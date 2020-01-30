@@ -52,7 +52,6 @@ class Realsense(Camera):
         self.config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.framerate)
         self.config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.framerate)
 
-
     def __iter__(self):
         """
         Iterates through each depth/color frame in the object

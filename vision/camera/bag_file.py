@@ -9,6 +9,10 @@ try:
     from vision.realsense.template import Camera
 except ImportError:
     from template import Camera
+try:
+    from vision.util.take_picture import save_camera_frame
+except:
+    from take_picture import save_camera_frame
 
 
 class BagFile(Camera):
@@ -104,7 +108,12 @@ class BagFile(Camera):
             cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_NORMAL)
             cv2.resizeWindow('Depth/Color Stream', (self.width, int(self.height / 2)))
             cv2.imshow('Depth/Color Stream', images)
+
             key = cv2.waitKey(1)
+
+            if key == ord('c'):
+                save_camera_frame(depth_image, color_image)
+
             # if pressed 'q' or escape (27) exit program
             if key == ord('q') or key == 27 or cv2.getWindowProperty("Depth/Color Stream", 0) == -1:
                 cv2.destroyAllWindows()
