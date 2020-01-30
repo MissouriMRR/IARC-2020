@@ -21,8 +21,6 @@ class BlobFinder:
 
     Parameters
     ----------
-    image: np array
-        image to detect blobs in, as a np array
     params: SimpleBlobDetector_Params
         blob detector params object
     """
@@ -119,7 +117,7 @@ if __name__ == '__main__':
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
 
-        blob_finder = BlobFinder(image, params=import_params(config))
-        bboxes = blob_finder.find()
+        blob_finder = BlobFinder(params=import_params(config))
+        bboxes = blob_finder.find(image)
 
         plot_blobs(blob_finder.keypoints, image)
