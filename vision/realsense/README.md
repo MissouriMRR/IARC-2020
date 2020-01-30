@@ -29,6 +29,8 @@ file must be in the same directory as this program.
 #  Testing the BagFile class                          #
 #######################################################
 
+import bag_file
+
 # Create object for parsing command-line options
 parser = argparse.ArgumentParser(description="Read recorded bag file and display depth and color streams.\
                                   Remember to change the stream resolution, fps and format to match the recorded.\
