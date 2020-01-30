@@ -67,15 +67,23 @@ class BlobFinder:
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self):
+    def find(self, image):
         """
         Detects blobs in the image provided in the constructor
+
+        Parameters
+        ----------
+        image: np.ndarray
+            image to find blobs in
 
         Returns
         -------
         list[Rectangle]
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
+
+        if not isinstance(image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
 
         keypoints = self.blob_detector.detect(self.image)
         self.keypoints = keypoints
