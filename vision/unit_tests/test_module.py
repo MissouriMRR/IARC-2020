@@ -32,14 +32,15 @@ class TestModuleInFrame(unittest.TestCase):
         }
         print(os.getcwd())
         for picname in expected_results.keys():
-            picpath = os.path.join('vision_images', 'module', picname)
-            
-            image = cv2.imread(picpath)
+            with self.subTest(i=picname):
+                picpath = os.path.join('vision_images', 'module', picname)
+                
+                image = cv2.imread(picpath)
 
-            if image is None:
-                raise FileNotFoundError(f"Could not read {picpath}!")
+                if image is None:
+                    raise FileNotFoundError(f"Could not read {picpath}!")
 
-            results.append(mif(image))
+                results.append(mif(image))
        
         self.assertListEqual(results, list(expected_results.values()))
 
