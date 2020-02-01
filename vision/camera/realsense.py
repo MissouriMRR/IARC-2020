@@ -1,6 +1,11 @@
 """
 The Realsense class is a child class of the camera, designed to be used for realsense depth cameras
 """
+import sys, os
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
@@ -12,7 +17,7 @@ except ImportError:
 try:
     from vision.util.take_picture import save_camera_frame
 except:
-    from take_picture import save_camera_frame
+    from util.take_picture import save_camera_frame
 
 
 class Realsense(Camera):
@@ -134,3 +139,5 @@ class Realsense(Camera):
 
         self.pipeline.stop()
 
+if __name__ == '__main__':
+    Realsense(0, 0, 0).display_in_window()
