@@ -32,6 +32,11 @@ class TestModuleInFrame(unittest.TestCase):
         }
         print(os.getcwd())
         for picname in expected_results.keys():
+<<<<<<< HEAD:vision/unit_tests/test_modulecheck.py
+            picpath = os.path.join('vision', 'vision_images', 'module', picname)
+            results.append(mif(cv2.imread(picpath)))
+
+=======
             picpath = os.path.join('vision_images', 'module', picname)
             
             image = cv2.imread(picpath)
@@ -41,6 +46,7 @@ class TestModuleInFrame(unittest.TestCase):
 
             results.append(mif(image))
        
+>>>>>>> 6b1016a256fd45ffcef4478de024fe3c93b91263:vision/unit_tests/test_module.py
         self.assertListEqual(results, list(expected_results.values()))
 
 
