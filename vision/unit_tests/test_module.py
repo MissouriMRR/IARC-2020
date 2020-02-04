@@ -37,11 +37,11 @@ class TestModuleInFrame(unittest.TestCase):
                 
                 image = cv2.imread(picpath)
 
-                if image is None:
+          if image is None:
                     raise FileNotFoundError(f"Could not read {picpath}!")
 
                 results.append(mif(image))
-       
+
         self.assertListEqual(results, list(expected_results.values()))
 
 
