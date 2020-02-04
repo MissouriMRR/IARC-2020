@@ -11,7 +11,8 @@ class ModuleLocation:
 
     def __init__(self):
         self.img = np.array(0)
-        
+        self.depth = np.array(0)
+
         self.holes = np.array(0)
         
         self.circles = np.array(0)
@@ -19,18 +20,26 @@ class ModuleLocation:
         self.x_buckets = np.array(0)
         self.y_buckets = np.array(0)
 
-    def getCenter(self, img):
+    def setImg(self, img):
+        """
+        """
+        # Seperate depth channel from image
+        self.depth = img[:, :, 4:]
+        self.img = img[:, :, 3]
+
+    def getCenter(self):
         """
         Find the center of the front face of the module.
         Returns
         -------
         Tuple - coordinates of the center of the module.
         """
-        self.img = img
+
+        self.setImg(self.img)
         self.holes = self.getHoleLocations()
 
 
-    def _circleDetection(self, img=self.img):
+    def _circleDetection(self):
         """
         Returns
         -------
@@ -83,7 +92,7 @@ class ModuleLocation:
         num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
         self.y_buckets, _ = np.histogram(y_vals, num_buckets, (lower_bound, upper_bound))
 
-    def getHoleLocations(self, img=self.img):
+    def getHoleLocations(self):
         """
         Finds the locations of the 4 holes on the front face of the module.
 
