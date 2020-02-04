@@ -8,9 +8,9 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 try:
-    from vision.blob.blobfind import import_params
+    from vision.util.import_params import import_params
 except ImportError:
-    from blob.blobfind import import_params
+    from util.import_params import import_params
 
 
 class TestParamsImport(unittest.TestCase):
