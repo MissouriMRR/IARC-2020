@@ -10,14 +10,17 @@ import unittest
 import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
-from vision.module.detector import ModuleKMeans as mkm
+#from vision.module.detector import ModuleKMeans as mkm
 
 
 class TestModuleInFrame(unittest.TestCase):
+    """
+    Testing module.in_frame functionality.
+    """
     def test_ModuleInFrame(self):
         """
         Testing ModuleInFrame
-        
+
         Returns
         -------
         ndarray[bool] which images the module was detected in
@@ -30,12 +33,12 @@ class TestModuleInFrame(unittest.TestCase):
             "Block3.jpg" : True,
             "Block4.jpg" : True
         }
-        print(os.getcwd())
         for picname in expected_results.keys():
             with self.subTest(i=picname):
                 picpath = os.path.join('vision_images', 'module', picname)
 
                 image = cv2.imread(picpath)
+
 
                 if image is None:
                     raise FileNotFoundError(f"Could not read {picpath}!")
@@ -43,10 +46,6 @@ class TestModuleInFrame(unittest.TestCase):
                 results.append(mif(image))
 
         self.assertListEqual(results, list(expected_results.values()))
-
-
-class TestKMeans(unittest.TestCase):
-    pass
 
 
 if __name__ == '__main__':
