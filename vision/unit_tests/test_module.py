@@ -34,7 +34,7 @@ class TestModuleInFrame(unittest.TestCase):
         for picname in expected_results.keys():
             with self.subTest(i=picname):
                 picpath = os.path.join('vision_images', 'module', picname)
-                
+
                 image = cv2.imread(picpath)
 
                 if image is None:
@@ -50,4 +50,4 @@ class TestKMeans(unittest.TestCase):
 
 
 if __name__ == '__main__':
-        unittest.main()
+    unittest.main()
