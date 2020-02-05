@@ -1,15 +1,78 @@
 # Vision
+
 The vision team is responsible for processing images in order to extract information relevant to flight control.
 
+## Quick Links
+
+[Getting Started](#getting-started)
+
+[Directory Structure](#directory-structure)
+
+[Storing Images](#storing-images)
+
+[Documentation](#documentation)
+
+[Unit Testing](#unit-testing)
+
+## Getting Started
+
+1. Clone this repository
+
+```bash
+    git clone https://github.com/MissouriMRR/IARC-2020
+```
+
+2. Install pip requirements
+
+```bash
+    pip install -r requirements.txt
+```
+
+3. (For Vision Tests) Download the test images from the team drive.
+
+3a. Ask leadership for access to the MRR team drive.
+
+3b. In google drive, click the shared drives link and open the Multirotor Robot folder.
+
+3c. Navigate to IARC Mission 9/.
+
+3d. Download vision_images folder as a whole.
+
+3e. Extract the zip file into the repo -- IARC-2020/vision/vision_images
+
+4. (Optional) Run unit tests.
+
+```bash
+    ./unit_tests/runall.sh
+```
+
+5. Contributing
+
+5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
+
+5b. In any project, choose an issue from the To do section.
+
+5c. Create a plan for solving this issue and get approved by leadership.
+
+5d. Checkout respective branch in repository and write code.
+
+5e. When finished, go to the repository website and submit a pull request.
+
+5f. Have pull request reviewed.
+
+5g. Merge branch into develop when approved.
+
+
 ## Directory Structure
+
 ```
     vision/
-        blob/
+        obstacle/
             ...
-            main.py  <- Runnable file
+            main.py  <- Code, runnable from IARC/
             README.md  <- Feature goal, use instructions
             requirements.txt  <- All necessary pip packages
-        realsense/
+        camera/
             ...
             main.py
             README.md
@@ -20,39 +83,41 @@ The vision team is responsible for processing images in order to extract informa
         vision_videos/  # Downloaded from team drive(see below)
             blob/
             ...
-        unit_tests/
-            blob/
-                test_classification.py  <- Follows Unit Testing specs from below
-                test_blobbing.py
-            ...
-            runall.sh  <- Runs every unit test
         main.py  <- Will bootstrap all vision code
         README.md  <- This file.
+
+    unit_tests/
+        test_classification.py  <- Follows Unit Testing specs from below
+        test_blobbing.py
+        ...
+        runall.sh  <- Runs every unit test
 ```
 
+## Storing Images
 
-## Images
 *Images & Videos should never be commited into any part of the repo at any time!*
 
 Uploading Images & Videos: Upload all content to the MRR Team Drive in *IARC Mission 9/vision_images or videos* then to the respective project folder.
 
 Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/vision_images or videos* and save it in your copy of the repository as *IARC-2020/vision/vision_images (or _videos)*. Code and unit tests should work as if all content is located in these folders.
 
-
 ## Documentation
+
 #### Code Files
-```
+
+```python
     """
     At the top of each file you should have a docstring like this describing its purpose.
     """
 ```
 
 #### Classes
-```
+
+```python
     Class Neuron:
         """
         A group of neurons capable of emergent learning.
-        
+
         Parameters
         -----------
         fire_thresh: float
@@ -65,7 +130,8 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 ```
 
 #### Functions
-```
+
+```python
     def stdp(spike_train):
         """
         An asynchronous hebbian learning rule to suggest synapse weight updates.
@@ -74,7 +140,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
         ----------
         spike_train: ndarray[t, n], boolean values
             Log of neuron fires at each timestep.
-        
+
         Raises
         ------
         ValueError: If something bad happens.
@@ -86,12 +152,14 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 ```
 
 ## Unit Testing
+
 All unit testing should be done with the standard python unittest module.
 
 #### Tests Cases
+
 There should be a test case for each major function of each class/function.
 
-```
+```python
     import unittest
 
     class TestNeuron(unittest.TestCase):
@@ -119,7 +187,7 @@ There should be a test case for each major function of each class/function.
             ## Ensure neurons only fire if potential > fire_thresh
             for fire_thresh in [-np.inf, -15, 0, .1, 100]:  # Need range of test values
                 neuron = Neuron(fire_thresh=fire_thresh, 0)
-                
+
                 potentials = np.arange(-20, 20, 2)
                 neuron.potentials = np.copy(potentials)
 
@@ -129,11 +197,100 @@ There should be a test case for each major function of each class/function.
 
                 ## only works with python lists
                 self.assertListEqual(list(expected_fires), list(real_fires))
-    
-    
+
+
+    if __name__ == '__main__:
+        unittest.main()
+```
+
+### Mocking
+
+When testing a class and its methods, it's important to know if failed tests are caused by the object itself or those it relies on. Mock classes/functions are used to overload any other functionality defined in the project that the class/function being tested relies on. This way, if a unit test fails, it is clear what class/function caused this issue.
+
+#### Mock functions
+
+```python
+    import unittest
+    from unittest import mock
+
+    class TestInputNeuron(unittest.TestCase):
+        def test_tick(self):
+            """
+            Testing InputNeuron.__call__.
+
+            Parameters
+            ----------
+            state: tuple
+                Current state of env.
+
+            Returns
+            -------
+            ndarray Spikes fired in input neurons.
+
+            Effects
+            -------
+            InputNeuron calls get_rates w/ state as parameter, using the output to set input rate.
+            """
+            ## Ensure get_rates called w/ correct params.
+            states = [('a', 'b'), None]
+
+            for state in states:
+                get_rate = mock.Mock(return_value=.5)
+
+                neuron = InputNeuron(get_rate)
+                neuron(state)
+
+                get_rate.assert_called_once()
+
+                call_args = list(get_rate.call_args)
+                self.assertEqual(len(call_args), 1)
+                self.assertIn(state, call_args)
+
+            ## ...
+
+
     if __name__ == '__main__:
         unittest.main()
 ```
 
 #### Mock classes
-TODO
+
+```python
+    import unittest
+    from unittest import mock
+
+    class TestNeuralNetwork(unittest.TestCase):
+
+        def test_reset(self):
+            """
+            Testing NeuralNetwork.reset.
+
+            Effects
+            -------
+            Neuron.reset is called with parameters x, y, z.
+            Synapse.reset is called with parameters z, y, x.
+            """
+            ## Ensure Neuron & Synapse reset functions called w/ correct params.
+
+            # -> assumes NeuralNetwork has imports for neuron, synapse
+            with mock.patch('Neuron', spec=Neuron) as mock_neuron:
+                with mock.patch('Synapse', spec=Synapse) as mock_synapse:
+                    network = NeuralNetwork()
+
+                    mock_neuron.reset.assert_called_once()
+                    mock_synapse.reset.assert_called_once()
+
+                    neuron_call_args = list(mock_neuron.reset.call_args)
+                    self.assertEqual(len(neuron_call_args), 3)
+                    self.assertIn('x', neuron_call_args[0])
+                    # ...
+
+                    synapse_call_args = list(mock_synapse.reset.call_args)
+                    self.assertEqual(len(synapse_call_args), 3)
+                    self.assertEqual('z', synapse_call_args[0])
+                    # ...
+
+
+    if __name__ == '__main__:
+        unittest.main()
+```

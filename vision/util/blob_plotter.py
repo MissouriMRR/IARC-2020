@@ -32,4 +32,4 @@ def plot_blobs(keypoints, image):
 
     # show image with circles indicating where blobs were detected
     cv2.imshow("Blobs", im_with_keypoints)
-    cv2.waitKey(0)
+    cv2.waitKey(1)
