@@ -65,14 +65,14 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Directory Structure
 
-```python
+```
     vision/
-        blob/
+        obstacle/
             ...
-            main.py  <- Runnable file
+            main.py  <- Code, runnable from IARC/
             README.md  <- Feature goal, use instructions
             requirements.txt  <- All necessary pip packages
-        realsense/
+        camera/
             ...
             main.py
             README.md
@@ -83,14 +83,14 @@ The vision team is responsible for processing images in order to extract informa
         vision_videos/  # Downloaded from team drive(see below)
             blob/
             ...
-        unit_tests/
-            blob/
-                test_classification.py  <- Follows Unit Testing specs from below
-                test_blobbing.py
-            ...
-            runall.sh  <- Runs every unit test
         main.py  <- Will bootstrap all vision code
         README.md  <- This file.
+
+    unit_tests/
+        test_classification.py  <- Follows Unit Testing specs from below
+        test_blobbing.py
+        ...
+        runall.sh  <- Runs every unit test
 ```
 
 ## Storing Images

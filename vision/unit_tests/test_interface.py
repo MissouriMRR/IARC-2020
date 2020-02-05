@@ -1,4 +1,7 @@
-import sys,os
+"""
+Flight-vision interface related tests.
+"""
+import sys, os
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -9,7 +12,9 @@ from vision.bounding_box import BoundingBox
 
 
 class TestEnvironment(unittest.TestCase):
-
+    """
+    Testing the environment class.
+    """
     def setUp(self):
         self.target = [
             BoundingBox(4, ","),
@@ -21,6 +26,9 @@ class TestEnvironment(unittest.TestCase):
         ]
 
     def test_iter(self):
+        """
+        Test Environment.__iter__
+        """
         env = Environment()
         env.bounding_boxes = self.target
         for i, bounding_boxes in enumerate(env):
