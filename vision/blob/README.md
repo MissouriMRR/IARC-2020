@@ -1,8 +1,10 @@
 # Blob Detection
+
 The blob team is a division of the vision team dedicated to detecting
 and classifying objects in images taken by the drone's RealSense cameras.
 
 ### Documentation
+
 Blob detection is done with the OpenCV SimpleBlobDetector. 
 The SimpleBlobDetector can take a number of parameters that control how the
 blobs are detected. SimpleBlobDetector follows a number of steps in
@@ -24,6 +26,7 @@ The find_blobs function takes in an image (with optional logging), and returns
 an `np.array` of `Rectangle` objects that define the bounding boxes of the blobs.
 
 ### Unit Testing
+
 Unit tests can be found under [vision/unit_tests](vision/unit_tests).
 There is a single unit test called `test_finding_blobs` that tests all the
 images in [vision/blob/samples](vision/blob/samples) to determine if the
