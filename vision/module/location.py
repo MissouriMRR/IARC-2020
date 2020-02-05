@@ -17,15 +17,18 @@ class ModuleLocation:
         
         self.circles = np.array(0)
         
-        self.x_buckets = np.array(0)
-        self.y_buckets = np.array(0)
+        self.x_heights = np.array(0)
+        self.x_bounds = np.array(0)
+        self.y_heights = np.array(0)
+        self.y_bounds = np.array(0)
 
     def setImg(self, img):
         """
         """
         # Seperate depth channel from image
-        self.depth = img[:, :, 4:]
-        self.img = img[:, :, 3]
+        #self.depth = img[:, :, 4:]
+        #self.img = img[:, :, 3]
+        self.img = img
 
     def getCenter(self):
         """
@@ -45,6 +48,8 @@ class ModuleLocation:
         -------
         ndarray - circles detected in image.
         """
+        BLUR_SIZE = 5
+
         # Grayscale
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
 
@@ -57,11 +62,11 @@ class ModuleLocation:
         
         # Hough Circle Detection
         self.circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
-        self.circles = np.uint16(circles)
+        self.circles = np.uint16(self.circles)
 
         # Resize circles into 2d array
-        self.circles = np.reshape(circles, (np.shape(circles)[1], 3))
-        return circles
+        self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
+        return self.circles
 
     def _getBuckets(self):
         """
@@ -84,13 +89,13 @@ class ModuleLocation:
         upper_bound = np.amax(x_vals)
         lower_bound = np.amin(x_vals)
         num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-        self.x_buckets, _ = np.histogram(x_vals, num_buckets, (lower_bound, upper_bound))
+        self.x_heights, self.x_bounds = np.histogram(x_vals, num_buckets, (lower_bound, upper_bound))
 
         # Bucket sorting y values
         upper_bound = np.amax(x_vals)
         lower_bound = np.amin(x_vals)
         num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-        self.y_buckets, _ = np.histogram(y_vals, num_buckets, (lower_bound, upper_bound))
+        self.y_heights, self.y_bounds = np.histogram(y_vals, num_buckets, (lower_bound, upper_bound))
 
     def getHoleLocations(self):
         """
@@ -100,6 +105,33 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
+        # 0 (x0, y1)
+        # 1 (x1, y0)
+        # 2 (x1, y2)
+        # 3 (x2, y1)
+        ind = 0
+        hole_ind = 0
+        np.reshape(self.holes, (2, 4))
+        for h in self.x_heights:
+            if h > 10:
+               self.holes[hole_ind, 0] = self.x_bounds[ind]
+               hole_ind += 1
+            ind += 1
+
+        ind = 0
+        hole_ind = 0
+        for h in self.y_heights():
+            if h > 10:
+                if hole_ind % 2:
+                    self.holes[hole_ind + 1, 0] = self.y_bounds[ind]
+                else:
+                    self.holes[hole_ind - 1, 0] = self.y_bounds[ind]
+            ind += 1
+        
+    def showImg(self):
+        cv2.imshow(self.img, 0)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         
         
 if __name__ == "__main__":
