@@ -1,3 +1,7 @@
+"""
+Runs through images and determines which have the pylon
+"""
+
 import unittest
 import os
 import sys
@@ -10,27 +14,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 # from vision.pylon.detect_pylon import import_params
-
-def detect_red(image):
-    # Convert the image from BGR to HSV
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-    # Set the lower and upper color limits
-    lower_red = np.array([50, 150, 25])
-    upper_red = np.array([255, 255, 120])
-    # Red_mask picks out any pixel between the lower and upper limits
-    # and replaces them with white.  Everything else is replaced with black
-    red_mask = cv2.inRange(hsv, lower_red, upper_red)
-
-    # Run through each pixel in the mask.  If one is white, then
-    # we detected part of the pylon
-    pylon = False
-    for x in range(0, red_mask.shape[0]):
-        for y in range(0, red_mask.shape[1]):
-            if red_mask[x, y] != 0:
-                pylon = True
-
-    return pylon
+from vision.pylon.detect_pylon import detect_red
 
 class TestPylon(unittest.TestCase):
     def test_pylon(self):
@@ -52,22 +36,14 @@ class TestPylon(unittest.TestCase):
             "sim_pylon2.png":True,
             "sim_pylon3.png":True
         }
-        prefix = 'vision' if os.path.isdir("vision") else ''
-
-        # config_filename = os.path.join(prefix, 'pylon', 'config.json')
-        # with open(config_filename, 'r') as config_file:
-            # raw_config = json.load(config_file)
-
-        # config = import_params(raw_config)
+        prefix = 'vision' if os.path.isdir("vision") else '..'
 
         for filename, expected in expected_pylon.items():
             with self.subTest(i=filename):
                 img_filename = os.path.join(prefix, 'vision_images', 'pylon', filename)
                 img_file = cv2.imread(img_filename)
-                # if img_file == None:
-                    # print(img_filename)
-                    # return;
-
+                if img_file is None:
+                    self.fail(msg="Failed to read image.  " + img_filename)
 
                 # detector = BlobFinder(img_file, params=config)
                 # bounding_boxes = detector.find()
