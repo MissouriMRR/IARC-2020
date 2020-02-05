@@ -2,7 +2,6 @@
 This program will save a color frame as a JPG, the depth frame as a JPG,
 and the depth scale in a .txt file for use in image processing. The realsense camera must be
 plugged into the computer, and must not be currently streaming for the program to work.
-
 The files are all saved in the same directory as the program, and are named using the current
 date and time at which the frames were taken, followed by either "-depthImage", "-colorImage",
 or "-depthScale" accordingly.
@@ -17,7 +16,6 @@ import pyrealsense2 as rs
 def save_frame_on_press(width, height, framerate, serial_no=None):
     """
     Enable the realsense camera and upon q/ESC press capture image.
-
     Parameters
     ----------
     width: int
@@ -28,7 +26,6 @@ def save_frame_on_press(width, height, framerate, serial_no=None):
         Images captures per second.
     serial_no: str, default=None
         Serial number of camera if want specific one.
-
     Effects
     -------
     Saves color and depth images w/ date as title in current directory.

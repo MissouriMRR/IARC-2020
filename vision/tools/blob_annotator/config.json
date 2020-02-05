@@ -1,0 +1,14 @@
+{
+    "controls": {
+        "NEXT": "n",
+        "PREV": "p",
+        "CLEAR": "c",
+        "UNDO": "u",
+        "CHANGE_TAG": "t"
+    },
+    "labels": {
+        "blob": {
+            "color": [200, 150, 120]
+        }
+    }
+}

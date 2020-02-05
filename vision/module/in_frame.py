@@ -23,7 +23,6 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
