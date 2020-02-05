@@ -20,6 +20,9 @@ from vision.util.import_params import import_params
 
 
 class TestBlobbing(unittest.TestCase):
+    """
+    Testing obstacle detection.
+    """
     def test_finding_blobs(self):
         """
         Tests that the expected number of blobs is found
@@ -59,7 +62,7 @@ class TestBlobbing(unittest.TestCase):
 
                 self.assertEqual(len(bounding_boxes), expected, msg=f"Expected {expected} blobs, found {len(bounding_boxes)} in image {filename}")
 
-    def test_annotation_accuracy(self):  # TODO maybe this should be a benchmark?
+    def test_annotation_accuracy(self):
         """
         Test accuracy of blob finder via custom Annotations w/ blob_annotator tool.
         """
@@ -121,7 +124,6 @@ class TestBlobbing(unittest.TestCase):
                     if all((x1_close, y1_close, x2_close, y2_close)):
                         accuracy += 1
 
-            ## TODO split this up into true positives and false negatives -- detector not guessing more than should
             accuracy /= len(annotation.findall('object'))
             print(f"{filename}: {accuracy * 100:.2f}%")
 
