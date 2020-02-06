@@ -22,7 +22,7 @@ def plot_blobs(keypoints, image):
     if not isinstance(image, np.ndarray):
         raise ValueError(f"Expected argument of type BlobFinder, got {type(image)} instead")
 
-    im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     # print formatted list of bouding boxes
     print('[')

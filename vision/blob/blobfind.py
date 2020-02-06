@@ -13,34 +13,7 @@ import cv2
 import numpy as np
 from vision.bounding_box import BoundingBox
 import json
-
-
-def import_params(config):
-    if not isinstance(config, dict):
-        raise ValueError(f"When importing params, config should be a dictionary, got {type(config)} instead")
-
-    params = cv2.SimpleBlobDetector_Params()
-
-    for category in config:
-        if 'enable' not in config[category]:
-            raise ValueError(f"Category '{category}' is missing an 'enable' attribute")
-        category_enabled = config[category]['enable']
-
-        try:
-            setattr(params, category, category_enabled)
-        except AttributeError:
-            ## Not all settings have enable/disable
-            pass
-
-        if category_enabled:
-            if hasattr(params, category):
-                setattr(params, category, config[category]['enable'])
-            for attr in config[category]:
-                if hasattr(params, attr):
-                    setattr(params, attr, config[category][attr])
-
-    return params
-
+from vision.util.import_params import import_params
 
 class BlobFinder:
     """
@@ -48,33 +21,13 @@ class BlobFinder:
 
     Parameters
     ----------
-    image: np array
-        image to detect blobs in, as a np array
     params: SimpleBlobDetector_Params
         blob detector params object
     """
-    def __init__(self, image, params=None):
-        self.image = image
+    def __init__(self, params=None):
         self.keypoints = []
         self.params = params
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
-
-    @property
-    def image(self):
-        """
-        This function is called every time self.image is run.
-        """
-        return self._image
-
-    @image.setter
-    def image(self, value):
-        """
-        Defines behavior of self.image = value.
-        """
-        if not isinstance(value, np.ndarray):
-            raise ValueError("Requires image as np.ndarray")
-
-        self._image = value
 
     @property
     def params(self):
@@ -89,14 +42,19 @@ class BlobFinder:
         Defines behavior of self.params = value.
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
-            raise ValueError("Requires instance of SimpleBlobDetector_Params")
+            raise ValueError(f"Requires instance of SimpleBlobDetector_Params, got {type(value)}")
 
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self):
+    def find(self, image):
         """
         Detects blobs in the image provided in the constructor
+
+        Parameters
+        ----------
+        image: np.ndarray
+            image to find blobs in
 
         Returns
         -------
@@ -104,7 +62,10 @@ class BlobFinder:
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 
-        keypoints = self.blob_detector.detect(self.image)
+        if not isinstance(image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
+
+        keypoints = self.blob_detector.detect(image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -155,7 +116,8 @@ if __name__ == '__main__':
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
-        blob_finder = BlobFinder(image, params=import_params(config))
-        bboxes = blob_finder.find()
+
+        blob_finder = BlobFinder(params=import_params(config))
+        bboxes = blob_finder.find(image)
 
         plot_blobs(blob_finder.keypoints, image)

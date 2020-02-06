@@ -38,8 +38,8 @@ class Pipeline:
         for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
             if i == self.alg_time:
                 break
-            blob_finder = BlobFinder(color_image, params=import_params(config))
-            bboxes = blob_finder.find()
+            blob_finder = BlobFinder(params=import_params(config))
+            bboxes = blob_finder.find(color_image)
             env.update(bboxes)
 
             plot_blobs(blob_finder.keypoints, color_image)
