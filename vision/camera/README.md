@@ -50,3 +50,20 @@ bag_reader = bag_file.BagFile(1280, 720, 30, args.input)
 
 bag_reader.display_in_window()
 ```
+
+### Sim Camera Example
+
+To use the sim camera, run the program from the terminal
+with "python camera_driver.py". The airsim must also be running
+for the sim camera class to work.
+
+```Python
+#######################################################
+#  Testing the Sim Camera                             #
+#######################################################
+
+import sim_camera
+
+sim_cam = sim_camera.SimCamera()
+sim_cam.display_in_window()
+```
