@@ -22,18 +22,31 @@ class ModuleLocation:
         self.y_heights = np.array(0)
         self.y_bounds = np.array(0)
 
+        self.center = np.array(0)
 
     def getCenter(self):
         """
         Find the center of the front face of the module.
         Returns
         -------
-        Tuple - coordinates of the center of the module.
+        ndarray - coordinates of the center of the module.
         """
 
         self.setImg(self.img)
         self.getHoleLocations()
-        self.showHoles()
+
+        # Coordinates of the center of the front face of the module
+        self.center = np.arange(0, 2)
+
+        x_total = 0
+        y_total = 0
+        for x, y in self.holes:
+            x_total += x
+            y_total += y
+        self.center[0] = x // 4
+        self.center[1] = y // 4
+
+        return self.center
     
     def getHoleLocations(self):
         """
@@ -43,30 +56,29 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
-        self._groupCircles()
 
-        # 0 (x0, y1)
-        # 1 (x1, y0)
-        # 2 (x1, y2)
-        # 3 (x2, y1)
-        ind = 0
-        hole_ind = 0
+        BUCKET_MINIMUM = 10
+
+        self._groupCircles()
+        
         self.holes = np.arange(0, 8)
-        self.holes = np.reshape(self.holes, (4, 2))
+        self.holes = np.reshape(self.holes, (4, 2)) # Set of 4 (x, y) coordinates
+
+        # x coordinates
+        ind = 0
+        coord_ind = 0
         for h in self.x_heights:
-            if h >= 1:
-               self.holes[hole_ind, 0] = self.x_bounds[ind]
-               hole_ind += 1
+            if h >= BUCKET_MINIMUM:
+               self.holes[coord_ind, 0] = self.x_bounds[ind]
+               coord_ind += 1
             ind += 1
 
+        # y coordinates
         ind = 0
         coord_ind = 0
         for h in self.y_heights:
-            if h >= 1:
-                if hole_ind % 2:
-                    self.holes[coord_ind + 1, 1] = self.y_bounds[ind]
-                else:
-                    self.holes[coord_ind - 1, 1] = self.y_bounds[ind]
+            if h >= BUCKET_MINIMUM:
+                self.holes[coord_ind, 1] = self.y_bounds[ind]
                 coord_ind += 1
             ind += 1
 
