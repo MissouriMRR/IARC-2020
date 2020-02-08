@@ -1,3 +1,6 @@
+## Camera Modules
+All camera modules have a generic interface so they can be swapped out easily.
+
 # Example Code
 
 The following are examples of how to use the camera child classes. As always, make sure to either change file import paths,
@@ -56,6 +59,8 @@ bag_reader.display_in_window()
 To use the sim camera, run the program from the terminal
 with "python camera_driver.py". The airsim must also be running
 for the sim camera class to work.
+
+[Airsim Image API](https://github.com/microsoft/AirSim/blob/master/docs/image_apis.md#what-does-pixel-values-mean-in-different-image-types)
 
 ```Python
 #######################################################
