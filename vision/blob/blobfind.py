@@ -58,7 +58,7 @@ class BlobFinder:
 
         Returns
         -------
-        list[Rectangle]
+        list[BoundingBox]
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 

@@ -9,9 +9,24 @@ import numpy as np
 LOWER_RED = np.array([50, 150, 25])
 UPPER_RED = np.array([255, 255, 120])
 
-# detect_red detects all pixels that fall in a certain range in an image
-# then outputs the original image and detected mask
+
 def detect_red(image):
+    """
+    detect_red detects all pixels that fall in a certain range in an image
+    then outputs the original image and detected mask
+
+    Parameters
+    ----------
+    image: ndarray
+        Image to detect pylon in.
+
+    Returns
+    -------
+    bool If pylon is in frame or not.
+    """
+    if image is None:
+        raise ValueError("Image cannot be None.")
+
     # Convert the image from BGR to HSV
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -28,6 +43,7 @@ def detect_red(image):
 
     # Returns false if the pylon was not detected
     return False
+
 
 if __name__ == '__main__':
     image = cv2.imread("sim_pylon.png")

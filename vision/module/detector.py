@@ -11,11 +11,9 @@ class ModuleKMeans:
     Applies the kmeans algorithm to an image and displays a remapped
     version of the image showing either the remapped colors or a black
     and white image showing only specified color channels
+
     Paramters
     ---------
-    imgPath: string
-        Reads in the image with this name to be used
-
     channel_weights: float array
         Decides the weight of each channel in the image
     """
@@ -30,6 +28,9 @@ class ModuleKMeans:
 
         Parameters
         ----------
+        image: ndarray
+            Image to apply kmeans to.
+
         K: int
             Number of centers to use for the kmeans algorithm
             (bigger K = more variety of colors)
@@ -56,6 +57,9 @@ class ModuleKMeans:
         """
 
         self.img = image
+
+        if image is None:
+            raise ValueError(f"Image cannot be None.")
 
         if len(self.img.shape) == 3 and self.img.shape[-1] != len(self.channel_weights):
             raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got {self.img.shape[-1]}")
