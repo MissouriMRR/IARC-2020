@@ -4,28 +4,28 @@ Takes information from the camera and gives it to vision
 
 import os
 import json
-from vision.realsense.read_bag import ReadBag
+from vision.camera.read_bag import ReadBag
 from vision.blob.blobfind import import_params, BlobFinder
 from vision.util.blob_plotter import plot_blobs
 
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs a blob detection algorithm, and updates the blobs to the
-    environment class.
+    This is a pipeline class that takes in a video, runs a blob detection algorithm,
+    and updates the blobs to the environment class.
 
     Parameters
     -------------
-    vid_file <.bag>
-    A video file that the algorithm can act upon
+    vid_file: str
+        Filename of .bag file that the algorithm can act upon.
 
-    env <Environment>
-    The environment interface that is used by flight code. The pipeline updates the interface.
+    env: Environment
+        The environment interface that is used by flight code. 
+        The pipeline updates the interface.
 
-    alg_time <int>
-    An integer value that corresponds to how long the video loops.
+    alg_time: int
+        An integer value that corresponds to how long the video loops.
     """
-
     def __init__(self, vid_file, env, alg_time=98):
         self.vid_file = vid_file
         self.env = env
@@ -33,20 +33,20 @@ class Pipeline:
 
     def run_algorithm(self):
         """
-        Method that takes the given video file and environment, and updates the environment with detected blobs.
+        Method that takes the given video file and environment, and updates the
+        environment with detected blobs.
         """
         for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
             if i == self.alg_time:
                 break
-            blob_finder = BlobFinder(color_image, params=import_params(config))
-            bboxes = blob_finder.find()
+            blob_finder = BlobFinder(params=import_params(config))
+            bboxes = blob_finder.find(color_image)
             env.update(bboxes)
 
             plot_blobs(blob_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
-
     from vision.interface import Environment
 
     prefix = 'vision' if os.path.isdir("vision") else ''

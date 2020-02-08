@@ -8,9 +8,9 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 try:
-    from vision.blob.blobfind import import_params
+    from vision.util.import_params import import_params
 except ImportError:
-    from blob.blobfind import import_params
+    from util.import_params import import_params
 
 
 class TestParamsImport(unittest.TestCase):
@@ -41,14 +41,15 @@ class TestParamsImport(unittest.TestCase):
         params = import_params(sample_config)
 
         for category, settings in sample_config.items():
-            enabled = sample_config[category]['enable']
+            with self.subTest(i=category):
+                enabled = sample_config[category]['enable']
 
-            for param, value in settings.items():
-                if param == 'enable':
-                    self.assertEqual(getattr(params, category), value, msg=f"Expected attribute '{category}' to have value '{value}', got '{getattr(params, category)}' instead")
+                for param, value in settings.items():
+                    if param == 'enable':
+                        self.assertEqual(getattr(params, category), value, msg=f"Expected attribute '{category}' to have value '{value}', got '{getattr(params, category)}' instead")
 
-                elif enabled:
-                    self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
+                    elif enabled:
+                        self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
 
 
 if __name__ == '__main__':

@@ -23,6 +23,9 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
+    if img is None:
+        raise ValueError(f"Image cannot be None.")
+
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -33,12 +36,12 @@ def ModuleInFrame(img):
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE,BLUR_SIZE), sigmaX=0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
 
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(laplacian)
-    
+
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
     circles = np.uint16(circles)
@@ -54,16 +57,16 @@ def ModuleInFrame(img):
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
                 slopes = np.append(slopes, m)
-    
+
     # Converting slopes to degrees
     slopes = np.degrees(np.arctan(slopes))
-    
+
     # Bucket sorting slopes to group parallels
     upper_bound = np.amax(slopes)
     lower_bound = np.amin(slopes)
     num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-    
+
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
-    
+
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
