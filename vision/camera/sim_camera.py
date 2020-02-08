@@ -1,12 +1,12 @@
 """
-The SimCamera class is a child class of the camera, designed to be used for simulator depth/color streams
+SimCamera is a child class of camera, designed to be used for simulator depth/color streams
 """
 
 import cv2
 import numpy as np
 import airsim
 try:
-    from vision.realsense.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 
