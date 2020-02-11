@@ -32,7 +32,7 @@ class ModuleLocation:
         ndarray - coordinates of the center of the module.
         """
 
-        self.getHoleLocations()
+        self._getHoleLocations()
 
         # Coordinates of the center of the front face of the module
         self.center = np.arange(0, 2)
@@ -47,7 +47,7 @@ class ModuleLocation:
 
         return self.center
     
-    def getHoleLocations(self):
+    def _getHoleLocations(self):
         """
         Finds the locations of the 4 holes on the front face of the module.
 
