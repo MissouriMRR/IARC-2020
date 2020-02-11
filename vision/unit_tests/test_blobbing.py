@@ -15,7 +15,7 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-from vision.blob.blobfind import BlobFinder
+from vision.obstacle.obstacle_finder import BlobFinder
 from vision.util.import_params import import_params
 
 
@@ -46,7 +46,7 @@ class TestBlobbing(unittest.TestCase):
         }
         prefix = 'vision' if os.path.isdir("vision") else ''
 
-        config_filename = os.path.join(prefix, 'blob', 'config.json')
+        config_filename = os.path.join(prefix, 'obstacle', 'config.json')
         with open(config_filename, 'r') as config_file:
             raw_config = json.load(config_file)
 
@@ -54,7 +54,7 @@ class TestBlobbing(unittest.TestCase):
 
         for filename, expected in expected_blobs.items():
             with self.subTest(i=filename):
-                img_filename = os.path.join(prefix, 'vision_images', 'blob', filename)
+                img_filename = os.path.join(prefix, 'vision_images', 'obstacle', filename)
                 img_file = cv2.imread(img_filename)
 
                 detector = BlobFinder(params=config)
@@ -64,12 +64,12 @@ class TestBlobbing(unittest.TestCase):
 
     def test_annotation_accuracy(self):
         """
-        Test accuracy of blob finder via custom Annotations w/ blob_annotator tool.
+        Test accuracy of obstacle finder via custom Annotations w/ blob_annotator tool.
         """
         THRESHOLD = 5
 
         prefix = 'vision' if os.path.isdir("vision") else ''
-        img_folder = os.path.join(prefix, 'vision_images', 'blob')
+        img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
         annotation_folder = os.path.join(img_folder, 'Annotations')
 
         ## Read annotations
@@ -79,10 +79,10 @@ class TestBlobbing(unittest.TestCase):
 
         annotations = {filename: lxml.etree.parse(os.path.join(annotation_folder, filename)).getroot() for filename in os.listdir(annotation_folder)}
 
-        print(f"Found {len(annotations)} annotations in vision_images/blob!")
+        print(f"Found {len(annotations)} annotations in vision_images/obstacle!")
 
-        ## Check accuracy of blob detector
-        config_filename = os.path.join(prefix, 'blob', 'config.json')
+        ## Check accuracy of obstacle detector
+        config_filename = os.path.join(prefix, 'obstacle', 'config.json')
         with open(config_filename, 'r') as config_file:
             raw_config = json.load(config_file)
 

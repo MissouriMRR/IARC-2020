@@ -5,13 +5,13 @@ Takes information from the camera and gives it to vision
 import os
 import json
 from vision.camera.read_bag import ReadBag
-from vision.blob.blobfind import import_params, BlobFinder
+from vision.obstacle.obstacle_finder import import_params, BlobFinder
 from vision.util.blob_plotter import plot_blobs
 
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs a blob detection algorithm,
+    This is a pipeline class that takes in a video, runs a obstacle detection algorithm,
     and updates the blobs to the environment class.
 
     Parameters
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     from vision.interface import Environment
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
     env = Environment()
 
     with open(config_filename, 'r') as config_file:

@@ -22,7 +22,7 @@ class BlobFinder:
     Parameters
     ----------
     params: SimpleBlobDetector_Params
-        blob detector params object
+        obstacle detector params object
     """
     def __init__(self, params=None):
         self.keypoints = []
@@ -74,7 +74,7 @@ class BlobFinder:
             center_x, center_y = keypoint.pt[0], keypoint.pt[1]
             radius = keypoint.size / 2
 
-            # calculate coordinates for bounding box of each blob
+            # calculate coordinates for bounding box of each obstacle
             pos_dx = center_x + radius
             neg_dx = center_x - radius
             pos_dy = center_y + radius
@@ -104,8 +104,8 @@ if __name__ == '__main__':
     from vision.util.blob_plotter import plot_blobs
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'blob')
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
 
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
