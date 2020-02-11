@@ -108,11 +108,10 @@ class TestBlobbing(unittest.TestCase):
 
                     for bounding_box in bounding_boxes:
                         ## Get x's and y's from bounding box
-                        X, Y, Z = [], [], []
-                        for x, y, z in bounding_box.vertices:
+                        X, Y = [], []
+                        for x, y in bounding_box.vertices:
                             X.append(x)
                             Y.append(y)
-                            Z.append(z)
                         X, Y = np.unique(X), np.unique(Y)
                         bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
 

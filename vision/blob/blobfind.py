@@ -91,7 +91,7 @@ class BlobFinder:
             bottom_right_far = bottom_right_near
             bottom_left_far = bottom_left_near
 
-            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near] # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
             bbox = BoundingBox(vertices, None)
