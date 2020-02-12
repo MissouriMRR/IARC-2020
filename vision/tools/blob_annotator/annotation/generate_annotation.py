@@ -1,18 +1,16 @@
-############################################
-# Multi-Rotor Robot Design Team
-# Missouri University of Science and Technology
-# Fall 2017
-# Christopher O'Toole
+'''
+Utility functions for creating Pascal VOC style annotations
 
+Multi-Rotor Robot Design Team
+Missouri University of Science and Technology
+Fall 2017
+Christopher O'Toole
+'''
 import os
 import cv2
 import numpy as np
 from lxml import etree
 
-'''
-
-Utility functions for creating Pascal VOC style annotations
-'''
 
 ROOT_NAME = 'annotation'
 OBJECT_ELEMENT_NAME = 'object'
@@ -57,7 +55,8 @@ def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, 
     file_path: str
         Path which the annotation file will be written to
     overwrite: bool, optional
-        Optional parameter specifying if an existing annotations should be overwritten, defaults to False
+        Optional parameter specifying if an existing annotations 
+        should be overwritten, defaults to False
     """
     height, width, depth = img.shape
 
@@ -101,12 +100,12 @@ def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, 
         Optional parameter specifying if an existing annotations should be overwritten, defaults to False
     """
 
-    img_file_name, img_extension = os.path.splitext(img_path)
+    img_file_name, _ = os.path.splitext(img_path)
     img = cv2.imread(img_path)
     assert img is not None, 'generate_pascvalvoc_annotation_from_image_file(): could not read image at %s' % (img_path,)
 
     if annotation_dir is None:
-        generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, img_file_name + '.xml', overwrite=overwrite)
+        generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, img_file_name + '.xml', img_path='', overwrite=overwrite)
     else:
         img_folder = os.path.dirname(img_file_name)
         img_name = os.path.basename(img_file_name)
