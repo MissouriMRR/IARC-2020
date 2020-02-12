@@ -1,11 +1,9 @@
 """
 Runs through images and determines which have the pylon
 """
-
 import unittest
 import os
 import sys
-import json
 import cv2
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +13,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 # from vision.pylon.detect_pylon import import_params
 from vision.pylon.detect_pylon import detect_red
+
 
 class TestPylon(unittest.TestCase):
     def test_pylon(self):

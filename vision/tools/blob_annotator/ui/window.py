@@ -25,14 +25,14 @@ class Window(object):
     def __exit__(self, *params):
         if not self.destroyed:
             cv2.destroyWindow(self.title)
-        
+
         self.destroyed = True
 
     def set_mouse_callback(self, callback):
         cv2.setMouseCallback(self.title, callback)
 
-    def set_property(self, property, value):
-        cv2.setWindowProperty(self.title, property, value)
+    def set_property(self, key, value):
+        cv2.setWindowProperty(self.title, key, value)
 
     def get_key(self):
         key = chr(cv2.waitKey(int(2)) & 0xFF)
