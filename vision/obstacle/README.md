@@ -12,11 +12,13 @@ SimpleBlobDetector follows a number of steps in
 order to find blobs:
 (Summarized from [LearnOpenCV](learnopencv.com/blob-detection-using-opencv-python-c/))
 
-1. **Thresholding:** Multiple binary images are created from the source image, where
-binarization is done in the range of `minThreshold` and `maxThreshold` for each image.
+1. **Thresholding:** Multiple binary images are created from the source image, where binarization is done in the range of `minThreshold` and `maxThreshold` for each image.
+
 2. **Grouping:** In each of the binary images, connected white pixels are grouped.
+
 3. **Merging:** The centers of the groups are compared. If the blobs are closer
 together than `minDistBetweenBlobs`, then they are merged together.
+
 4. **Center and Radius:** Finally, each blob has its center and radius computed.
 
 The return value is a list of [keypoints](docs.opencv.org/2.4/modules/features2d/doc/common_interfaces_of_feature_detectors.html#keypoint), 
