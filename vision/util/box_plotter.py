@@ -20,7 +20,7 @@ def plot_box(boxes, image, waittime=0):
     image: np.ndarray
         image to detect obstacles in
     waittime: int, default=0
-        cv2.waitKey parameter, number of seconds to show window 0=inf. 
+        cv2.waitKey parameter, number of seconds to show window 0=inf.
     """
     if not isinstance(boxes, list):
         raise ValueError(f"Expected list of BoundingBox, got {type(boxes)} instead")
