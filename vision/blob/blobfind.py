@@ -80,10 +80,10 @@ class BlobFinder:
             pos_dy = center_y + radius
             neg_dy = center_y - radius
 
-            top_left_near = (neg_dx, neg_dy, 0)
-            top_right_near = (pos_dx, neg_dy, 0)
-            bottom_right_near = (pos_dx, pos_dy, 0)
-            bottom_left_near = (neg_dx, pos_dy, 0)
+            top_left_near = (neg_dx, neg_dy)
+            top_right_near = (pos_dx, neg_dy)
+            bottom_right_near = (pos_dx, pos_dy)
+            bottom_left_near = (neg_dx, pos_dy)
 
             # With depth, these will be calculated differently
             """top_left_far = top_left_near
