@@ -55,7 +55,7 @@ def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, 
     file_path: str
         Path which the annotation file will be written to
     overwrite: bool, optional
-        Optional parameter specifying if an existing annotations 
+        Optional parameter specifying if an existing annotations
         should be overwritten, defaults to False
     """
     height, width, depth = img.shape
