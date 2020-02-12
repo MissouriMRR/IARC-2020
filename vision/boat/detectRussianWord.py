@@ -119,7 +119,7 @@ def detect_russian_word(imagePNG):
         box = BoundingBox(verts, ObjectType('text'))
         box_obs.append(box)
     print(text == russian_word)
-    return box_obs
+    return text == russian_word
 
 
 if __name__ == "__main__":

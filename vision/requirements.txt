@@ -1,3 +1,4 @@
+pytesseract
 numpy
 opencv-python
 
