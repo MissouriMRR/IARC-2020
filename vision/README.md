@@ -16,19 +16,19 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Getting Started
 
-1. Clone this repository
+1.  Clone this repository
 
 ```bash
     git clone https://github.com/MissouriMRR/IARC-2020
 ```
 
-2. Install pip requirements
+2.  Install pip requirements
 
 ```bash
     pip install -r requirements.txt
 ```
 
- 3. (For Vision Tests) Download the test images from the team drive.
+3.  (For Vision Tests) Download the test images from the team drive.
 
  3a. Ask leadership for access to the MRR team drive.
 
@@ -40,13 +40,13 @@ The vision team is responsible for processing images in order to extract informa
 
  3e. Extract the zip file into the repo -- IARC-2020/vision/vision_images
 
- 4. (Optional) Run unit tests.
+4.  (Optional) Run unit tests.
 
 ```bash
     ./unit_tests/runall.sh
 ```
 
- 5. Contributing
+5.  Contributing
 
 5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
 
