@@ -5,8 +5,9 @@ Takes information from the camera and gives it to vision
 import os
 import json
 from vision.camera.read_bag import ReadBag
-from vision.obstacle.obstacle_finder import import_params, BlobFinder
-from vision.util.blob_plotter import plot_blobs
+from vision.obstacle.obstacle_finder import ObstacleFinder
+from vision.util.import_params import import_params
+from vision.util.obstacle_plotter import plot_obstacles
 
 
 class Pipeline:
@@ -39,11 +40,11 @@ class Pipeline:
         for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
             if i == self.alg_time:
                 break
-            blob_finder = BlobFinder(params=import_params(config))
-            bboxes = blob_finder.find(color_image)
+            obstacle_finder = ObstacleFinder(params=import_params(config))
+            bboxes = obstacle_finder.find(color_image)
             env.update(bboxes)
 
-            plot_blobs(blob_finder.keypoints, color_image)
+            plot_obstacles(obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
