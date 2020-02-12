@@ -56,7 +56,7 @@ class ModuleLocation:
         ndarray - locations of the 4 holes
         """
 
-        BUCKET_MINIMUM = 10
+        BUCKET_MINIMUM = 1
 
         self._groupCircles()
         
@@ -67,7 +67,7 @@ class ModuleLocation:
         ind = 0
         coord_ind = 0
         for h in self.x_heights:
-            if h >= BUCKET_MINIMUM:
+            if h >= BUCKET_MINIMUM and not (coord_ind >=4):
                self.holes[coord_ind, 0] = self.x_bounds[ind]
                coord_ind += 1
             ind += 1
@@ -76,7 +76,7 @@ class ModuleLocation:
         ind = 0
         coord_ind = 0
         for h in self.y_heights:
-            if h >= BUCKET_MINIMUM:
+            if h >= BUCKET_MINIMUM and not (coord_ind >= 4):
                 self.holes[coord_ind, 1] = self.y_bounds[ind]
                 coord_ind += 1
             ind += 1
@@ -137,7 +137,7 @@ class ModuleLocation:
         laplacian = np.uint8(laplacian)
         
         # Hough Circle Detection
-        self.circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=25, minRadius=0, maxRadius=50)
+        self.circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=6, param1=63, param2=30, minRadius=0, maxRadius=50)
         self.circles = np.uint16(self.circles)
 
         # Resize circles into 2d array
@@ -164,11 +164,9 @@ class ModuleLocation:
         -------
         None
         """
-
         # Seperate depth channel from image
-        # self.depth = img[:, :, 4:]
-        # self.img = img[:, :, 3]
-        self.img = img
+        self.depth = img[:, :, 3:]
+        self.img = img[:, :, :3]
 
     def showImg(self):
         """
