@@ -5,13 +5,14 @@ Takes information from the camera and gives it to vision
 import os
 import json
 from vision.camera.read_bag import ReadBag
-from vision.blob.blobfind import import_params, BlobFinder
-from vision.util.blob_plotter import plot_blobs
+from vision.obstacle.obstacle_finder import ObstacleFinder
+from vision.util.import_params import import_params
+from vision.util.obstacle_plotter import plot_obstacles
 
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs a blob detection algorithm,
+    This is a pipeline class that takes in a video, runs a obstacle detection algorithm,
     and updates the blobs to the environment class.
 
     Parameters
@@ -20,7 +21,7 @@ class Pipeline:
         Filename of .bag file that the algorithm can act upon.
 
     env: Environment
-        The environment interface that is used by flight code. 
+        The environment interface that is used by flight code.
         The pipeline updates the interface.
 
     alg_time: int
@@ -39,18 +40,18 @@ class Pipeline:
         for i, (depth_image, color_image) in enumerate(ReadBag(self.vid_file)):
             if i == self.alg_time:
                 break
-            blob_finder = BlobFinder(params=import_params(config))
-            bboxes = blob_finder.find(color_image)
+            obstacle_finder = ObstacleFinder(params=import_params(config))
+            bboxes = obstacle_finder.find(color_image)
             env.update(bboxes)
 
-            plot_blobs(blob_finder.keypoints, color_image)
+            plot_obstacles(obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
     from vision.interface import Environment
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
     env = Environment()
 
     with open(config_filename, 'r') as config_file:

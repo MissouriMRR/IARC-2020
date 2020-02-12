@@ -1,1 +1,1 @@
-python3 -m unittest discover `dirname $0`
+python3 -m unittest discover unit_tests\

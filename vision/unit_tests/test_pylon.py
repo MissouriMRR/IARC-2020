@@ -1,11 +1,9 @@
 """
 Runs through images and determines which have the pylon
 """
-
 import unittest
 import os
 import sys
-import json
 import cv2
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +13,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 # from vision.pylon.detect_pylon import import_params
 from vision.pylon.detect_pylon import detect_red
+
 
 class TestPylon(unittest.TestCase):
     def test_pylon(self):
@@ -45,7 +44,7 @@ class TestPylon(unittest.TestCase):
                 if img_file is None:
                     self.fail(msg="Failed to read image.  " + img_filename)
 
-                # detector = BlobFinder(img_file, params=config)
+                # detector = ObstacleFinder(img_file, params=config)
                 # bounding_boxes = detector.find()
                 pylon = detect_red(img_file)
 

@@ -1,7 +1,7 @@
-## Camera Modules
+# Camera Modules
 All camera modules have a generic interface so they can be swapped out easily.
 
-# Example Code
+## Example Code
 
 The following are examples of how to use the camera child classes. As always, make sure to either change file import paths,
 or to download everything into the same file.
