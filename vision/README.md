@@ -103,7 +103,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 
 ## Documentation
 
-#### Code Files
+### Code Files
 
 ```python
     """
@@ -111,7 +111,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
     """
 ```
 
-#### Classes
+### Classes
 
 ```python
     Class Neuron:
@@ -129,7 +129,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
             pass
 ```
 
-#### Functions
+### Functions
 
 ```python
     def stdp(spike_train):
@@ -155,7 +155,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 
 All unit testing should be done with the standard python unittest module.
 
-#### Tests Cases
+### Tests Cases
 
 There should be a test case for each major function of each class/function.
 
