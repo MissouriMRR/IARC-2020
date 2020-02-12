@@ -22,7 +22,6 @@ class PascalVocAnnotator(object):
     CONFIG_PATH = 'config.json'
     SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
 
-
     def __init__(self, path_to_image_folder=TEST_DIRECTORY):
         ## Read config
         with open(self.CONFIG_PATH, 'r') as configfile:
@@ -39,7 +38,7 @@ class PascalVocAnnotator(object):
         self._path_to_image_folder = path_to_image_folder
         self._paths = [os.path.join(path_to_image_folder, filename) for filename in os.listdir(self.path_to_image_folder)
                        if os.path.splitext(filename)[1] in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS]
-        self._paths.sort(key=lambda path: os.path.getmtime(path))
+        self._paths.sort(key=os.path.getmtime)
 
         self._current_image = None
 
@@ -185,7 +184,7 @@ class PascalVocAnnotator(object):
         outline_thickness = 5
 
         text = f'Active tag: {self.tag}'
-        (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
+        (_, text_h), __ = cv2.getTextSize(text, font, font_scale, thickness)
         origin = (margin, margin + text_h)
         cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
                     thickness+outline_thickness)
@@ -195,11 +194,10 @@ class PascalVocAnnotator(object):
         """
         Refresh the whole screen and process actions.
         """
-        check_key_press = lambda key: self._window.was_key_pressed(key)
         frame = self._current_image.copy()
 
         for key, event in self._key_events.items():
-            if check_key_press(key):
+            if self._window.was_key_pressed(key):
                 event()
 
         for annotation in self._annotations:

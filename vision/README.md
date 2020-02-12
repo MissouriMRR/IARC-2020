@@ -16,37 +16,37 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Getting Started
 
-1. Clone this repository
+1.  Clone this repository
 
 ```bash
     git clone https://github.com/MissouriMRR/IARC-2020
 ```
 
-2. Install pip requirements
+2.  Install pip requirements
 
 ```bash
     pip install -r requirements.txt
 ```
 
-3. (For Vision Tests) Download the test images from the team drive.
+3.  (For Vision Tests) Download the test images from the team drive.
 
-3a. Ask leadership for access to the MRR team drive.
+3a.    Ask leadership for access to the MRR team drive.
 
-3b. In google drive, click the shared drives link and open the Multirotor Robot folder.
+3b.    In google drive, click the shared drives link and open the Multirotor Robot folder.
 
-3c. Navigate to IARC Mission 9/.
+3c.    Navigate to IARC Mission 9/.
 
-3d. Download vision_images folder as a whole.
+3d.    Download vision_images folder as a whole.
 
-3e. Extract the zip file into the repo -- IARC-2020/vision/vision_images
+3e.    Extract the zip file into the repo -- IARC-2020/vision/vision_images
 
-4. (Optional) Run unit tests.
+4.  (Optional) Run unit tests.
 
 ```bash
     ./unit_tests/runall.sh
 ```
 
-5. Contributing
+5.  Contributing
 
 5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
 
@@ -61,7 +61,6 @@ The vision team is responsible for processing images in order to extract informa
 5f. Have pull request reviewed.
 
 5g. Merge branch into develop when approved.
-
 
 ## Directory Structure
 
@@ -103,7 +102,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 
 ## Documentation
 
-#### Code Files
+### Code Files
 
 ```python
     """
@@ -111,7 +110,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
     """
 ```
 
-#### Classes
+### Classes
 
 ```python
     Class Neuron:
@@ -129,7 +128,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
             pass
 ```
 
-#### Functions
+### Functions
 
 ```python
     def stdp(spike_train):
@@ -155,7 +154,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 
 All unit testing should be done with the standard python unittest module.
 
-#### Tests Cases
+### Tests Cases
 
 There should be a test case for each major function of each class/function.
 
