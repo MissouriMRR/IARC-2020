@@ -10,8 +10,6 @@ the location of this program in terminal, and run using
 "python capture_airsim_image.py". Enter q to capture an image, or e to exit.
 """
 import airsim
-import cv2
-import numpy as np
 
 client = airsim.MultirotorClient()
 
