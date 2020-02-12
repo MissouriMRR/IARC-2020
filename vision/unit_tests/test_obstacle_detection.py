@@ -1,5 +1,5 @@
 """
-Blob detector unit tests.
+Obstacle detector unit tests.
 """
 import unittest
 import os
@@ -15,29 +15,29 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-from vision.obstacle.obstacle_finder import BlobFinder
+from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
 
 
-class TestBlobbing(unittest.TestCase):
+class TestObstacleDetection(unittest.TestCase):
     """
     Testing obstacle detection.
     """
-    def test_finding_blobs(self):
+    def test_obstacle_detection(self):
         """
-        Tests that the expected number of blobs is found
+        Tests that the expected number of obstacles is found
 
         Settings
         --------
-        expected_blobs: dict{string: int}
-            number of expected blobs (value) to be found in each image (key)
+        expected_obstacles: dict{string: int}
+            number of expected obstacles (value) to be found in each image (key)
 
         Returns
         -------
         list[bool]
-            whether the expected number of blobs in each image equals the detected number of blobs
+            whether the expected number of obstacles in each image equals the detected number of obstacles
         """
-        expected_blobs = {
+        expected_obstacles = {
             "apple.jpg": 1,
             "legos.jpg": 30,
             "MyBeach.png": 1,
@@ -52,15 +52,15 @@ class TestBlobbing(unittest.TestCase):
 
         config = import_params(raw_config)
 
-        for filename, expected in expected_blobs.items():
+        for filename, expected in expected_obstacles.items():
             with self.subTest(i=filename):
                 img_filename = os.path.join(prefix, 'vision_images', 'obstacle', filename)
                 img_file = cv2.imread(img_filename)
 
-                detector = BlobFinder(params=config)
+                detector = ObstacleFinder(params=config)
                 bounding_boxes = detector.find(img_file)
 
-                self.assertEqual(len(bounding_boxes), expected, msg=f"Expected {expected} blobs, found {len(bounding_boxes)} in image {filename}")
+                self.assertEqual(len(bounding_boxes), expected, msg=f"Expected {expected} obstacles, found {len(bounding_boxes)} in image {filename}")
 
     def test_annotation_accuracy(self):
         """
@@ -97,7 +97,7 @@ class TestBlobbing(unittest.TestCase):
 
                 assert image.shape, f"Failed to read {img_path}!"
 
-                bounding_boxes = BlobFinder(image, params=config).find()
+                bounding_boxes = ObstacleFinder(params=config).find(image)
 
                 accuracy = 0
 

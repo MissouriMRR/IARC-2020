@@ -7,7 +7,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import cv2
 import json
 import timeit
-from vision.obstacle.obstacle_finder import BlobFinder
+from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
 
 if __name__ == '__main__':
@@ -23,5 +23,5 @@ if __name__ == '__main__':
             continue
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
-        blob_finder = BlobFinder(params=import_params(config))
+        blob_finder = ObstacleFinder(params=import_params(config))
         print(img, image.shape, timeit.timeit(lambda: blob_finder.find(image), number=10) / 10)
