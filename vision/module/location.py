@@ -188,11 +188,11 @@ class ModuleLocation:
         -------
         """
 
-        circleImg = self.img
+        circleImg = np.copy(self.img)
 
         for x, y, r in self.circles:
-            circleImg = cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
-            circleImg = cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+            cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
+            cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
         cv2.imshow("Module Circles", circleImg)
         cv2.waitKey(0)
@@ -207,10 +207,10 @@ class ModuleLocation:
         None
         """
 
-        holeImg = self.img
+        holeImg = np.copy(self.img)
 
         for x, y in self.holes:
-            holeImg = cv2.circle(img=holeImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
+            cv2.circle(img=holeImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
 
         cv2.imshow("Module Location Hole Detection", holeImg)
         cv2.waitKey(0)
@@ -225,11 +225,11 @@ class ModuleLocation:
         None
         """
         
-        centerImg = self.img
+        centerImg = np.copy(self.img)
         for x, y in self.holes:
-            centerImg = cv2.circle(img=centerImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
+            cv2.circle(img=centerImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
         
-        centerImg = cv2.circle(img=centerImg, center=(self.center[0], self.center[1]), radius=10, color=(0, 255, 0), thickness=-1)
+        cv2.circle(img=centerImg, center=(self.center[0], self.center[1]), radius=10, color=(0, 255, 0), thickness=-1)
 
         cv2.imshow("Module Location Center", centerImg)
         cv2.waitKey(0)
