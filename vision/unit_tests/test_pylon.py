@@ -45,7 +45,7 @@ class TestPylon(unittest.TestCase):
                 if img_file is None:
                     self.fail(msg="Failed to read image.  " + img_filename)
 
-                # detector = BlobFinder(img_file, params=config)
+                # detector = ObstacleFinder(img_file, params=config)
                 # bounding_boxes = detector.find()
                 pylon = detect_red(img_file)
 
