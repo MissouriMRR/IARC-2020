@@ -1,3 +1,6 @@
+"""
+Utility to measure performance of obstacle detector.
+"""
 import os
 import sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -9,6 +12,7 @@ import json
 import timeit
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
+
 
 if __name__ == '__main__':
     prefix = 'vision' if os.path.isdir("vision") else ''
