@@ -1,13 +1,14 @@
-# Blob Detection
+# Obstacle Detection
 
-The blob team is a division of the vision team dedicated to detecting
+The obstacle team is a division of the vision team dedicated to detecting
 and classifying objects in images taken by the drone's RealSense cameras.
 
 ### Documentation
 
-Blob detection is done with the OpenCV SimpleBlobDetector. 
+Obstacle detection is done with the OpenCV SimpleBlobDetector. 
 The SimpleBlobDetector can take a number of parameters that control how the
-blobs are detected. SimpleBlobDetector follows a number of steps in
+blobs are detected, which are interpreted as obstacles. 
+SimpleBlobDetector follows a number of steps in
 order to find blobs:
 (Summarized from [LearnOpenCV](learnopencv.com/blob-detection-using-opencv-python-c/))
 
@@ -28,7 +29,9 @@ an `np.array` of `Rectangle` objects that define the bounding boxes of the blobs
 ### Unit Testing
 
 Unit tests can be found under [vision/unit_tests](vision/unit_tests).
-There is a single unit test called `test_finding_blobs` that tests all the
-images in [vision/blob/samples](vision/blob/samples) to determine if the
-expected number of blobs is detected. Note that this requires modifying
-the `expected_blobs` array based on your images.
+There is a unit test called `test_obstacle_detection` that tests all the
+images in [vision/vision_images/obstacle](vision/blob/samples) to determine if the
+expected number of obstacles is actually detected. Note that this requires modifying
+the `expected_obstacles` array based on your images. A second test called 
+`test_params_import` is used to verify that custom parameters for the `ObstacleFinder`
+are imported correctly.
