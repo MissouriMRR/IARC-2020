@@ -21,7 +21,7 @@ class Pipeline:
         Filename of .bag file that the algorithm can act upon.
 
     env: Environment
-        The environment interface that is used by flight code. 
+        The environment interface that is used by flight code.
         The pipeline updates the interface.
 
     alg_time: int

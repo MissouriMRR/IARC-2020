@@ -18,8 +18,8 @@ class ModuleKMeans:
         Decides the weight of each channel in the image
     """
 
-    def __init__(self, channel_weights=[1., 1., 1.]):
-        self.channel_weights = channel_weights
+    def __init__(self, channel_weights=None):
+        self.channel_weights = channel_weights if channel_weights is not None else [1., 1., 1.]
 
     def applyKMeans(self, image, K, criteria=0, attempts=10,
                     flags=cv2.KMEANS_RANDOM_CENTERS):
