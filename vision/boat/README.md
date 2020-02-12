@@ -10,19 +10,19 @@ Download pytesseract for OCR (optical character recognition)
 
 ### Using Mac and Homebrew
 
-1. Downlaod tesseract
+1.  Downlaod tesseract
 
 ```bash
    brew install tesseract
 ```
 
-2. Download tesseract-lang (to use Russian)
+2.  Download tesseract-lang (to use Russian)
 
 ```bash
    brew install tesseract-lang
 ```
 
-3. Download Python wrapper
+3.  Download Python wrapper
 
 ```bash
     pip install pytesseract
@@ -30,13 +30,13 @@ Download pytesseract for OCR (optical character recognition)
 
 ### Using Linux/Windows
 
-1. Download tesseract and language
+1.  Download tesseract and language
 
 ```bash
     sudo apt-get install tesseract-ocr-[rus]
 ```
 
-2. Download Python wrapper
+2.  Download Python wrapper
 
 ```bash
     pip install pytesseract
