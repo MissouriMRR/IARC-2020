@@ -1,5 +1,5 @@
 """
-Detects blobs in images using OpenCV's SimpleBlobDetector.
+Detects obstacles in images using OpenCV's SimpleBlobDetector
 """
 import os
 import sys
@@ -13,68 +13,21 @@ import cv2
 import numpy as np
 from vision.bounding_box import BoundingBox
 import json
+from vision.util.import_params import import_params
 
-
-def import_params(config):
-    if not isinstance(config, dict):
-        raise ValueError(f"When importing params, config should be a dictionary, got {type(config)} instead")
-
-    params = cv2.SimpleBlobDetector_Params()
-
-    for category in config:
-        if 'enable' not in config[category]:
-            raise ValueError(f"Category '{category}' is missing an 'enable' attribute")
-        category_enabled = config[category]['enable']
-
-        try:
-            setattr(params, category, category_enabled)
-        except AttributeError:
-            ## Not all settings have enable/disable
-            pass
-
-        if category_enabled:
-            if hasattr(params, category):
-                setattr(params, category, config[category]['enable'])
-            for attr in config[category]:
-                if hasattr(params, attr):
-                    setattr(params, attr, config[category][attr])
-
-    return params
-
-
-class BlobFinder:
+class ObstacleFinder:
     """
-    Constructs a BlobFinder object with an image, logging, and params
+    Constructs an ObstacleFinder object with an image, logging, and params
 
     Parameters
     ----------
-    image: np array
-        image to detect blobs in, as a np array
     params: SimpleBlobDetector_Params
-        blob detector params object
+        SimpleBlobDetector params object
     """
-    def __init__(self, image, params=None):
-        self.image = image
+    def __init__(self, params=None):
         self.keypoints = []
         self.params = params
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
-
-    @property
-    def image(self):
-        """
-        This function is called every time self.image is run.
-        """
-        return self._image
-
-    @image.setter
-    def image(self, value):
-        """
-        Defines behavior of self.image = value.
-        """
-        if not isinstance(value, np.ndarray):
-            raise ValueError("Requires image as np.ndarray")
-
-        self._image = value
 
     @property
     def params(self):
@@ -89,22 +42,30 @@ class BlobFinder:
         Defines behavior of self.params = value.
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
-            raise ValueError("Requires instance of SimpleBlobDetector_Params")
+            raise ValueError(f"Requires instance of SimpleBlobDetector_Params, got {type(value)}")
 
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self):
+    def find(self, image):
         """
-        Detects blobs in the image provided in the constructor
+        Detects obstacles in the image provided in the constructor
+
+        Parameters
+        ----------
+        image: np.ndarray
+            image to find obstacles in
 
         Returns
         -------
-        list[Rectangle]
+        list[BoundingBox]
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 
-        keypoints = self.blob_detector.detect(self.image)
+        if not isinstance(image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
+
+        keypoints = self.blob_detector.detect(image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -113,7 +74,7 @@ class BlobFinder:
             center_x, center_y = keypoint.pt[0], keypoint.pt[1]
             radius = keypoint.size / 2
 
-            # calculate coordinates for bounding box of each blob
+            # calculate coordinates for bounding box of each obstacle
             pos_dx = center_x + radius
             neg_dx = center_x - radius
             pos_dy = center_y + radius
@@ -140,11 +101,11 @@ class BlobFinder:
 
 
 if __name__ == '__main__':
-    from vision.util.blob_plotter import plot_blobs
+    from vision.util.obstacle_plotter import plot_obstacles
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'blob')
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
 
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
@@ -155,7 +116,7 @@ if __name__ == '__main__':
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
-        blob_finder = BlobFinder(image, params=import_params(config))
-        bboxes = blob_finder.find()
+        obstacle_finder = ObstacleFinder(params=import_params(config))
+        bboxes = obstacle_finder.find(image)
 
-        plot_blobs(blob_finder.keypoints, image)
+        plot_obstacles(obstacle_finder.keypoints, image)

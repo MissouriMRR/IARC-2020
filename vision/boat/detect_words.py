@@ -127,11 +127,11 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    original_image = cv2.imread(os.path.join('vision_images', 'boat', 'russianWord0.png'))
-    if original_image is None:
-        print("nope")
+    originalImage = cv2.imread(os.path.join('vision_images', 'boat', 'russianWord0.png'))
 
-    result = detect_russian_word(original_image)
-    # test_annotation_accuracy()
+    if originalImage is None:
+        raise FileNotFoundError("Could not read image!")
+
+    result = detect_russian_word(originalImage)
 
     print("Time:", time.time() - start)
