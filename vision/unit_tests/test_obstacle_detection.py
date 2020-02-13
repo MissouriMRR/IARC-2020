@@ -107,7 +107,6 @@ class TestObstacleDetection(unittest.TestCase):
                     ax1, ay1, ax2, ay2 = [int(annotation_bounding_box.find(param).text) for param in ['xmin', 'ymin', 'xmax', 'ymax']]
 
                     for bounding_box in bounding_boxes:
-                        print("VERTICES", bounding_box.vertices)
                         ## Get x's and y's from bounding box
                         X, Y = [], []
                         for x, y in bounding_box.vertices:

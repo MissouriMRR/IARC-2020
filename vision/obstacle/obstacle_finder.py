@@ -86,10 +86,6 @@ class ObstacleFinder:
             bottom_left_near = (neg_dx, pos_dy)
 
             # With depth, these will be calculated differently
-            """top_left_far = top_left_near
-            top_right_far = top_right_near
-            bottom_right_far = bottom_right_near
-            bottom_left_far = bottom_left_near"""
 
             vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near] # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
