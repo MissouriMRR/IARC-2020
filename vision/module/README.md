@@ -22,7 +22,8 @@ in frame.
 
 ## ModuleLocation
 
-The ModuleLocation class will take in an image and output the coordinates of the center of the front face of the module.
+The ModuleLocation class will take in an image and find the distance to the center of the module.
 
 It will use circle detection and bucket sorting to find the coordinates of the four holes on the front face.
 Then, it will average these coordinates to find the center of the front face.
+It will then find the distance to that coordinate. The distance is based off the depth channel at the center coordinate.
