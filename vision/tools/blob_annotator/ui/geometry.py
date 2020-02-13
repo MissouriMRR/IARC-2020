@@ -236,14 +236,14 @@ class ResizableBox(object):
                         self._handle_colors[circle] = self._darker_handle_color
 
                         if self._selected_handle.x < self.x1:
-                            self._invert_resize_x_axis = True
+                            self._invert_resize_x_axis = False
                         else:
                             self._invert_resize_x_axis = False
 
                         if self._selected_handle.y < self.y1:
                             self._invert_resize_y_axis = True
                         else:
-                                self._invert_resize_y_axis = False
+                            self._invert_resize_y_axis = False
 
         elif event == cv2.EVENT_LBUTTONDOWN:
             if self._selected_handle is not None:
