@@ -28,7 +28,7 @@ Download pytesseract for OCR (optical character recognition)
     pip install pytesseract
 ```
 
-### Using Linux/Windows
+### Using Linux
 
 1.  Download tesseract and language
 
@@ -36,8 +36,12 @@ Download pytesseract for OCR (optical character recognition)
     sudo apt-get install tesseract-ocr-[rus]
 ```
 
-2.  Download Python wrapper
+###Using Windows
+
+* Download Python wrapper
 
 ```bash
     pip install pytesseract
 ```
+* Inclue the tesseract in your path
+* import pytesseract
