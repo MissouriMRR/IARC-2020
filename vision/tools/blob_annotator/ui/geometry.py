@@ -64,7 +64,7 @@ class Rectangle(Shape):
 
     @property
     def midpoint(self):
-        return (int((self.x+self.x1)//2), int((self.y + self.y1)//2))
+        return int((self.x+self.x1)//2), int((self.y + self.y1)//2)
 
     def get_bounds(self):
         return self

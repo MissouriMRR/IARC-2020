@@ -12,7 +12,7 @@ import cv2
 from ui.colors import Colors
 from ui.window import Window
 from annotation.annotation import Annotation
-from annotation.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
+from annotation.generate_annotation import ANNOTATION_DEFAULT_DIR, generate_pascvalvoc_annotation_from_image_file
 
 
 class PascalVocAnnotator(object):
@@ -21,7 +21,6 @@ class PascalVocAnnotator(object):
     TEST_DIRECTORY = 'test_images'
     CONFIG_PATH = 'config.json'
     SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
-
 
     def __init__(self, path_to_image_folder=TEST_DIRECTORY):
         ## Read config
@@ -45,7 +44,6 @@ class PascalVocAnnotator(object):
 
         self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self.color_map, annotation_dir=ANNOTATION_DEFAULT_DIR)
         self._window = None
-        self.tag_index = 0
         self._annotations = []
         self._annotation_in_progress = None
         self._changed = False
@@ -55,17 +53,10 @@ class PascalVocAnnotator(object):
         self._key_events = {
             self.controls['NEXT']: self._next,
             self.controls['PREV']: self._prev,
-            self.controls['CHANGE_TAG']: self._next_tag,
             self.controls['UNDO']: self._undo,
             self.controls['CLEAR']: self._clear
         }
 
-        ## Print controls
-        print("Controls")
-        for key, value in self._key_events.items():
-            print(f"{value.__name__}: {key}")
-
-        print()
 
     def __enter__(self):
         self._window = Window(PascalVocAnnotator.WINDOW_TITLE, cv2.WND_PROP_FULLSCREEN).__enter__()
@@ -116,9 +107,6 @@ class PascalVocAnnotator(object):
     def _prev(self):
         self.index -= 1
 
-    def _next_tag(self):
-        self.tag_index += 1
-
     def _clear(self):
         if self._annotations:
             self._annotations.clear()
@@ -159,37 +147,27 @@ class PascalVocAnnotator(object):
         self._changed = False
 
     @property
-    def tag_index(self):
-        return self._tag_index
-
-    @tag_index.setter
-    def tag_index(self, value):
-        self._tag_index = value % len(self.labels)
-
-    @property
     def current_color(self):
-        return self.color_map[self.labels[self.tag_index]]
+        return self.color_map[self.labels[0]]
 
-    @property
-    def tag(self):
-        return self.labels[self.tag_index]
-
-    def show_tag(self, img):
+    def show_controls(self, img):
         """
-        Display tag in use on top of screen.
+        Display controls in use on top of screen.
         """
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1
-        thickness = 2
+        font_scale = 1/2
+        thickness = 1
         margin = 5
-        outline_thickness = 5
+        outline_thickness = 2
 
-        text = f'Active tag: {self.tag}'
-        (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
-        origin = (margin, margin + text_h)
-        cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
-                    thickness+outline_thickness)
-        cv2.putText(img, text, origin, font, font_scale, self.current_color, thickness)
+        text = ''
+        for key, value in self._key_events.items():
+            text = text + f"{value.__name__}:{key}" + " "
+            (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
+            origin = (margin, margin + text_h)
+            cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
+                        thickness+outline_thickness, True)
+            cv2.putText(img, text, origin, font, font_scale, Colors.WHITE.value, thickness, True)
 
     def update(self):
         """
@@ -208,7 +186,7 @@ class PascalVocAnnotator(object):
         if self._annotation_in_progress is not None:
             self._annotation_in_progress.draw(frame)
 
-        self.show_tag(frame)
+        self.show_controls(frame)
 
         self._window.draw(frame)
         return not self._window.should_quit
@@ -225,15 +203,15 @@ class PascalVocAnnotator(object):
                 return
 
         if event == cv2.EVENT_LBUTTONDOWN and (not self._annotation_in_progress):
-            self._annotation_in_progress = Annotation(x, y, self.current_color, self.tag)
+            self._annotation_in_progress = Annotation(x, y, self.current_color, 0)
 
         elif event == cv2.EVENT_LBUTTONUP and self._annotation_in_progress:
             self._annotations.insert(0, self._annotation_in_progress)
             self._annotation_in_progress = None
 
         elif event == cv2.EVENT_MOUSEMOVE and self._annotation_in_progress:
-            self._annotation_in_progress.box.w = abs(x - self._annotation_in_progress.box.x)
-            self._annotation_in_progress.box.h = abs(y - self._annotation_in_progress.box.y)
+            self._annotation_in_progress.box.w = x - self._annotation_in_progress.box.x
+            self._annotation_in_progress.box.h = y - self._annotation_in_progress.box.y
 
         self._changed |= bool(self._annotation_in_progress)
 

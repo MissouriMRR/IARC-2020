@@ -7,14 +7,16 @@ import cv2
 class Window(object):
     """Abstracts OpenCV's high-level QT functionality."""
     QUIT_KEY = 'q'
+    QUIT_KEY2 = ''
 
-    def __init__(self, title='', flags=None, quit_key=QUIT_KEY):
+    def __init__(self, title='', flags=None, quit_key=QUIT_KEY, quit_key2=QUIT_KEY2):
         self.title = title
         self._flags = [] if flags is None else [flags]
         self.destroyed = False
         self.should_quit = False
         self._pipelines = []
         self.quit_key = quit_key
+        self.quit_key2 = quit_key2
         self._unprocessed_keys = {}
 
         cv2.namedWindow(title, *self._flags)
@@ -37,7 +39,7 @@ class Window(object):
     def get_key(self):
         key = chr(cv2.waitKey(int(2)) & 0xFF)
 
-        if key == self.quit_key:
+        if key == self.quit_key or key == self.quit_key2:
             self.should_quit = True
 
         self._unprocessed_keys[key] = True
