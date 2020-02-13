@@ -6,23 +6,41 @@ import numpy as np
 
 class ModuleLocation:
     """
-    Finds the center of the front face of the module.
+    Finds the distance to the front face of the module.
     """
 
+    ## Initialization
+
     def __init__(self):
-        self.img = np.array(0)
-        self.depth = np.array(0)
+        self.img = np.array(0) # Color image input
+        self.depth = np.array(0) # Depth image input
 
-        self.holes = np.array(0)
+        self.holes = np.array(0) # Location of four holes
         
-        self.circles = np.array(0)
+        self.circles = np.array(0) # List of circles detected in color image
         
-        self.x_heights = np.array(0)
-        self.x_bounds = np.array(0)
-        self.y_heights = np.array(0)
-        self.y_bounds = np.array(0)
+        self.x_heights = np.array(0) # Histogram of x-coordinate values
+        self.x_bounds = np.array(0) # x-coordinate bounds of histogram
+        self.y_heights = np.array(0) # Histogram of y-coordinate values
+        self.y_bounds = np.array(0) # y-coordinate bounds of histogram
 
-        self.center = np.array(0)
+        self.center = np.array(0) # Coordinates of center
+        self.distance = 0 # Distance to the center
+
+    ## Finding Distance to Module
+
+    def getDistance(self):
+        """
+        Finds the distance to the module.
+        Returns
+        -------
+        int - distance to the module.
+        """
+        self.getCenter()
+        self.distance = self.depth[self.center[0], self.center[1], 0]
+        return self.distance
+
+    ## Finding the Center
 
     def getCenter(self):
         """
@@ -42,8 +60,8 @@ class ModuleLocation:
         for x, y in self.holes:
             x_total += x
             y_total += y
-        self.center[0] = x // 4
-        self.center[1] = y // 4
+        self.center[0] = x_total // 4
+        self.center[1] = y_total // 4
 
         return self.center
     
@@ -145,7 +163,7 @@ class ModuleLocation:
         
         return self.circles
 
-    def _increaseBrightness(self):
+    def _increaseBrightness(self, increase):
         """
         Increases the brightness of the image.
 
@@ -153,10 +171,11 @@ class ModuleLocation:
         -------
         None
         """
-        BRIGHTNESS_INCREASE = 10 # Value to increase brightness by
-        self.img += BRIGHTNESS_INCREASE
+        self.img += increase
 
-    def setImg(self, img):
+    ## Outside Input Functions
+
+    def setImg(self, color, depth):
         """
         Sets the image detection is performed on.
 
@@ -164,9 +183,10 @@ class ModuleLocation:
         -------
         None
         """
-        # Seperate depth channel from image
-        self.depth = img[:, :, 3:]
-        self.img = img[:, :, :3]
+        self.depth = depth
+        self.img = color
+
+    ## Visualization Functions
 
     def showImg(self):
         """
@@ -197,28 +217,10 @@ class ModuleLocation:
         cv2.imshow("Module Circles", circleImg)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-
-    def showHoles(self):
-        """
-        Shows an image of detected holes.
-
-        Returns
-        -------
-        None
-        """
-
-        holeImg = np.copy(self.img)
-
-        for x, y in self.holes:
-            cv2.circle(img=holeImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
-
-        cv2.imshow("Module Location Hole Detection", holeImg)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
     
     def showCenter(self):
         """
-        Shows the image with a circle at the center.
+        Shows the image with detected holes and center.
 
         Returns
         -------
