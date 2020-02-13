@@ -1,9 +1,15 @@
+"""
+Boat related unit tests.
+"""
 import unittest
 import os
 import cv2
 from vision.boat.detect_words import detect_russian_word
 
 class TestDetectRussianWord(unittest.TestCase):
+    """
+    Testing the text detector.
+    """
     def test_detect_russian(self):
         """
         Testing vision.boat.detectRussianWord
@@ -29,12 +35,13 @@ class TestDetectRussianWord(unittest.TestCase):
         vision_folder = 'vision' if os.path.isdir('vision') else ''
 
         for filename, expected_result in expected.items():
-            image = cv2.imread(os.path.join(vision_folder, 'vision_images', 'boat', filename))
-            if image is None:
-                self.fail(f"Failed to read: {filename}")
+            with self.subTest(i=filename):
+                image = cv2.imread(os.path.join(vision_folder, 'vision_images', 'boat', filename))
+                if image is None:
+                    self.fail(f"Failed to read: {filename}")
 
-            result = detect_russian_word(image)
-            self.assertEqual(expected_result, result, msg=f"Failed at image {filename}")
+                result = detect_russian_word(image)
+                self.assertEqual(expected_result, result, msg=f"Failed at image {filename}")
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ import cv2
 from ui.colors import Colors
 from ui.window import Window
 from annotation.annotation import Annotation
-from annotation.generate_annotation import ANNOTATION_DEFAULT_DIR, generate_pascvalvoc_annotation_from_image_file
+from annotation.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
 
 
 class PascalVocAnnotator(object):
@@ -21,6 +21,7 @@ class PascalVocAnnotator(object):
     TEST_DIRECTORY = 'test_images'
     CONFIG_PATH = 'config.json'
     SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
+
 
     def __init__(self, path_to_image_folder=TEST_DIRECTORY):
         ## Read config
@@ -38,12 +39,13 @@ class PascalVocAnnotator(object):
         self._path_to_image_folder = path_to_image_folder
         self._paths = [os.path.join(path_to_image_folder, filename) for filename in os.listdir(self.path_to_image_folder)
                        if os.path.splitext(filename)[1] in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS]
-        self._paths.sort(key=lambda path: os.path.getmtime(path))
+        self._paths.sort(key=os.path.getmtime)
 
         self._current_image = None
 
         self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self.color_map, annotation_dir=ANNOTATION_DEFAULT_DIR)
         self._window = None
+        self.tag_index = 0
         self._annotations = []
         self._annotation_in_progress = None
         self._changed = False

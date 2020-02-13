@@ -4,13 +4,20 @@ The Environment class will manage the other objects in the environment
 
 
 class Environment:
-
-    # list of rectangles in environment
+    """
+    The percieved environment.
+    """
     def __init__(self):
         self.bounding_boxes = []
 
-    # iterator of the bounding boxes list
     def __iter__(self):
+        """
+        Iterate over all bounding boxes.
+
+        Yields
+        ------
+        BoundingBox
+        """
         i = 0
         while True:
             try:
@@ -20,6 +27,13 @@ class Environment:
             except ZeroDivisionError:
                 yield None
 
-    # updates bounding boxes list
     def update(self, bounding_boxes):
+        """
+        Update environment.
+
+        Parameters
+        ----------
+        bounding_boxes: list[BoundingBox]
+            New environment data.
+        """
         self.bounding_boxes = bounding_boxes
