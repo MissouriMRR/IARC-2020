@@ -5,8 +5,9 @@ import unittest
 import os
 import cv2
 import lxml
+import numpy as np
 
-from vision.boat.detect_words import detect_russian_word
+from boat.detect_words import detect_russian_word
 
 
 class TestDetectRussianWord(unittest.TestCase):
@@ -88,10 +89,9 @@ class TestDetectRussianWord(unittest.TestCase):
                     for bounding_box in bounding_boxes:
                         ## Get x's and y's from bounding box
                         X, Y, Z = [], [], []
-                        for x, y, z in bounding_box.vertices:
+                        for x, y in bounding_box.vertices:
                             X.append(x)
                             Y.append(y)
-                            Z.append(z)
 
                         X, Y = np.unique(X), np.unique(Y)
                         bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
@@ -106,8 +106,8 @@ class TestDetectRussianWord(unittest.TestCase):
                         if all((x1_close, y1_close, x2_close, y2_close)):
                             accuracy += 1
 
-            accuracy /= len(annotation.findall('object'))
-            print(f"{filename}: {accuracy * 100:.2f}%")
+                    accuracy /= len(annotation.findall('object'))
+                    print(f"{filename}: {accuracy * 100:.2f}%")
 
 
 if __name__ == '__main__':

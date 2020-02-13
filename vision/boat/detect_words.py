@@ -16,7 +16,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 from bounding_box import BoundingBox
-from blob.object_type import ObjectType
+from bounding_box import ObjectType
 
 
 def test_annotation_accuracy():  # TODO maybe this should be a benchmark?
@@ -118,8 +118,8 @@ def detect_russian_word(imagePNG):
 
         box = BoundingBox(verts, ObjectType('text'))
         box_obs.append(box)
-    print(text == russian_word)
-    return text == russian_word
+
+    return box_obs
 
 
 if __name__ == "__main__":
