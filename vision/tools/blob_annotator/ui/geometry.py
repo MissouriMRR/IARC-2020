@@ -216,13 +216,17 @@ class ResizableBox(object):
 
             elif self._is_resizing_box:
                 if not self._invert_resize_x_axis:
+                    # Right side
                     self.w = x - self.x
                 else:
+                    # Left side
                     self.w = self.x1 - x
 
                 if not self._invert_resize_y_axis:
+                    # Bottom
                     self.h = y - self.y
                 else:
+                    # Top
                     self.h = self.y1 - y
 
             elif (self._selected_handle is not None and not self._selected_handle.is_inside(x, y)) or self._selected_handle is None:
