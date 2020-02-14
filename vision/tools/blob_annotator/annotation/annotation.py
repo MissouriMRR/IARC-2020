@@ -8,7 +8,7 @@ from ui.geometry import ResizableBox
 
 
 class Annotation(object):
-    '''Represents a particular object annoation'''
+    '''Represents a particular object annotation'''
     detector = None
 
     def __init__(self, x, y, color, label, w=1, h=1):

@@ -160,11 +160,11 @@ class PascalVocAnnotator(object):
         font_scale = 1/2
         thickness = 1
         margin = 5
-        outline_thickness = 2
+        outline_thickness = 3
 
         text = ''
         for key, value in self._key_events.items():
-            text = text + f"{value.__name__}:{key}" + " "
+            text = text + f"{value.__name__}: {key}" + "   "
             (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
             origin = (margin, margin + text_h)
             cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
