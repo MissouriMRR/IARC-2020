@@ -32,6 +32,9 @@ def ModuleInFrame(img):
     # Remove depth channel
     img = img[:, :, :3]
 
+    # Create output image
+    output = img.copy()
+
     # Grayscale
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
@@ -43,8 +46,12 @@ def ModuleInFrame(img):
     laplacian = np.uint8(laplacian)
 
     # Hough Circle Detection
-    # circles = (x, y, r)
-    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
+    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
+    if circles is None:  # no circles found
+        return False
+    elif circles.shape[1] > 100:  # too many circles found
+        raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
+
     circles = np.uint16(circles)
 
     # Resize circles into 2d array
@@ -52,7 +59,10 @@ def ModuleInFrame(img):
 
     # Finding slopes between the circles
     slopes = np.array([])
-    for x, y, _ in circles:
+
+    for x, y, r in circles:
+        cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+        cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
         for iX, iY, __ in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
@@ -68,6 +78,10 @@ def ModuleInFrame(img):
     num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
 
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
+
+    # show the output image
+    cv2.imshow("output", output)
+    cv2.waitKey(0)
 
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
