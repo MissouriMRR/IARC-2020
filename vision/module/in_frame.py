@@ -1,14 +1,14 @@
 """
 This file contains the ModuleInFrame function to detect if the module is in an image
 """
+import cv2
+import numpy as np
 
 # Constants
 BLUR_SIZE = 5 # Blur kernel size
 BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
 MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
 
-import cv2
-import numpy as np
 
 def ModuleInFrame(img):
     """
@@ -29,6 +29,9 @@ def ModuleInFrame(img):
     # Remove depth channel
     img = img[:, :, :3]
 
+    # Create output image
+    output = img.copy()
+
     # Grayscale
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
@@ -40,7 +43,12 @@ def ModuleInFrame(img):
     laplacian = np.uint8(laplacian)
     
     # Hough Circle Detection
-    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
+    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
+    if circles is None:  # no circles found
+        return False
+    elif circles.shape[1] > 100:  # too many circles found
+        raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
+
     circles = np.uint16(circles)
 
     # Resize circles into 2d array
@@ -49,21 +57,27 @@ def ModuleInFrame(img):
     # Finding slopes between the circles
     slopes = np.array([])
     for x, y, r in circles:
+        cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+        cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
         for iX, iY, iR in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
                 slopes = np.append(slopes, m)
-    
+
     # Converting slopes to degrees
     slopes = np.degrees(np.arctan(slopes))
-    
+
     # Bucket sorting slopes to group parallels
     upper_bound = np.amax(slopes)
     lower_bound = np.amin(slopes)
     num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-    
+
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
-    
+
+    # show the output image
+    cv2.imshow("output", output)
+    cv2.waitKey(0)
+
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
