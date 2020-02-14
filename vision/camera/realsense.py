@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import pyrealsense2 as rs
 try:
-    from vision.realsense.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 try:

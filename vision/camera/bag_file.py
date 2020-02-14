@@ -1,12 +1,11 @@
 """
 The BagFile class is a child class of the camera, designed to be used for pre-recorded .bag files
 """
-
 import cv2
 import numpy as np
 import pyrealsense2 as rs
 try:
-    from camera.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 try:
