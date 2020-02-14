@@ -23,6 +23,9 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
+    if img is None:
+        raise ValueError(f"Image cannot be None.")
+
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -36,12 +39,12 @@ def ModuleInFrame(img):
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE,BLUR_SIZE), sigmaX=0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
 
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(laplacian)
-    
+
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
     if circles is None:  # no circles found
@@ -56,10 +59,11 @@ def ModuleInFrame(img):
 
     # Finding slopes between the circles
     slopes = np.array([])
+
     for x, y, r in circles:
         cv2.circle(output, (x, y), r, (0, 255, 0), 4)
         cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-        for iX, iY, iR in circles:
+        for iX, iY, __ in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):

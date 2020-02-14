@@ -33,15 +33,17 @@ class TestModuleInFrame(unittest.TestCase):
             "Block3.jpg" : True,
             "Block4.jpg" : True
         }
-        for picname in expected_results:
-            picpath = os.path.join('vision_images', 'module', picname)
+        for picname in expected_results.keys():
+            with self.subTest(i=picname):
+                picpath = os.path.join('vision_images', 'module', picname)
 
-            image = cv2.imread(picpath)
+                image = cv2.imread(picpath)
 
-            if image is None:
-                raise FileNotFoundError(f"Could not read {picpath}!")
 
-            results.append(mif(image))
+                if image is None:
+                    raise FileNotFoundError(f"Could not read {picpath}!")
+
+                results.append(mif(image))
 
         self.assertListEqual(results, list(expected_results.values()))
 
