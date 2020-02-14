@@ -30,7 +30,7 @@ class BagFile(Camera):
         Name of .bag file to read.
         Driver should find this by parsing arguments
     """
-    def __init__(self, screen_width, screen_height, frame_rate, filename):
+    def __init__(self, screen_width, screen_height, frame_rate, filename, **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.filename = filename

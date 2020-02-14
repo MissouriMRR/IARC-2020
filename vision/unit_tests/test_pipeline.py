@@ -11,10 +11,8 @@ import unittest
 from unittest.mock import patch, Mock
 import numpy as np
 
-# from vision.pipeline import Pipeline
 from vision.pipeline import Pipeline
 
-from camera import bag_file
 
 class TestPipeline(unittest.TestCase):
     """
