@@ -8,8 +8,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import unittest
-from unittest.mock import patch, Mock
-import numpy as np
+from unittest.mock import patch
 
 from vision.camera import *
 
@@ -24,7 +23,7 @@ class TestPipeline(unittest.TestCase):
             return func(*args, **kwargs)
 
         return patched_function
-    
+
     def run_all_types(func):
         """
         Wrapper creating subtest for every type of object.

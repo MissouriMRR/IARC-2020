@@ -42,15 +42,12 @@ class TestDetectRussianWord(unittest.TestCase):
 
         ### Ensure returns correct type of BoundingBox
         with self.subTest(i="Object type"):
-            for i in range(1, 9):
-                image = np.zeros((1000, 1000, 3), dtype='uint8')
-                cv2.putText(image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+            image = np.zeros((1000, 1000, 3), dtype='uint8')
+            cv2.putText(image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
-                output = detect_russian_word(image)
+            output = detect_russian_word(image)
 
-                if output is not None:
-                    break
-            else:
+            if output is None:
                 self.fail(msg="Failed to detect obstacle to be able to test.")
 
             for box in output:

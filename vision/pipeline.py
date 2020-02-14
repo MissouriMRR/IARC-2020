@@ -7,7 +7,6 @@ import json
 from camera.bag_file import BagFile
 from obstacle.obstacle_finder import ObstacleFinder
 from util import import_params
-from util.obstacle_plotter import plot_obstacles
 
 
 class Pipeline:
@@ -45,6 +44,7 @@ class Pipeline:
             bboxes = obstacle_finder.find(color_image)
             self.env.update(bboxes)
 
+            #from util.obstacle_plotter import plot_obstacles
             #plot_obstacles(obstacle_finder.keypoints, color_image)
 
 
