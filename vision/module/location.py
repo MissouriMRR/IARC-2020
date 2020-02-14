@@ -27,6 +27,9 @@ class ModuleLocation:
         self.center = np.array(0) # Coordinates of center
         self.distance = 0 # Distance to the center
 
+        self.slopes = np.array(0) # Slopes between circles
+        self.slope_heights = np.array(0) # Histogram of heights
+
     ## Finding Distance to Module
 
     def getDistance(self):
@@ -36,13 +39,13 @@ class ModuleLocation:
         -------
         int - distance to the module.
         """
-        self.getCenter()
+        self._getCenter()
         self.distance = self.depth[self.center[0], self.center[1], 0]
         return self.distance
 
     ## Finding the Center
 
-    def getCenter(self):
+    def _getCenter(self):
         """
         Find the center of the front face of the module.
         Returns
@@ -50,7 +53,7 @@ class ModuleLocation:
         ndarray - coordinates of the center of the module.
         """
 
-        self.getHoleLocations()
+        self._getHoleLocations()
 
         # Coordinates of the center of the front face of the module
         self.center = np.arange(0, 2)
@@ -65,7 +68,7 @@ class ModuleLocation:
 
         return self.center
     
-    def getHoleLocations(self):
+    def _getHoleLocations(self):
         """
         Finds the locations of the 4 holes on the front face of the module.
 
@@ -73,67 +76,48 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
+        self._getSlopes()
+        self._groupSlopes()
 
-        BUCKET_MINIMUM = 1
-
-        self._groupCircles()
-        
         self.holes = np.arange(0, 8)
         self.holes = np.reshape(self.holes, (4, 2)) # Set of 4 (x, y) coordinates
 
-        # x coordinates
-        ind = 0
-        coord_ind = 0
-        for h in self.x_heights:
-            if h >= BUCKET_MINIMUM and not (coord_ind >=4):
-               self.holes[coord_ind, 0] = self.x_bounds[ind]
-               coord_ind += 1
-            ind += 1
-
-        # y coordinates
-        ind = 0
-        coord_ind = 0
-        for h in self.y_heights:
-            if h >= BUCKET_MINIMUM and not (coord_ind >= 4):
-                self.holes[coord_ind, 1] = self.y_bounds[ind]
-                coord_ind += 1
-            ind += 1
+        
 
         return self.holes
 
-    def _groupCircles(self):
+    def _groupSlopes(self):
         """
-        Bucket sorts circles in order to find holes in module.
-
+        Bucket sort slopes to find parallels.
         Returns
         -------
-        ndarray - heights of x values of circles.
-        ndarray - bounds of x values of circles.
-        ndarray - heights of y values of circles.
-        ndarray - bounds of y values of circles.
+        None
         """
-
-        self._circleDetection()
-
         BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
 
-        # Seperate the axis
-        x_vals = np.take(self.circles, [0], 1)
-        y_vals = np.take(self.circles, [1], 1)
-
-        # Bucket sorting x values
-        upper_bound = np.amax(x_vals)
-        lower_bound = np.amin(x_vals)
+        upper_bound = np.amax(self.slopes)
+        lower_bound = np.amin(self.slopes)
         num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-        self.x_heights, self.x_bounds = np.histogram(x_vals, num_buckets, (lower_bound, upper_bound))
 
-        # Bucket sorting y values
-        upper_bound = np.amax(y_vals)
-        lower_bound = np.amin(y_vals)
-        num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
-        self.y_heights, self.y_bounds = np.histogram(y_vals, num_buckets, (lower_bound, upper_bound))
+        self.slope_heights, _ = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
 
-        return self.x_heights, self.x_bounds, self.y_heights, self.y_bounds
+    def _getSlopes(self):
+        """
+        Finds slopes between detected circles
+        Returns
+        -------
+        None
+        """
+        self.slopes = np.array([])
+        for x, y, _ in self.circles:
+            for iX, iY, _ in self.circles:
+                m = (iY - y) / (iX - x)
+                # slope must be non-infinite and can't be between the same circle
+                if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
+                    self.slopes = np.append(self.slopes, m)
+        
+        # Convert slopes to degrees
+        self.slopes = np.degrees(np.arctan(self.slopes))
 
     def _circleDetection(self):
         """
