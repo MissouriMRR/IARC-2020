@@ -153,6 +153,7 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 ## Unit Testing
 
 All unit testing should be done with the standard python unittest module.
+Unit tests will be run whenever someone submits a pull request to ensure code works as expected.
 
 ### Tests Cases
 
