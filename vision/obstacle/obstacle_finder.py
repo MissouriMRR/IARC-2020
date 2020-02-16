@@ -11,7 +11,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
-from vision.bounding_box import BoundingBox
+from vision.bounding_box import BoundingBox, ObjectType
 import json
 from vision.util.import_params import import_params
 
@@ -95,7 +95,7 @@ class ObstacleFinder:
             vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
-            bbox = BoundingBox(vertices, None)
+            bbox = BoundingBox(vertices, ObjectType.AVOID)
             bounding_boxes.append(bbox)
 
         return bounding_boxes
