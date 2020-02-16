@@ -8,6 +8,24 @@ Download pytesseract for OCR (optical character recognition)
 
 * IMPORTANT: * Make sure to install extra language pack for Uzbek(Cyrilic)
 
+### Using Linux
+
+1.  Download tesseract and language
+
+```bash
+    sudo apt-get install tesseract-ocr
+    sudo apt-get install tesseract-ocr-[rus]
+```
+
+### Using Windows
+
+* Download Python wrapper
+
+```bash
+    pip install pytesseract
+```
+* Inclue the tesseract in your path
+
 ### Using Mac and Homebrew
 
 1.  Downlaod tesseract
@@ -27,21 +45,3 @@ Download pytesseract for OCR (optical character recognition)
 ```bash
     pip install pytesseract
 ```
-
-### Using Linux
-
-1.  Download tesseract and language
-
-```bash
-    sudo apt-get install tesseract-ocr-[rus]
-```
-
-###Using Windows
-
-* Download Python wrapper
-
-```bash
-    pip install pytesseract
-```
-* Inclue the tesseract in your path
-* import pytesseract
