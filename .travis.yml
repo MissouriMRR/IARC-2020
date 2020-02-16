@@ -5,6 +5,7 @@ python:
   - "3.6"
   - "3.7"
 install:
+  - sudo apt-get install tesseract-ocr
   - sudo apt-get install tesseract-ocr-[rus]
   - pip install -r vision/requirements.txt
 script:
