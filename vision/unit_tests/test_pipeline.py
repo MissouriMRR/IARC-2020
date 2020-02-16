@@ -18,7 +18,8 @@ class TestPipeline(unittest.TestCase):
     """
     Testing the pipeline class.
     """
-    def _get_pipeline(self, **kwargs):  ## Patch ReadBag, ObstacleFinder, env, plot_obstacles
+    @staticmethod
+    def _get_pipeline(**kwargs):  ## Patch ReadBag, ObstacleFinder, env, plot_obstacles
         env = Mock()
         env.update = Mock()
 

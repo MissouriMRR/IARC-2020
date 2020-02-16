@@ -20,7 +20,8 @@ class TestObstacleDetection(unittest.TestCase):
     """
     Testing obstacle detection.
     """
-    def _get_params(self, **kwargs):
+    @staticmethod
+    def _get_params(**kwargs):
         """
         Generate a blob detector params object.
         """
