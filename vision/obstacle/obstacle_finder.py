@@ -15,6 +15,7 @@ from vision.bounding_box import BoundingBox
 import json
 from vision.util.import_params import import_params
 
+
 class ObstacleFinder:
     """
     Constructs an ObstacleFinder object with an image, logging, and params
@@ -101,7 +102,7 @@ class ObstacleFinder:
 
 
 if __name__ == '__main__':
-    from vision.util.obstacle_plotter import plot_obstacles
+    from vision.util.box_plotter import plot_box
 
     prefix = 'vision' if os.path.isdir("vision") else ''
     img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
@@ -119,4 +120,4 @@ if __name__ == '__main__':
         obstacle_finder = ObstacleFinder(params=import_params(config))
         bboxes = obstacle_finder.find(image)
 
-        plot_obstacles(obstacle_finder.keypoints, image)
+        plot_box(bboxes, image)
