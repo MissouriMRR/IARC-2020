@@ -8,4 +8,4 @@ python:
 install:
   - pip install -r vision/requirements.txt
 script:
-  - bash vision/unit_tests/runall.sh
+  - bash vision/unit_tests/travis_runall.sh
