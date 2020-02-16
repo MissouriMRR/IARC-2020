@@ -1,6 +1,12 @@
 """
 Boat related unit tests.
 """
+import sys, os
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
+
 import unittest
 import numpy as np
 import cv2
