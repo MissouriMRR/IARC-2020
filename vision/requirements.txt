@@ -1,5 +1,9 @@
 numpy
 opencv-python
+pytesseract  # Requires additional install
+
+# Simulator
+airsim
 
 # Realsense
 pyrealsense2
@@ -7,5 +11,3 @@ pyrealsense2
 # Blob annotations
 lxml
 
-# Realsense
-pytesseract

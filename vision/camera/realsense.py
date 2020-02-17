@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import pyrealsense2 as rs
 try:
-    from vision.realsense.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 try:
@@ -36,7 +36,7 @@ class Realsense(Camera):
         Serial number of the realsense camera to stream from
         Defaults to empty, which reads if only one realsense is plugged in
     """
-    def __init__(self, screen_width, screen_height, frame_rate, serial_no=""):
+    def __init__(self, screen_width, screen_height, frame_rate, serial_no="", **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.serialNumber = serial_no
