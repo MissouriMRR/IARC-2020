@@ -1,17 +1,16 @@
 """
 The BagFile class is a child class of the camera, designed to be used for pre-recorded .bag files
 """
-
 import cv2
 import numpy as np
 import pyrealsense2 as rs
 try:
-    from vision.realsense.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 try:
     from vision.util.take_picture import save_camera_frame
-except:
+except ImportError:
     from take_picture import save_camera_frame
 
 
@@ -31,7 +30,7 @@ class BagFile(Camera):
         Name of .bag file to read.
         Driver should find this by parsing arguments
     """
-    def __init__(self, screen_width, screen_height, frame_rate, filename):
+    def __init__(self, screen_width, screen_height, frame_rate, filename, **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.filename = filename

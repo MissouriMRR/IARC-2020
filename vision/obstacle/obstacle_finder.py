@@ -1,5 +1,5 @@
 """
-Detects blobs in images using OpenCV's SimpleBlobDetector.
+Detects obstacles in images using OpenCV's SimpleBlobDetector
 """
 import os
 import sys
@@ -11,18 +11,19 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
-from vision.bounding_box import BoundingBox
+from vision.bounding_box import BoundingBox, ObjectType
 import json
 from vision.util.import_params import import_params
 
-class BlobFinder:
+
+class ObstacleFinder:
     """
-    Constructs a BlobFinder object with an image, logging, and params
+    Constructs an ObstacleFinder object with an image, logging, and params
 
     Parameters
     ----------
     params: SimpleBlobDetector_Params
-        blob detector params object
+        SimpleBlobDetector params object
     """
     def __init__(self, params=None):
         self.keypoints = []
@@ -49,12 +50,12 @@ class BlobFinder:
 
     def find(self, image):
         """
-        Detects blobs in the image provided in the constructor
+        Detects obstacles in the image provided in the constructor
 
         Parameters
         ----------
         image: np.ndarray
-            image to find blobs in
+            image to find obstacles in
 
         Returns
         -------
@@ -74,7 +75,7 @@ class BlobFinder:
             center_x, center_y = keypoint.pt[0], keypoint.pt[1]
             radius = keypoint.size / 2
 
-            # calculate coordinates for bounding box of each blob
+            # calculate coordinates for bounding box of each obstacle
             pos_dx = center_x + radius
             neg_dx = center_x - radius
             pos_dy = center_y + radius
@@ -94,18 +95,18 @@ class BlobFinder:
             vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
-            bbox = BoundingBox(vertices, None)
+            bbox = BoundingBox(vertices, ObjectType.AVOID)
             bounding_boxes.append(bbox)
 
         return bounding_boxes
 
 
 if __name__ == '__main__':
-    from vision.util.blob_plotter import plot_blobs
+    from vision.util.box_plotter import plot_box
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'blob')
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
 
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
@@ -116,8 +117,7 @@ if __name__ == '__main__':
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
+        obstacle_finder = ObstacleFinder(params=import_params(config))
+        bboxes = obstacle_finder.find(image)
 
-        blob_finder = BlobFinder(params=import_params(config))
-        bboxes = blob_finder.find(image)
-
-        plot_blobs(blob_finder.keypoints, image)
+        plot_box(bboxes, image)

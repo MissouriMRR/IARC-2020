@@ -11,12 +11,12 @@ import cv2
 import numpy as np
 import pyrealsense2 as rs
 try:
-    from vision.realsense.template import Camera
+    from vision.camera.template import Camera
 except ImportError:
     from template import Camera
 try:
     from vision.util.take_picture import save_camera_frame
-except:
+except ImportError:
     from util.take_picture import save_camera_frame
 
 
@@ -36,12 +36,8 @@ class Realsense(Camera):
         Serial number of the realsense camera to stream from
         Defaults to empty, which reads if only one realsense is plugged in
     """
-    def __init__(self, screen_width, screen_height, frame_rate, serial_no=""):
+    def __init__(self, screen_width, screen_height, frame_rate, serial_no="", **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
-
-        # Initialize clipping constants
-        self.CLIPPING = False
-        self.clipping_distance_in_meters = 4
 
         self.serialNumber = serial_no
 
@@ -70,13 +66,8 @@ class Realsense(Camera):
         profile = self.pipeline.start(self.config)
 
         # Getting the depth sensor's depth scale (see rs-align example for explanation)
-        depth_sensor = profile.get_device().first_depth_sensor()
-        depth_scale = depth_sensor.get_depth_scale()
-
-        # We will be removing the background of objects more than
-        #  clipping_distance_in_meters meters away
-        if self.CLIPPING:
-            clipping_distance = self.clipping_distance_in_meters / depth_scale
+        #depth_sensor = profile.get_device().first_depth_sensor()
+        #depth_scale = depth_sensor.get_depth_scale()
 
         align_to = rs.stream.color
         align = rs.align(align_to)
@@ -109,7 +100,6 @@ class Realsense(Camera):
             beyond a given distance from the camera
         """
         for depth_image, color_image in self:
-            # Remove background - Set pixels further than clipping_distance to grey
             grey_color = 153
             depth_image_3d = np.dstack((depth_image, depth_image, depth_image))
 
