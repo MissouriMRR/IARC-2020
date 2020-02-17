@@ -12,6 +12,8 @@ class ModuleLocation:
     ## Initialization
 
     def __init__(self):
+        """
+        """
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
 
@@ -76,13 +78,18 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
+        NUM_CIRCLES = np.shape(self.circles)[0]
+
         self._getSlopes()
         self._groupSlopes()
 
         self.holes = np.arange(0, 8)
         self.holes = np.reshape(self.holes, (4, 2)) # Set of 4 (x, y) coordinates
 
-        
+
+
+        #slope_index // circleslength
+        #slope_index % circleslength
 
         return self.holes
 
@@ -144,7 +151,7 @@ class ModuleLocation:
 
         # Resize circles into 2d array
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
-        
+
         return self.circles
 
     def _increaseBrightness(self, increase):
@@ -181,6 +188,18 @@ class ModuleLocation:
         None
         """
         cv2.imshow("Module Location Image", self.img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    def showDepth(self):
+        """
+        Shows the depth channel image.
+        
+        Returns
+        -------
+        None
+        """
+        cv2.imshow("Module Depth Image", self.depth)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
