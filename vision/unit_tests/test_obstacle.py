@@ -1,26 +1,49 @@
 """
-Boat related unit tests.
+Obstacle detector unit tests.
 """
-import sys, os
+import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import unittest
+
 import numpy as np
 import cv2
 
-from boat.detect_words import detect_russian_word
+from vision.obstacle.obstacle_finder import ObstacleFinder
+from vision.bounding_box import BoundingBox, ObjectType
 
 
-class TestDetectRussianWord(unittest.TestCase):
+class TestObstacleDetection(unittest.TestCase):
     """
-    Testing the text detector.
+    Testing obstacle detection.
     """
-    def test_detect_russian(self):
+    @staticmethod
+    def _get_params(**kwargs):
         """
-        Testing text_detector.
+        Generate a blob detector params object.
+        """
+        config = {
+            "minThreshold": 10,
+            "maxThreshold": 300,
+            "filterByArea": True,
+            "minArea": 100,
+            "maxArea": 200000
+        }
+        config.update(kwargs)
+
+        params = cv2.SimpleBlobDetector_Params()
+
+        for key, value in config.items():
+            setattr(params, key, value)
+
+        return params
+
+    def test_find(self):
+        """
+        Testing ObstacleFinder.find.
 
         Parameters
         ----------
@@ -42,18 +65,25 @@ class TestDetectRussianWord(unittest.TestCase):
 
         ## 3 Channel {0..255} Image
         with self.subTest(i="3 Channel {0..255} Image"):
+            detector = ObstacleFinder(params=self._get_params())
+
             image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
 
-            detect_russian_word(image)
+            detector.find(image)
 
         ### Ensure returns correct type of BoundingBox
         with self.subTest(i="Object type"):
-            image = np.zeros((1000, 1000, 3), dtype='uint8')
-            cv2.putText(image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+            detector = ObstacleFinder(params=self._get_params())
 
-            output = detect_russian_word(image)
+            for i in range(1, 9):
+                image = np.zeros((1000, 1000, 3), dtype='uint8')
+                cv2.rectangle(image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
 
-            if output is None:
+                output = detector.find(image)
+
+                if output is not None:
+                    break
+            else:
                 self.fail(msg="Failed to detect obstacle to be able to test.")
 
             for box in output:
@@ -74,7 +104,7 @@ class TestDetectRussianWord(unittest.TestCase):
 
                 ##
                 self.assertIsInstance(box.object_type, ObjectType)
-                self.assertEqual(box.object_type, ObjectType.TEXt)
+                self.assertEqual(box.object_type, ObjectType.AVOID)
 
 
 if __name__ == '__main__':

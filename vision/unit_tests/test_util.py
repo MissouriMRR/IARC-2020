@@ -1,3 +1,6 @@
+"""
+Testing vision.util.import_params.
+"""
 import unittest
 import os
 import sys
