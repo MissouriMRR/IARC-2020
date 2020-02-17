@@ -45,6 +45,10 @@ def ModuleInFrame(img):
     # Hough Circle Detection
     # circles = (x, y, r)
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
+
+    if circles is None:
+        return False
+
     circles = np.uint16(circles)
 
     # Resize circles into 2d array
