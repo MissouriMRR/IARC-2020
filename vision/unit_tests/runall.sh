@@ -1,1 +1,1 @@
-python3 -m unittest discover unit_tests\
+python3 -m unittest discover unit_tests/

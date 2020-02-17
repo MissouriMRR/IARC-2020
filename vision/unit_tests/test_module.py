@@ -2,12 +2,13 @@
 For testing all module algorithms.
 """
 import os, sys
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path += [parent_dir]
-sys.path += [os.path.dirname(parent_dir)]
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import unittest
-import cv2
+import numpy as np
 
 from vision.module.in_frame import ModuleInFrame as mif
 #from vision.module.detector import ModuleKMeans as mkm
@@ -17,35 +18,64 @@ class TestModuleInFrame(unittest.TestCase):
     """
     Testing module.in_frame functionality.
     """
-    def test_ModuleInFrame(self):
+    def test_params(self):
         """
-        Testing ModuleInFrame
+        Verify can handle range of input types.
+
+        Parameters
+        ----------
+        image: ndarray
+            Image to classify.
+        """
+        IMAGE_SIZE = [1920, 1080]
+
+        ## 1 Channel Image
+        with self.subTest(i="1 Channel Image"):
+            pass
+
+        ## 3 Channel [0, 1] Image
+        with self.subTest(i="3 Channel [0, 1] Image"):
+            pass
+
+        ## 3 Channel {0..255} Image
+        with self.subTest(i="3 Channel {0..255} Image"):
+            image = np.ones(shape=(*IMAGE_SIZE, 3), dtype='uint8')
+
+            result = mif(image)
+
+            self.assertIn(result, [True, False])
+
+        ## 4 Channel [0, 1] Image
+        with self.subTest(i="4 Channel [0, 1] Image"):
+            pass
+
+        ## 4 Channel {0..255} Image
+        with self.subTest(i="4 Channel {0..255} Image"):
+            pass
+
+        ## Empty image
+        with self.subTest(i="Empty Image"):
+            pass
+
+        ## None as image
+        with self.subTest(i="None as Image"):
+            pass
+
+    def test_return(self):
+        """
+        Verify returns only expected output types.
 
         Returns
         -------
-        ndarray[bool] which images the module was detected in
+        bool
         """
+        ##
+        for i in range(1, 6):
+            image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
 
-        results = []
-        expected_results = {
-            "Block1.jpg" : True,
-            "Block2.jpg" : True,
-            "Block3.jpg" : True,
-            "Block4.jpg" : True
-        }
-        for picname in expected_results.keys():
-            with self.subTest(i=picname):
-                picpath = os.path.join('vision_images', 'module', picname)
+            result = mif(image)
 
-                image = cv2.imread(picpath)
-
-
-                if image is None:
-                    raise FileNotFoundError(f"Could not read {picpath}!")
-
-                results.append(mif(image))
-
-        self.assertListEqual(results, list(expected_results.values()))
+            self.assertIn(result, [True, False])
 
 
 if __name__ == '__main__':
