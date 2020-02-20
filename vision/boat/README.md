@@ -38,10 +38,10 @@ Download pytesseract for OCR (optical character recognition)
 
 ###Using Windows
 
-* Download Python wrapper
+1.  Download Python wrapper
 
 ```bash
     pip install pytesseract
 ```
-* Inclue the tesseract in your path
-* import pytesseract
+2.  Include the tesseract in your path
+3.  Import pytesseract

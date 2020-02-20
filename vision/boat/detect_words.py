@@ -98,10 +98,10 @@ def detect_russian_word(imagePNG):
     # cv2.waitKey(0)
 
     # function from library: pytesseract to grab text from image
-    text = pytesseract.image_to_string(filter_image, lang="uzb_cyrl")
+    # text = pytesseract.image_to_string(filter_image, lang="uzb_cyrl")
     # print(text)
 
-    russian_word = 'модули иртибот'
+    # russian_word = 'модули иртибот'
     # print(russian_word)
 
 
