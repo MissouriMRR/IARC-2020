@@ -1,8 +1,11 @@
 """
 This file contains the ModuleInFrame function to detect if the module is in an image
+
+The commented-out lines are used to visualize the algorithm and are unnecessary for processing.
 """
 import cv2
 import numpy as np
+import argparse
 
 # Constants
 BLUR_SIZE = 5 # Blur kernel size
@@ -23,9 +26,6 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-    if img is None:
-        raise ValueError(f"Image cannot be None.")
-
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -39,12 +39,12 @@ def ModuleInFrame(img):
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE,BLUR_SIZE), sigmaX=0)
 
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(laplacian)
-
+    
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
     if circles is None:  # no circles found
@@ -59,11 +59,10 @@ def ModuleInFrame(img):
 
     # Finding slopes between the circles
     slopes = np.array([])
-
     for x, y, r in circles:
-        cv2.circle(output, (x, y), r, (0, 255, 0), 4)
-        cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-        for iX, iY, __ in circles:
+        # cv2.circle(output, (x, y), r, (0, 255, 0), 4)
+        # cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+        for iX, iY, iR in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
@@ -80,8 +79,33 @@ def ModuleInFrame(img):
     buckets, _ = np.histogram(slopes, num_buckets, (lower_bound, upper_bound))
 
     # show the output image
-    cv2.imshow("output", output)
-    cv2.waitKey(0)
+    # cv2.imshow("output", output)
+    # cv2.waitKey(0)
 
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
+
+
+if __name__ == '__main__':
+    """
+    To test in_frame, use
+    "python in_frame.py -i (image name).(image file extension)"
+    
+    Also note that in_frame, must be in the same file location,
+    or a path must be specified
+    """
+    # # Create object for parsing command-line options
+    parser = argparse.ArgumentParser(description="Read image file and display depth and test for ModuleInFrame.\
+                                     To read an image file, type \"python in_frame_driver.py --i (image name).(image extension)\"")
+    # # Add argument which takes path to a bag file as an input
+    parser.add_argument("-i", "--input", type=str, help="Path to the image file")
+    # # Parse the command line arguments to an object
+    args = parser.parse_args()
+    # # Safety if no parameter have been given
+    if not args.input:
+        raise FileNotFoundError("No input parameter has been given. For help type --help")
+
+    image = cv2.imread(args.input)
+    npImage = np.asarray(image)
+
+    print("Module in frame: " + str(ModuleInFrame(npImage)))
