@@ -15,7 +15,7 @@ class SimCamera(Camera):
     """
     Creates an airsim camera object
     """
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__(-1, -1, -1)  # for screen_width, screen_height, and framerate, unnecessary
         self.client = airsim.MultirotorClient()
 
