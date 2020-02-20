@@ -205,7 +205,7 @@ class PascalVocAnnotator(object):
                 return
 
         if event == cv2.EVENT_LBUTTONDOWN and (not self._annotation_in_progress):
-            self._annotation_in_progress = Annotation(x, y, self.current_color, 0)
+            self._annotation_in_progress = Annotation(x, y, self.current_color, "blob")
 
         elif event == cv2.EVENT_LBUTTONUP and self._annotation_in_progress:
             self._annotations.insert(0, self._annotation_in_progress)
