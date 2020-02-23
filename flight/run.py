@@ -1,8 +1,10 @@
-from multiprocessing import Process, Value
+from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
+# Shared communication object between flight and vision code
 class Communication:
 
+    # Arbitrary data values
     x = 0
     y = 0
 
@@ -17,10 +19,10 @@ class Communication:
     def get_y(self):
         return self.y
 
-    # Print x and y value
+    # Print x and y values
     def get(self):
         print(self.x,self.y)
-    
+
     # Set member variable x to specified value
     def set_x(self,val):
         self.x = val
@@ -29,30 +31,39 @@ class Communication:
     def set_y(self,val):
         self.y = val
 
+    # Default constructor
     # Initialize x and y to one
     def __init__(self):
         self.x = 1
         self.y = 1
 
+# Arbitrary flight function with communication object
+# paramter
 def flight(comm):
-    comm.set_x(comm.get_x() + 1) 
+    comm.set_x(comm.get_x() + 1)
 
+# Arbitrary vision function with communication object
+# paramter
 def vision(comm):
     comm.set_y(comm.get_y() + 1)
 
 def multi_proc():
 
+    # Register Communication object to Base Manager
     BaseManager.register('Communication',Communication)
+    # Create manager object
     manager = BaseManager()
+    # Start manager
     manager.start()
+    # Create Communication object from manager
     test = manager.Communication()
 
     # Create new processes
     print("-----Begin Processes-----")
     f = Process(target=flight, args=(test,))
     v = Process(target=vision, args=(test,))
-   
-    # Start flight and wait for it to finish 
+
+    # Start flight and vision functions
     f.start()
     v.start()
 
@@ -66,17 +77,20 @@ def multi_proc():
             f = Process(target=flight, args=(test,))
             f.start()
 
-        # Start vision and wait for it to finish 
+        # Start vision if it is no longer running
+        # Same idea as above code for flight
         if v.is_alive() == False:
             v = Process(target=vision, args=(test,))
             v.start()
 
         test.get()
-    
+
+    # Join flight and vision processes before exiting function
     f.join()
     v.join()
 
     print("----End of Processes----")
 
 if __name__ == '__main__':
+    # Run multiprocessing function
     multi_proc()
