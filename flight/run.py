@@ -1,12 +1,17 @@
+#!/bin/bash
+
 from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
 # Shared communication object between flight and vision code
 class Communication:
 
-    # Arbitrary data values
-    x = 0
-    y = 0
+    # Default constructor
+    # Initialize x and y to one
+    def __init__(self):
+        # Arbitrary data values
+        self.x = 1
+        self.y = 1
 
     # Use functions to access member variables of communication object
     # The object does not work properly when passed to a manager otherwise
@@ -21,36 +26,33 @@ class Communication:
 
     # Print x and y values
     def get(self):
-        print(self.x,self.y)
+        print(self.x, self.y)
 
     # Set member variable x to specified value
-    def set_x(self,val):
+    def set_x(self, val):
         self.x = val
 
     # Set member variable y to specified value
-    def set_y(self,val):
+    def set_y(self, val):
         self.y = val
 
-    # Default constructor
-    # Initialize x and y to one
-    def __init__(self):
-        self.x = 1
-        self.y = 1
 
 # Arbitrary flight function with communication object
 # paramter
 def flight(comm):
     comm.set_x(comm.get_x() + 1)
 
+
 # Arbitrary vision function with communication object
 # paramter
 def vision(comm):
     comm.set_y(comm.get_y() + 1)
 
-def multi_proc():
+
+def main():
 
     # Register Communication object to Base Manager
-    BaseManager.register('Communication',Communication)
+    BaseManager.register("Communication", Communication)
     # Create manager object
     manager = BaseManager()
     # Start manager
@@ -67,7 +69,7 @@ def multi_proc():
     f.start()
     v.start()
 
-    while(True):
+    while True:
 
         # If the process is no longer alive,
         # (i.e. error has been raised in this case)
@@ -91,6 +93,7 @@ def multi_proc():
 
     print("----End of Processes----")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Run multiprocessing function
-    multi_proc()
+    main()
