@@ -11,6 +11,7 @@ import argparse
 BLUR_SIZE = 5 # Blur kernel size
 BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
 MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
+MAX_CIRCLES = 100 # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
 
 
 def ModuleInFrame(img):
@@ -26,6 +27,10 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
+
+    if img is None:
+        raise ValueError(f"Image cannot be None.")
+
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
@@ -33,7 +38,7 @@ def ModuleInFrame(img):
     img = img[:, :, :3]
 
     # Create output image
-    output = img.copy()
+    # output = img.copy()
 
     # Grayscale
     gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
@@ -49,7 +54,7 @@ def ModuleInFrame(img):
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
     if circles is None:  # no circles found
         return False
-    elif circles.shape[1] > 100:  # too many circles found
+    elif circles.shape[1] > MAX_CIRCLES:  # too many circles found
         raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
 
     circles = np.uint16(circles)
@@ -85,7 +90,6 @@ def ModuleInFrame(img):
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
 
-
 if __name__ == '__main__':
     """
     To test in_frame, use
@@ -101,11 +105,14 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--input", type=str, help="Path to the image file")
     # # Parse the command line arguments to an object
     args = parser.parse_args()
-    # # Safety if no parameter have been given
-    if not args.input:
-        raise FileNotFoundError("No input parameter has been given. For help type --help")
 
-    image = cv2.imread(args.input)
+    if args.input:
+        inputImageFile = args.input
+    else:
+        inputImageFile = '../vision_images/module/Block2.jpg'
+        # raise FileNotFoundError("No input parameter has been given. For help type --help"
+
+    image = cv2.imread(inputImageFile)
     npImage = np.asarray(image)
 
     print("Module in frame: " + str(ModuleInFrame(npImage)))
