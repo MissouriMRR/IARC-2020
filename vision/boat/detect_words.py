@@ -5,6 +5,15 @@ It returns 'Match' if it identifies 'модули иртибот' and 'Not Match
 import pytesseract
 import numpy as np
 import cv2
+import lxml.etree
+import os, sys
+from bounding_box import BoundingBox, ObjectType
+
+
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 
 def detect_russian_word(imagePNG):
@@ -18,32 +27,36 @@ def detect_russian_word(imagePNG):
     False if not.
     """
 
-    #filter image
-    _, filterImage = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
+    # filter image
+    _, filter_image = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
 
-    #shows what the filtered image looks like
-    #cv2.imshow('img', filterImage)
-    #cv2.waitKey(0)
+    # shows what the filtered image looks like
+    # cv2.imshow('img', filter_image)
+    # cv2.waitKey(0)
 
-    #function from library: pytesseract to grab text from image
-    text = pytesseract.image_to_string(filterImage, lang="rus")
-    #print(text)
+    # function from library: pytesseract to grab text from image
+    # text = pytesseract.image_to_string(filter_image, lang="uzb_cyrl")
+    # print(text)
 
-    russianWord = 'модули иртибот'
-    #print(russianWord)
+    # russian_word = 'модули иртибот'
+    # print(russian_word)
 
-    """ Debug
-    d = pytesseract.image_to_data(filterImage, output_type=Output.DICT)
+
+    ## change the output
+    d = pytesseract.image_to_data(filter_image, output_type=pytesseract.Output.DICT)
+
     n_boxes = len(d['level'])
+    box_obs = []
     for i in range(n_boxes):
         (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
-        cv2.rectangle(imagePNG, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(imagePNG, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    cv2.imshow('img', imagePNG)
-    cv2.waitKey(0)
-    """
+        verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
 
-    return text == russianWord
+        box = BoundingBox(verts, ObjectType('text'))
+        box_obs.append(box)
+
+    return box_obs
 
 
 if __name__ == "__main__":
@@ -58,5 +71,4 @@ if __name__ == "__main__":
 
     result = detect_russian_word(originalImage)
 
-    print("Result:", result)
     print("Time:", time.time() - start)
