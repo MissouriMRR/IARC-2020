@@ -14,10 +14,13 @@ class ModuleLocation:
     def __init__(self):
         """
         """
+        # Ignore numpy warnings
+        np.seterr(all="ignore")
+
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
 
-        self.holes = np.arange(8).reshape((4, 2)) # Set of 4 (x, y) coordinates, location of the four holes
+        self.holes = np.arange(8) # Set of 4 (x, y) coordinates, location of the four holes
         
         self.circles = np.array(0) # List of circles detected in color image
         
@@ -72,11 +75,14 @@ class ModuleLocation:
         # Average hole coordinates to find center coordinates
         x_total = 0
         y_total = 0
-        for x, y in self.holes:
+        num_holes = 0
+        for x, y, _ in self.holes:
             x_total += x
             y_total += y
-        self.center[0] = x_total // 4
-        self.center[1] = y_total // 4
+            num_holes += 1
+        
+        self.center[0] = x_total // num_holes
+        self.center[1] = y_total // num_holes
 
         return self.center
     
@@ -89,30 +95,32 @@ class ModuleLocation:
         ndarray - locations of the 4 holes
         """
         NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
-        MIN_SEP = 1
+        MIN_SEP = .01 # minimum seperation between a slope and the main parallel slope
 
 
         # Find Slope with Most Parallels
-        most_parallels = np.amax(self.slope_heights)
-        bucket_ind = np.where(self.slope_heights==most_parallels)[0]
-        parallel = self.slope_bounds[bucket_ind]
-        
+        bucket_ind = np.argmax(self.slope_heights) # highest segment of histogram
+        parallel = self.slope_bounds[bucket_ind] # slope at highest segment
+
         # Find Holes Associated with parallels
         idx = 0
         hole_idx = 0
         for slope in self.slopes:
             if np.abs(slope - parallel) <= MIN_SEP:
+                # x and y are the indexes of 2 circles corresponding to a slope
                 x = idx // (NUM_CIRCLES - 1)
                 y = idx % (NUM_CIRCLES - 1)
                 y += int(y >= x)
+
                 if hole_idx == 0:
-                    self.holes = (x, y)
+                    self.holes = np.array(self.circles[x])
                 else:
-                    np.append(self.holes, self.circles[x, y])
+                    self.holes = np.append(self.holes, self.circles[x])
+                
+                self.holes = np.append(self.holes, self.circles[y])
                 hole_idx += 1
-                print(idx)
             idx += 1
-        print(self.holes)
+        self.holes = self.holes.reshape((-1, 3))
         return self.holes
 
     def _groupSlopes(self):
@@ -122,11 +130,11 @@ class ModuleLocation:
         -------
         None
         """
-        BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
+        BUCKET_MODIFIER = .5 # Changes how many buckets are in the range
 
         upper_bound = np.amax(self.slopes)
         lower_bound = np.amin(self.slopes)
-        num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
+        num_buckets = np.int32((upper_bound - lower_bound) * BUCKET_MODIFIER)
 
         self.slope_heights, self.slope_bounds = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
 
@@ -253,8 +261,8 @@ class ModuleLocation:
         """
         
         centerImg = np.copy(self.img)
-        for x, y in self.holes:
-            cv2.circle(img=centerImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
+        for x, y, r in self.holes:
+            cv2.circle(img=centerImg, center=(x, y), radius=r, color=(0, 0, 255), thickness=-1)
         
         cv2.circle(img=centerImg, center=(self.center[0], self.center[1]), radius=10, color=(0, 255, 0), thickness=-1)
 
