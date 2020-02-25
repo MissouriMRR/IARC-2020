@@ -237,7 +237,7 @@ class PascalVocAnnotator(object):
 
 
 if __name__ == '__main__':
-    DATASET_PATH = os.path.join("..", "..", "vision_images", "obstacle")
+    DATASET_PATH = os.path.join("../../vision_images/boat/")
 
     with PascalVocAnnotator(DATASET_PATH) as annotator:
         while annotator.update():

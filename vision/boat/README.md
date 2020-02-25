@@ -24,11 +24,11 @@ Download pytesseract for OCR (optical character recognition)
 ```bash
     pip install pytesseract
 ```
-* Inclue the tesseract in your path
+* Include the tesseract in your path
 
 ### Using Mac and Homebrew
 
-1.  Downlaod tesseract
+1.  Download tesseract
 
 ```bash
    brew install tesseract
