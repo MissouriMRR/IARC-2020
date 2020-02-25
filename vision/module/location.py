@@ -17,7 +17,7 @@ class ModuleLocation:
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
 
-        self.holes = np.array(0) # Location of four holes
+        self.holes = np.arange(8).reshape((4, 2)) # Set of 4 (x, y) coordinates, location of the four holes
         
         self.circles = np.array(0) # List of circles detected in color image
         
@@ -30,7 +30,8 @@ class ModuleLocation:
         self.distance = 0 # Distance to the center
 
         self.slopes = np.array(0) # Slopes between circles
-        self.slope_heights = np.array(0) # Histogram of heights
+        self.slope_heights = np.array(0) # Histogram of slopes
+        self.slope_bounds = np.array(0) # Bounds of slope histogram
 
     ## Finding Distance to Module
 
@@ -55,11 +56,20 @@ class ModuleLocation:
         ndarray - coordinates of the center of the module.
         """
 
+        # Circle detection
+        self._circleDetection()
+
+        # Get Slopes and Parallels
+        self._getSlopes()
+        self._groupSlopes()
+
+        # Find the Holes
         self._getHoleLocations()
 
         # Coordinates of the center of the front face of the module
         self.center = np.arange(0, 2)
 
+        # Average hole coordinates to find center coordinates
         x_total = 0
         y_total = 0
         for x, y in self.holes:
@@ -78,19 +88,31 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
-        NUM_CIRCLES = np.shape(self.circles)[0]
-
-        self._getSlopes()
-        self._groupSlopes()
-
-        self.holes = np.arange(0, 8)
-        self.holes = np.reshape(self.holes, (4, 2)) # Set of 4 (x, y) coordinates
+        NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
+        MIN_SEP = 1
 
 
-
-        #slope_index // circleslength
-        #slope_index % circleslength
-
+        # Find Slope with Most Parallels
+        most_parallels = np.amax(self.slope_heights)
+        bucket_ind = np.where(self.slope_heights==most_parallels)[0]
+        parallel = self.slope_bounds[bucket_ind]
+        
+        # Find Holes Associated with parallels
+        idx = 0
+        hole_idx = 0
+        for slope in self.slopes:
+            if np.abs(slope - parallel) <= MIN_SEP:
+                x = idx // (NUM_CIRCLES - 1)
+                y = idx % (NUM_CIRCLES - 1)
+                y += int(y >= x)
+                if hole_idx == 0:
+                    self.holes = (x, y)
+                else:
+                    np.append(self.holes, self.circles[x, y])
+                hole_idx += 1
+                print(idx)
+            idx += 1
+        print(self.holes)
         return self.holes
 
     def _groupSlopes(self):
@@ -106,7 +128,7 @@ class ModuleLocation:
         lower_bound = np.amin(self.slopes)
         num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
 
-        self.slope_heights, _ = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
+        self.slope_heights, self.slope_bounds = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
 
     def _getSlopes(self):
         """
@@ -146,7 +168,7 @@ class ModuleLocation:
         laplacian = np.uint8(laplacian)
         
         # Hough Circle Detection
-        self.circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=6, param1=63, param2=30, minRadius=0, maxRadius=50)
+        self.circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=14, param1=63, param2=30, minRadius=0, maxRadius=50)
         self.circles = np.uint16(self.circles)
 
         # Resize circles into 2d array
