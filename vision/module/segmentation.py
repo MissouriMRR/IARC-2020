@@ -6,6 +6,8 @@ import numpy as np
 import cv2
 
 
+## NOTE: Unmaintained, no plans to use in final.
+
 class ModuleKMeans:
     """
     Applies the kmeans algorithm to an image and displays a remapped

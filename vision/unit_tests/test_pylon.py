@@ -35,9 +35,9 @@ class TestPylonClassifier(unittest.TestCase):
 
         ## 3 Channel {0..255} Image
         with self.subTest(i="3 Channel {0..255} Image"):
-            image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
 
-            result = detect_red(image)
+            result = detect_red(color_image, None)
 
             self.assertIn(result, [True, False])
 
@@ -67,9 +67,9 @@ class TestPylonClassifier(unittest.TestCase):
         """
         ##
         for i in range(1, 6):
-            image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+            color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
 
-            result = detect_red(image)
+            result = detect_red(color_image, None)
 
             self.assertIn(result, [True, False])
 

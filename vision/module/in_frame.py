@@ -10,7 +10,7 @@ BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
 MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
 
 
-def ModuleInFrame(img):
+def ModuleInFrame(color_image, depth_image):
     """
     Determines if the Module is in frame
 
@@ -23,17 +23,17 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-    if img is None:
+    if color_image is None:
         raise ValueError(f"Image cannot be None.")
 
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
     # Remove depth channel
-    img = img[:, :, :3]
+    color_image = color_image[:, :, :3]
 
     # Grayscale
-    gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
     blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
