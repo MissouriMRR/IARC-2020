@@ -5,6 +5,8 @@ python:
   - "3.6"
   - "3.7"
 install:
+  - sudo apt-get update
+  - sudo apt-get upgrade
   - sudo apt-get install libtesseract-dev libleptonica-dev tesseract-ocr tesseract-ocr-[rus]
   - pip install -r vision/requirements.txt
 script:
