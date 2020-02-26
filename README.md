@@ -5,12 +5,11 @@
 # IARC-2020
 This repository contains code the Missouri S&T Multirotor Robot Design Team intends to use at the International Aerial Robotics Competition (IARC) in 2020
 
-# Table of contents
+# Table of Contents
 
 - [Codebase Structure](#codebase-structure)
 - [Running the Code](#running-the-code)
 - [Installation](#installation)
-- [Configuration Options](#configuration-options)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -26,28 +25,31 @@ Information about files within each directory can be found in /<directory>/READM
 ## Running the Code
 To run the competition code
 ```bash
-$ ./run.py  # Run this command
+$ pipenv shell # Initialize the python environment
+$ ./run.py  # Run the code
 ```
 
-## Installation
-
+## Requirements
 To run our competition code, you will need:
 * A drone or drone [simulator](https://dev.px4.io/master/en/simulation/)
 * Python version 3.6 or higher
-* Python3 pip
-* [Pipenv](https://github.com/pypa/pipenv)
+* [pipenv](https://github.com/pypa/pipenv)
+* [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python)
 
-Steps:
-1. Install a supported simulator by reading the instructions [here](https://dev.px4.io/master/en/simulation/).
-    > Currently, we do simple development with jMAVSim, and complex development and testing in AirSim, so start with jMAVSim
-
-2. Set up the development toolchain. Instructions are platform dependant - more info [here](https://dev.px4.io/master/en/setup/dev_env.html).
-
-3. Clone the PX4 Firmware repository. Tutorial [here](https://dev.px4.io/master/en/setup/building_px4.html#get_px4_code).
-
-4. Install Python3 and pip
-  - Recommended installation method is to use [Homebrew](https://brew.sh/) on MacOS `brew install python`, your native package manager on Linux (apt, yum, pacman, rpm), and [the Python website](https://www.python.org/downloads/) on Windows.
-
+## Installation
+1. Set up the development toolchain. Instructions are platform dependant - more info [here](https://dev.px4.io/master/en/setup/dev_env.html#development-environment).
+    - Choose your operating system from the **Development Environment** section
+    - **Install the latest Python version** using [pyenv](https://github.com/pyenv/pyenv) on MacOS and Linux. For Windows, get the executable from [the Python website](https://www.python.org/downloads/).
+    - Make sure you follow the steps *very specifically* - else you will waste time.
+3. Install [pipenv](https://github.com/pypa/pipenv)
+2. Clone the PX4 Firmware repository. Tutorial [here](https://dev.px4.io/master/en/setup/building_px4.html#get_px4_code).
+3. If you are testing at home, install a supported simulator by reading the instructions [here](https://dev.px4.io/master/en/simulation/jmavsim.html).
+    - Currently, we do simple development with jMAVSim, and complex development and testing in AirSim, so start with jMAVSim
+    - Run the make command in the PX4 Firmware repository
+4. In the root of this repository, run the following to create a virtual environment and install our packages:
+    ```bash
+    $ pipenv install
+    ```
 
 ## Contributing
 1. Clone the repository
