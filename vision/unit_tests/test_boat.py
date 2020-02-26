@@ -12,6 +12,7 @@ import numpy as np
 import cv2
 
 from boat.detect_words import detect_russian_word
+from bounding_box import BoundingBox, ObjectType
 
 
 class TestDetectRussianWord(unittest.TestCase):
@@ -74,7 +75,7 @@ class TestDetectRussianWord(unittest.TestCase):
 
                 ##
                 self.assertIsInstance(box.object_type, ObjectType)
-                self.assertEqual(box.object_type, ObjectType.TEXt)
+                self.assertEqual(box.object_type, ObjectType.TEXT)
 
 
 if __name__ == '__main__':
