@@ -1,4 +1,3 @@
-pytesseract
 numpy
 opencv-python
 pytesseract  # Requires additional install

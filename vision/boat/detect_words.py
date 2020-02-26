@@ -18,7 +18,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 class TextDetector:
 
-    def detect_russian_word(self, image):
+    def detect_russian_word(self, color_image, depth_image):
         """
         Function to detect words pulled from images
         -------
@@ -42,7 +42,6 @@ class TextDetector:
 
         # russian_word = 'модули иртибот'
         # print(russian_word)
-
 
         ## only return boxes that have text in them
         d = pytesseract.image_to_data(filter_image, output_type=pytesseract.Output.DICT, lang="uzb_cyrl")
@@ -69,12 +68,12 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    originalImage = cv2.imread(os.path.join('vision_images', 'boat', '2020-02-23.png'))
+    color_image = cv2.imread(os.path.join('vision_images', 'boat', '2020-02-23.png'))
 
-    if originalImage is None:
+    if color_image is None:
         raise FileNotFoundError("Could not read image!")
 
     detector = TextDetector()
-    result = detector.detect_russian_word(originalImage)
+    result = detector.detect_russian_word(color_image)
 
     print("Time:", time.time() - start)
