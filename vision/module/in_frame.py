@@ -14,7 +14,7 @@ MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to ident
 MAX_CIRCLES = 100 # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
 
 
-def ModuleInFrame(img):
+def ModuleInFrame(color_image, depth_image):
     """
     Determines if the Module is in frame
 
@@ -27,29 +27,28 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-
-    if img is None:
+    if color_image is None:
         raise ValueError(f"Image cannot be None.")
 
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
     # Remove depth channel
-    img = img[:, :, :3]
+    color_image = color_image[:, :, :3]
 
     # Create output image
     # output = img.copy()
 
     # Grayscale
-    gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
-    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE,BLUR_SIZE), sigmaX=0)
+    blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
 
     # Laplacian Transform
     laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
     laplacian = np.uint8(laplacian)
-    
+
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
     if circles is None:  # no circles found
@@ -73,6 +72,9 @@ def ModuleInFrame(img):
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
                 slopes = np.append(slopes, m)
 
+    if not slopes.size:
+        return False
+
     # Converting slopes to degrees
     slopes = np.degrees(np.arctan(slopes))
 
@@ -89,6 +91,7 @@ def ModuleInFrame(img):
 
     # Determine if any bucket of slopes is big enough
     return any(buckets > MIN_SLOPES_IN_BUCKET)
+
 
 if __name__ == '__main__':
     """
@@ -115,4 +118,4 @@ if __name__ == '__main__':
     image = cv2.imread(inputImageFile)
     npImage = np.asarray(image)
 
-    print("Module in frame: " + str(ModuleInFrame(npImage)))
+    print("Module in frame: " + str(ModuleInFrame(npImage, None)))

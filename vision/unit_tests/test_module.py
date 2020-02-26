@@ -40,9 +40,9 @@ class TestModuleInFrame(unittest.TestCase):
 
         ## 3 Channel {0..255} Image
         with self.subTest(i="3 Channel {0..255} Image"):
-            image = np.ones(shape=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.ones(shape=(*IMAGE_SIZE, 3), dtype='uint8')
 
-            result = mif(image)
+            result = mif(color_image, None)
 
             self.assertIn(result, [True, False])
 
@@ -72,10 +72,10 @@ class TestModuleInFrame(unittest.TestCase):
         """
         ##
         for i in range(1, 6):
-            image = 255 * np.ones((i * 100, i * 100, 3), dtype='uint8')
-            image = cv2.circle(image, (i * 50, i * 50), 20, (0, 0, 0), 4)
+            color_image = 255 * np.ones((i * 100, i * 100, 3), dtype='uint8')
+            color_image = cv2.circle(color_image, (i * 50, i * 50), 20, (0, 0, 0), 4)
 
-            result = mif(image)
+            result = mif(color_image, None)
 
             self.assertIn(result, [True, False])
 

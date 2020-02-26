@@ -48,13 +48,15 @@ class ObstacleFinder:
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self, image):
+    def find(self, color_image, depth_image):
         """
         Detects obstacles in the image provided in the constructor
 
         Parameters
         ----------
-        image: np.ndarray
+        color_image: np.ndarray
+            image to find obstacles in
+        depth_image: np.ndarray
             image to find obstacles in
 
         Returns
@@ -63,10 +65,10 @@ class ObstacleFinder:
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 
-        if not isinstance(image, np.ndarray):
-            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
+        if not isinstance(color_image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(color_image)}")
 
-        keypoints = self.blob_detector.detect(image)
+        keypoints = self.blob_detector.detect(color_image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -114,6 +116,6 @@ if __name__ == '__main__':
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
         obstacle_finder = ObstacleFinder(params=import_params(config))
-        bboxes = obstacle_finder.find(image)
+        bboxes = obstacle_finder.find(image, None)
 
         plot_box(bboxes, image)

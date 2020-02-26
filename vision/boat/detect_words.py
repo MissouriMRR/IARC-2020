@@ -16,7 +16,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 
-def detect_russian_word(imagePNG):
+def detect_russian_word(color_image, depth_image):
     """
     Function to detect words pulled from images
     -------
@@ -28,7 +28,7 @@ def detect_russian_word(imagePNG):
     """
 
     # filter image
-    _, filter_image = cv2.threshold(np.mean(imagePNG, axis=2), 127, 255, cv2.THRESH_BINARY)
+    _, filter_image = cv2.threshold(np.mean(color_image, axis=2), 127, 255, cv2.THRESH_BINARY)
 
     # shows what the filtered image looks like
     # cv2.imshow('img', filter_image)
@@ -49,7 +49,7 @@ def detect_russian_word(imagePNG):
     box_obs = []
     for i in range(n_boxes):
         (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
-        # cv2.rectangle(imagePNG, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(color_image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
         verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
 
@@ -64,11 +64,11 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    originalImage = cv2.imread(os.path.join('vision_images', 'boat', 'russianWord0.png'))
+    color_image = cv2.imread(os.path.join('vision_images', 'boat', 'russianWord0.png'))
 
-    if originalImage is None:
+    if color_image is None:
         raise FileNotFoundError("Could not read image!")
 
-    result = detect_russian_word(originalImage)
+    result = detect_russian_word(color_image, None)
 
     print("Time:", time.time() - start)
