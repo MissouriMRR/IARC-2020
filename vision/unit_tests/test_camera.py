@@ -176,7 +176,7 @@ class TestCamera(unittest.TestCase):
                 np.testing.assert_array_equal(color[:, :, ::-1], COLOR_IMAGE)
 
             try:
-                np.testing.assert_array_equal(depth, np.dstack([DEPTH_IMAGE] * 3))            
+                np.testing.assert_array_equal(depth, np.dstack([DEPTH_IMAGE] * 3))
             except AssertionError:
                 np.testing.assert_array_equal(depth, DEPTH_IMAGE)
 
