@@ -36,6 +36,10 @@ class ModuleLocation:
         self.slope_heights = np.array(0) # Histogram of slopes
         self.slope_bounds = np.array(0) # Bounds of slope histogram
 
+        self.upper_bound = np.array(0)
+        self.lower_bound = np.array(0)
+        self.num_buckets = np.array(0)
+
     ## Finding Distance to Module
 
     def getDistance(self):
@@ -95,8 +99,8 @@ class ModuleLocation:
         ndarray - locations of the 4 holes
         """
         NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
-        MIN_SEP = .01 # minimum seperation between a slope and the main parallel slope
 
+        sep = self.upper_bound - self.lower_bound / self.num_buckets
 
         # Find Slope with Most Parallels
         bucket_ind = np.argmax(self.slope_heights) # highest segment of histogram
@@ -106,7 +110,7 @@ class ModuleLocation:
         idx = 0
         hole_idx = 0
         for slope in self.slopes:
-            if np.abs(slope - parallel) <= MIN_SEP:
+            if np.abs(slope - parallel) <= sep:
                 # x and y are the indexes of 2 circles corresponding to a slope
                 x = idx // (NUM_CIRCLES - 1)
                 y = idx % (NUM_CIRCLES - 1)
@@ -132,11 +136,11 @@ class ModuleLocation:
         """
         BUCKET_MODIFIER = .5 # Changes how many buckets are in the range
 
-        upper_bound = np.amax(self.slopes)
-        lower_bound = np.amin(self.slopes)
-        num_buckets = np.int32((upper_bound - lower_bound) * BUCKET_MODIFIER)
+        self.upper_bound = np.amax(self.slopes)
+        self.lower_bound = np.amin(self.slopes)
+        self.num_buckets = np.int32((self.upper_bound - self.lower_bound) * BUCKET_MODIFIER)
 
-        self.slope_heights, self.slope_bounds = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
+        self.slope_heights, self.slope_bounds = np.histogram(self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound))
 
     def _getSlopes(self):
         """
