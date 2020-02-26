@@ -94,7 +94,7 @@ if __name__ == '__main__':
     """
     To test in_frame, use
     "python in_frame.py -i (image name).(image file extension)"
-    
+
     Also note that in_frame, must be in the same file location,
     or a path must be specified
     """

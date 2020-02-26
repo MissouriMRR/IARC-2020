@@ -9,6 +9,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import unittest
 import numpy as np
+import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
 #from vision.module.detector import ModuleKMeans as mkm
@@ -71,7 +72,8 @@ class TestModuleInFrame(unittest.TestCase):
         """
         ##
         for i in range(1, 6):
-            image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+            image = 255 * np.ones((i * 100, i * 100, 3), dtype='uint8')
+            image = cv2.circle(image, (i * 50, i * 50), 20, (0, 0, 0), 4)
 
             result = mif(image)
 
