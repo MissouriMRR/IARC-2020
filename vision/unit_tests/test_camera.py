@@ -11,16 +11,18 @@ import unittest
 from unittest.mock import patch
 
 import numpy as np
+import airsim
 
 from vision.camera import bag_file
 from vision.camera import realsense
+from vision.camera import sim_camera
 
 
 COLOR_IMAGE = np.arange(0, 10).reshape(-1, 1, 1) + np.arange(0, 10).reshape(1, -1, 1) + np.arange(0, 3).reshape(1, 1, -1)
 DEPTH_IMAGE = np.arange(0, 20).reshape(-1, 1) + np.arange(0, 20).reshape(1, -1)
 
 
-## bag_file
+## bag_file, realsense
 class FakeRSFrame:
     def __init__(self, data):
         self.data = data
@@ -56,7 +58,41 @@ class FakeRSPipeline:
         return FakeRSFrameContainer()
 
 
-## realsense
+## sim_camera
+class FakeAirsimResponse:
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def height(self):
+        return self.data.shape[0]
+
+    @property
+    def width(self):
+        return self.data.shape[1]
+
+    @property
+    def depth(self):
+        return 1 if len(self.data.shape) == 2 else self.data.shape[2]
+
+    @property
+    def image_data_uint8(self):
+        if self.depth == 1:
+            return np.array(np.dstack([self.data] * 3), dtype='uint8')
+
+        return np.array(self.data, dtype='uint8')
+
+
+class FakeAirsimClient:
+    def simGetImages(self, info):
+        target = info[0].image_type
+
+        if target is airsim.ImageType.Scene:
+            return [FakeAirsimResponse(np.copy(COLOR_IMAGE))]
+        elif target is airsim.ImageType.DepthVis:
+            return [FakeAirsimResponse(np.copy(DEPTH_IMAGE))]
+        else:
+            raise ValueError(f"Unrecognized airsim type '{target}'")
 
 
 ## testcase
@@ -64,10 +100,13 @@ class TestCamera(unittest.TestCase):
     """
     Testing the camera class.
     """
-
     def patch_camera(func):
+        """
+        Patch all necessary camera core components.
+        """
         @patch.object(bag_file.rs.pipeline, '__new__', return_value=FakeRSPipeline())
         @patch.object(bag_file.rs.align, '__new__', return_value=FakeRSAlign())
+        @patch.object(sim_camera.airsim.MultirotorClient, '__new__', return_value=FakeAirsimClient())
         def patched_function(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -78,7 +117,7 @@ class TestCamera(unittest.TestCase):
         Wrapper creating subtest for every type of object.
         """
         def run_all(self, *mocks):
-            for obj in [bag_file.BagFile, realsense.Realsense]:  # SimCamera]:
+            for obj in [bag_file.BagFile, realsense.Realsense, sim_camera.SimCamera]:
                 with self.subTest(i=obj.__name__):
                     self._get_camera = self._set_obj(obj)
 
@@ -135,8 +174,11 @@ class TestCamera(unittest.TestCase):
                 np.testing.assert_array_equal(color, COLOR_IMAGE)
             except AssertionError:
                 np.testing.assert_array_equal(color[:, :, ::-1], COLOR_IMAGE)
-            
-            np.testing.assert_array_equal(depth, DEPTH_IMAGE)
+
+            try:
+                np.testing.assert_array_equal(depth, np.dstack([DEPTH_IMAGE] * 3))            
+            except AssertionError:
+                np.testing.assert_array_equal(depth, DEPTH_IMAGE)
 
             if i > 3:
                 break
