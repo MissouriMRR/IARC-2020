@@ -10,15 +10,64 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import unittest
 from unittest.mock import patch
 
-from vision.camera import *
+import numpy as np
+
+from vision.camera import bag_file
+from vision.camera import realsense
 
 
-class TestPipeline(unittest.TestCase):
+COLOR_IMAGE = np.arange(0, 10).reshape(-1, 1, 1) + np.arange(0, 10).reshape(1, -1, 1) + np.arange(0, 3).reshape(1, 1, -1)
+DEPTH_IMAGE = np.arange(0, 20).reshape(-1, 1) + np.arange(0, 20).reshape(1, -1)
+
+
+## bag_file
+class FakeRSFrame:
+    def __init__(self, data):
+        self.data = data
+
+    def get_data(self):
+        return self.data
+
+
+class FakeRSFrameContainer:
+    def get_color_frame(self, *args, **kwargs):
+        return FakeRSFrame(np.copy(COLOR_IMAGE))
+
+    def get_depth_frame(self, *args, **kwargs):
+        return FakeRSFrame(np.copy(DEPTH_IMAGE))
+
+
+class FakeRSAlign:
     """
-    Testing the pipeline class.
+    Mocking pyrealsense2 align.
     """
+    def process(self, frame):
+        return frame
+
+
+class FakeRSPipeline:
+    """
+    Mocking pyrealsense2 pipeline.
+    """
+    def start(self, *args, **kwargs):
+        pass
+
+    def wait_for_frames(self, *args, **kwargs):
+        return FakeRSFrameContainer()
+
+
+## realsense
+
+
+## testcase
+class TestCamera(unittest.TestCase):
+    """
+    Testing the camera class.
+    """
+
     def patch_camera(func):
-        #@patch('pipeline.BagFile.__init__', autospec=True, return_value=None)
+        @patch.object(bag_file.rs.pipeline, '__new__', return_value=FakeRSPipeline())
+        @patch.object(bag_file.rs.align, '__new__', return_value=FakeRSAlign())
         def patched_function(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -28,8 +77,8 @@ class TestPipeline(unittest.TestCase):
         """
         Wrapper creating subtest for every type of object.
         """
-        def run_all(self):
-            for obj in []:  # BagFile, Realsense, SimCamera]:
+        def run_all(self, *mocks):
+            for obj in [bag_file.BagFile, realsense.Realsense]:  # SimCamera]:
                 with self.subTest(i=obj.__name__):
                     self._get_camera = self._set_obj(obj)
 
@@ -56,8 +105,8 @@ class TestPipeline(unittest.TestCase):
 
         return _get_camera
 
-    @run_all_types
     @patch_camera
+    @run_all_types
     def test_iter(self):
         """
         Testing Pipeline.run_algorithm.
@@ -80,9 +129,14 @@ class TestPipeline(unittest.TestCase):
         camera = self._get_camera()
 
         i = 0
-        for color, depth in camera:
+        for depth, color in camera:
             i += 1
-            # assert correct color and depth given(that I patched)
+            try:
+                np.testing.assert_array_equal(color, COLOR_IMAGE)
+            except AssertionError:
+                np.testing.assert_array_equal(color[:, :, ::-1], COLOR_IMAGE)
+            
+            np.testing.assert_array_equal(depth, DEPTH_IMAGE)
 
             if i > 3:
                 break
