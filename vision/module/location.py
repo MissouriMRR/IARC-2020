@@ -92,11 +92,11 @@ class ModuleLocation:
         """
         NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
 
-        sep = self.upper_bound - self.lower_bound / self.num_buckets # seperation from main parallel
+        sep = (self.upper_bound - self.lower_bound) / (self.num_buckets) # seperation from main parallel, width of a bucket
 
         # Find Slope with Most Parallels
         bucket_ind = np.argmax(self.slope_heights) # highest segment of histogram
-        parallel = self.slope_bounds[bucket_ind] # slope at highest segment is main parallel
+        parallel = self.slope_bounds[bucket_ind] - (sep / 2) # slope at highest segment minus half bucket width is main parallel
 
         # Find Holes Associated with parallels
         idx = 0
