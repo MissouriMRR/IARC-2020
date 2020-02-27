@@ -1,5 +1,5 @@
 """
-Detects blobs in images using OpenCV's SimpleBlobDetector.
+Detects obstacles in images using OpenCV's SimpleBlobDetector
 """
 import os
 import sys
@@ -11,18 +11,19 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
-from vision.bounding_box import BoundingBox
+from vision.bounding_box import BoundingBox, ObjectType
 import json
 from vision.util.import_params import import_params
 
-class BlobFinder:
+
+class ObstacleFinder:
     """
-    Constructs a BlobFinder object with an image, logging, and params
+    Constructs an ObstacleFinder object with an image, logging, and params
 
     Parameters
     ----------
     params: SimpleBlobDetector_Params
-        blob detector params object
+        SimpleBlobDetector params object
     """
     def __init__(self, params=None):
         self.keypoints = []
@@ -47,14 +48,16 @@ class BlobFinder:
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self, image):
+    def find(self, color_image, depth_image):
         """
-        Detects blobs in the image provided in the constructor
+        Detects obstacles in the image provided in the constructor
 
         Parameters
         ----------
-        image: np.ndarray
-            image to find blobs in
+        color_image: np.ndarray
+            image to find obstacles in
+        depth_image: np.ndarray
+            image to find obstacles in
 
         Returns
         -------
@@ -62,10 +65,10 @@ class BlobFinder:
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 
-        if not isinstance(image, np.ndarray):
-            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
+        if not isinstance(color_image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(color_image)}")
 
-        keypoints = self.blob_detector.detect(image)
+        keypoints = self.blob_detector.detect(color_image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -74,38 +77,34 @@ class BlobFinder:
             center_x, center_y = keypoint.pt[0], keypoint.pt[1]
             radius = keypoint.size / 2
 
-            # calculate coordinates for bounding box of each blob
+            # calculate coordinates for bounding box of each obstacle
             pos_dx = center_x + radius
             neg_dx = center_x - radius
             pos_dy = center_y + radius
             neg_dy = center_y - radius
 
-            top_left_near = (neg_dx, neg_dy, 0)
-            top_right_near = (pos_dx, neg_dy, 0)
-            bottom_right_near = (pos_dx, pos_dy, 0)
-            bottom_left_near = (neg_dx, pos_dy, 0)
+            top_left_near = (neg_dx, neg_dy)
+            top_right_near = (pos_dx, neg_dy)
+            bottom_right_near = (pos_dx, pos_dy)
+            bottom_left_near = (neg_dx, pos_dy)
 
             # With depth, these will be calculated differently
-            top_left_far = top_left_near
-            top_right_far = top_right_near
-            bottom_right_far = bottom_right_near
-            bottom_left_far = bottom_left_near
 
-            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near] # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
-            bbox = BoundingBox(vertices, None)
+            bbox = BoundingBox(vertices, ObjectType.AVOID)
             bounding_boxes.append(bbox)
 
         return bounding_boxes
 
 
 if __name__ == '__main__':
-    from vision.util.blob_plotter import plot_blobs
+    from vision.util.box_plotter import plot_box
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'blob')
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
 
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
@@ -116,8 +115,7 @@ if __name__ == '__main__':
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
+        obstacle_finder = ObstacleFinder(params=import_params(config))
+        bboxes = obstacle_finder.find(image, None)
 
-        blob_finder = BlobFinder(params=import_params(config))
-        bboxes = blob_finder.find(image)
-
-        plot_blobs(blob_finder.keypoints, image)
+        plot_box(bboxes, image)

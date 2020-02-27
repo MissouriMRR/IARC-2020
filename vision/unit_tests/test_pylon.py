@@ -1,55 +1,77 @@
 """
 Runs through images and determines which have the pylon
 """
-
-import unittest
-import os
-import sys
-import json
-import cv2
-
+import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-# from vision.pylon.detect_pylon import import_params
+import unittest
+import numpy as np
+
 from vision.pylon.detect_pylon import detect_red
 
-class TestPylon(unittest.TestCase):
-    def test_pylon(self):
-        """
-        Tests whether or not the pylon's red is detected in the image
 
-        Settings
-        --------
-        expected_blobs: dict{string: int}
-            number of expected blobs (value) to be found in each image (key)
+class TestPylonClassifier(unittest.TestCase):
+    def test_params(self):
+        """
+        Verify can handle range of input types.
+
+        Parameters
+        ----------
+        image: ndarray
+            Image to classify.
+        """
+        IMAGE_SIZE = [1920, 1080]
+
+        ## 1 Channel Image
+        with self.subTest(i="1 Channel Image"):
+            pass
+
+        ## 3 Channel [0, 1] Image
+        with self.subTest(i="3 Channel [0, 1] Image"):
+            pass
+
+        ## 3 Channel {0..255} Image
+        with self.subTest(i="3 Channel {0..255} Image"):
+            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+
+            result = detect_red(color_image, None)
+
+            self.assertIn(result, [True, False])
+
+        ## 4 Channel [0, 1] Image
+        with self.subTest(i="4 Channel [0, 1] Image"):
+            pass
+
+        ## 4 Channel {0..255} Image
+        with self.subTest(i="4 Channel {0..255} Image"):
+            pass
+
+        ## Empty image
+        with self.subTest(i="Empty Image"):
+            pass
+
+        ## None as image
+        with self.subTest(i="None as Image"):
+            pass
+
+    def test_return(self):
+        """
+        Verify returns only expected output types.
 
         Returns
         -------
-        list[bool]
-            whether the expected number of blobs in each image equals the detected number of blobs
+        bool
         """
-        expected_pylon = {
-            "sim_pylon.png":True,
-            "sim_pylon2.png":True,
-            "sim_pylon3.png":True
-        }
-        prefix = 'vision' if os.path.isdir("vision") else '..'
+        ##
+        for i in range(1, 6):
+            color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
 
-        for filename, expected in expected_pylon.items():
-            with self.subTest(i=filename):
-                img_filename = os.path.join(prefix, 'vision_images', 'pylon', filename)
-                img_file = cv2.imread(img_filename)
-                if img_file is None:
-                    self.fail(msg="Failed to read image.  " + img_filename)
+            result = detect_red(color_image, None)
 
-                # detector = BlobFinder(img_file, params=config)
-                # bounding_boxes = detector.find()
-                pylon = detect_red(img_file)
-
-                self.assertEqual(pylon, expected, msg=f"Expected {expected} blobs, did not find pylon in image {filename}")
+            self.assertIn(result, [True, False])
 
 
 if __name__ == '__main__':

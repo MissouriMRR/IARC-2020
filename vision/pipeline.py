@@ -13,30 +13,32 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import json
 from vision.camera.bag_file import BagFile
 from vision.blob.blobfind import import_params, BlobFinder
+from vision.util import import_params
 from vision.util.blob_plotter import plot_blobs
 
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs a blob detection algorithm,
+    This is a pipeline class that takes in a video, runs an obstacle detection algorithm,
     and updates the blobs to the environment class.
 
     Parameters
     -------------
     env: Environment
-        The environment interface that is used by flight code. 
+        The environment interface that is used by flight code.
         The pipeline updates the interface.
 
     alg_time: int
         An integer value that corresponds to how long the video loops.
     """
-    def __init__(self, env, alg_time=98):
+    def __init__(self, env, config, alg_time=98):
         if not isinstance(env, Environment):
             raise ValueError(f"Argument env should be type Environment, got {type(env)}")
         self.env = env
         if type(alg_time) is not int:
             raise ValueError(f"Argument alg_time should be type int, got {type(alg_time)}")
         self.alg_time = alg_time
+        self.config = config
 
     def run_algorithm(self, vid_file):
         """
@@ -55,18 +57,18 @@ class Pipeline:
         for i, (depth_image, color_image) in enumerate(vid_file):
             if i == self.alg_time:
                 break
-            blob_finder = BlobFinder(params=import_params(config))
-            bboxes = blob_finder.find(color_image)
-            env.update(bboxes)
+            obstacle_finder = BlobFinder(params=import_params.import_params(self.config))
+            bboxes = obstacle_finder.find(color_image)
+            self.env.update(bboxes)
 
-            plot_blobs(blob_finder.keypoints, color_image)
+            plot_blobs(obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
     from vision.interface import Environment
 
     prefix = 'vision' if os.path.isdir("vision") else ''
-    config_filename = os.path.join(prefix, 'blob', 'config.json')
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
     env = Environment()
 
     with open(config_filename, 'r') as config_file:
@@ -77,5 +79,5 @@ if __name__ == '__main__':
     module_video_file = BagFile(100, 100, 60, module_video)
     sample_video_file = BagFile(100, 100, 60, sample_video)
 
-    pipeline = Pipeline(env)
+    pipeline = Pipeline(env, config)
     pipeline.run_algorithm(sample_video_file)

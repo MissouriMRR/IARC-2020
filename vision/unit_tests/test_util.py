@@ -1,3 +1,6 @@
+"""
+Testing vision.util.import_params.
+"""
 import unittest
 import os
 import sys
@@ -26,7 +29,7 @@ class TestParamsImport(unittest.TestCase):
         Returns
         -------
         list[bool]
-            whether the expected number of blobs in each image equals the detected number of blobs
+            whether each configuration matches the expected value
         """
         sample_config = {
             "filterByArea": {

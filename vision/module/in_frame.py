@@ -1,16 +1,16 @@
 """
 This file contains the ModuleInFrame function to detect if the module is in an image
 """
+import cv2
+import numpy as np
 
 # Constants
 BLUR_SIZE = 5 # Blur kernel size
 BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
 MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
 
-import cv2
-import numpy as np
 
-def ModuleInFrame(img):
+def ModuleInFrame(color_image, depth_image):
     """
     Determines if the Module is in frame
 
@@ -23,17 +23,17 @@ def ModuleInFrame(img):
     -------
     bool: true if the module is in the frame and false if not in the frame
     """
-    if img is None:
+    if color_image is None:
         raise ValueError(f"Image cannot be None.")
 
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
     # Remove depth channel
-    img = img[:, :, :3]
+    color_image = color_image[:, :, :3]
 
     # Grayscale
-    gray = cv2.cvtColor(src=img, code=cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
 
     # Guassian Blur
     blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
@@ -43,7 +43,12 @@ def ModuleInFrame(img):
     laplacian = np.uint8(laplacian)
 
     # Hough Circle Detection
+    # circles = (x, y, r)
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=40, minRadius=0, maxRadius=50)
+
+    if circles is None:
+        return False
+
     circles = np.uint16(circles)
 
     # Resize circles into 2d array
@@ -51,8 +56,8 @@ def ModuleInFrame(img):
 
     # Finding slopes between the circles
     slopes = np.array([])
-    for x, y, r in circles:
-        for iX, iY, iR in circles:
+    for x, y, _ in circles:
+        for iX, iY, __ in circles:
             m = (iY - y) / (iX - x)
             # slope must be non-infinite and can't be between the same circle
             if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
