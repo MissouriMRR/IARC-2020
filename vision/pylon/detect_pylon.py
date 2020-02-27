@@ -9,6 +9,9 @@ import numpy as np
 LOWER_RED = np.array([50, 150, 25])
 UPPER_RED = np.array([255, 255, 120])
 
+# Hold a treshold for the number of red pixels there should be in the image.
+RED_THRESHOLD = 50
+
 
 def detect_red(color_image, depth_image):
     """
@@ -36,15 +39,19 @@ def detect_red(color_image, depth_image):
     # and replaces them with white.  Everything else is replaced with black
     red_mask = cv2.inRange(hsv, LOWER_RED, UPPER_RED)
 
-    # Run through each pixel in the mask.  If one is white, then
-    # we detected part of the pylon
+    # Run through each pixel in the mask. If over RED_THRESHOLD is white
+    # then we have detected a pylon
+    red_pixels = 0
     for x in range(0, red_mask.shape[0]):
         for y in range(0, red_mask.shape[1]):
             if red_mask[x, y] != 0:
-                return True
+                red_pixels += 1
 
-    # Returns false if the pylon was not detected
-    return False
+    # Return if the pylon was detected or not
+    if red_pixels >= RED_THRESHOLD:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
