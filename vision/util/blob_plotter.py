@@ -27,7 +27,7 @@ def plot_blobs(keypoints, image):
     # print formatted list of bouding boxes
     print('[')
     for bbox in keypoints:
-        print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+        print('\tKeypoint:', round(bbox.pt[0], 2), round(bbox.pt[1], 2))
     print(']')
 
     # show image with circles indicating where blobs were detected
