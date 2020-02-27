@@ -1,4 +1,5 @@
 """
+This file contains the ModuleLocation class to find the location of the center of the module in an image.
 """
 
 import cv2
@@ -6,16 +7,13 @@ import numpy as np
 
 class ModuleLocation:
     """
-    Finds the distance to the front face of the module.
+    Finds the coordinates of the center of the front face of the module.
     """
 
     ## Initialization
 
     def __init__(self):
-        """
-        """
-        # Ignore numpy warnings
-        np.seterr(all="ignore")
+        np.seterr(all="ignore") # Ignore numpy warnings
 
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
@@ -23,11 +21,6 @@ class ModuleLocation:
         self.holes = np.arange(8) # Set of 4 (x, y) coordinates, location of the four holes
         
         self.circles = np.array(0) # List of circles detected in color image
-        
-        self.x_heights = np.array(0) # Histogram of x-coordinate values
-        self.x_bounds = np.array(0) # x-coordinate bounds of histogram
-        self.y_heights = np.array(0) # Histogram of y-coordinate values
-        self.y_bounds = np.array(0) # y-coordinate bounds of histogram
 
         self.center = np.array(0) # Coordinates of center
         self.distance = 0 # Distance to the center
@@ -36,9 +29,9 @@ class ModuleLocation:
         self.slope_heights = np.array(0) # Histogram of slopes
         self.slope_bounds = np.array(0) # Bounds of slope histogram
 
-        self.upper_bound = np.array(0)
-        self.lower_bound = np.array(0)
-        self.num_buckets = np.array(0)
+        self.upper_bound = np.array(0) # upper bound of slopes
+        self.lower_bound = np.array(0) # lower bound of slopes
+        self.num_buckets = np.array(0) # number of buckets applied to slopes
 
     ## Finding Distance to Module
 
@@ -49,20 +42,19 @@ class ModuleLocation:
         -------
         int - distance to the module.
         """
-        self._getCenter()
+        self.getCenter()
         self.distance = self.depth[self.center[0], self.center[1], 0]
         return self.distance
 
     ## Finding the Center
 
-    def _getCenter(self):
+    def getCenter(self):
         """
         Find the center of the front face of the module.
         Returns
         -------
         ndarray - coordinates of the center of the module.
         """
-
         # Circle detection
         self._circleDetection()
 
@@ -100,11 +92,11 @@ class ModuleLocation:
         """
         NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
 
-        sep = self.upper_bound - self.lower_bound / self.num_buckets
+        sep = self.upper_bound - self.lower_bound / self.num_buckets # seperation from main parallel
 
         # Find Slope with Most Parallels
         bucket_ind = np.argmax(self.slope_heights) # highest segment of histogram
-        parallel = self.slope_bounds[bucket_ind] # slope at highest segment
+        parallel = self.slope_bounds[bucket_ind] # slope at highest segment is main parallel
 
         # Find Holes Associated with parallels
         idx = 0
@@ -124,6 +116,7 @@ class ModuleLocation:
                 self.holes = np.append(self.holes, self.circles[y])
                 hole_idx += 1
             idx += 1
+
         self.holes = self.holes.reshape((-1, 3))
         return self.holes
 
@@ -136,10 +129,12 @@ class ModuleLocation:
         """
         BUCKET_MODIFIER = .5 # Changes how many buckets are in the range
 
+        # Get parameters for bucket sorting
         self.upper_bound = np.amax(self.slopes)
         self.lower_bound = np.amin(self.slopes)
         self.num_buckets = np.int32((self.upper_bound - self.lower_bound) * BUCKET_MODIFIER)
 
+        # Bucket sort
         self.slope_heights, self.slope_bounds = np.histogram(self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound))
 
     def _getSlopes(self):
@@ -198,7 +193,7 @@ class ModuleLocation:
         """
         self.img += increase
 
-    ## Outside Input Functions
+    ## Input Functions
 
     def setImg(self, color, depth):
         """
