@@ -1,12 +1,12 @@
 """
 Utility to measure performance of obstacle detector.
 """
-import os
-import sys
+import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
+
 import cv2
 import json
 import timeit
