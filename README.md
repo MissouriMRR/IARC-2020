@@ -11,6 +11,7 @@ intends to use at the International Aerial Robotics Competition (IARC) in 2020
 
 - [Codebase Structure](#codebase-structure)
 - [Running the Code](#running-the-code)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Contributing](#contributing)
 - [License](#license)
@@ -18,9 +19,9 @@ intends to use at the International Aerial Robotics Competition (IARC) in 2020
 ## Codebase Structure
 
 ```text
-/vision  # Computer Vision related algorithms
-/flight  # Physical control (motors, actuators, etc.) related algorithms
-/run.py  # Python program to run the competition code
+vision/  # Computer Vision related algorithms
+flight/  # Physical control (motors, actuators, etc.) related algorithms
+run.py  # Python program to run the competition code
 
 Information about files within each directory can be found in /<directory>/README.md
 ```
