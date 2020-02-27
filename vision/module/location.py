@@ -249,7 +249,7 @@ class ModuleLocation:
         cv2.imshow("Module Circles", circleImg)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    
+
     def showCenter(self):
         """
         Shows the image with detected holes and center.

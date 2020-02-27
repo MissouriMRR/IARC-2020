@@ -28,4 +28,4 @@ if __name__ == '__main__':
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
         blob_finder = ObstacleFinder(params=import_params(config))
-        print(img, image.shape, timeit.timeit(lambda: blob_finder.find(image), number=10) / 10)
+        print(img, image.shape, timeit.timeit(lambda: blob_finder.find(image, None), number=10) / 10)
