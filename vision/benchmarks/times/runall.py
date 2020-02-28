@@ -28,10 +28,12 @@ if __name__ == '__main__':
         for m_name, method in benchmark.__dict__.items():
             if 'time_' not in m_name or not callable(method):
                 continue
-            
+
             try:
                 time = timeit.timeit(lambda: method(b_instance), number=N_REPEATS) / N_REPEATS
-            except Exception:
-                print(f"{b_name}.{m_name}: error")
+            except Exception as e:
+                print(f"{b_name}.{m_name}: error: {e}")
             else:
                 print(f"{b_name}.{m_name}: {time:.5f}s")
+
+    print()

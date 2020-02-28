@@ -7,25 +7,48 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-import cv2
 import json
-import timeit
+import cv2
+
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
 
 
-if __name__ == '__main__':
-    prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
-    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+class TimeObstacle:
+    """
+    Timing ObstacleFinder methods.
+    """
+    def setup(self):
+        """
+        Configure blob detector and initialize images.
+        """
+        prefix = '' if os.path.isdir("times") else '..'
 
-    with open(config_filename, 'r') as config_file:
-        config = json.load(config_file)
+        ## Load images
+        img_folder = os.path.join(prefix, '..', 'vision_images', 'obstacle')
 
-    for img in os.listdir(img_folder):
-        if img[-4:] not in ['.png', '.jpg']:
-            continue
+        self.images = []
+        for filename in os.listdir(img_folder):
+            if filename[-4:] not in ['.png', '.jpg']:
+                continue
 
-        image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
-        blob_finder = ObstacleFinder(params=import_params(config))
-        print(img, image.shape, timeit.timeit(lambda: blob_finder.find(image, None), number=10) / 10)
+            img_path = os.path.join(img_folder, os.fsdecode(filename))
+
+            image = cv2.imread(img_path)
+
+            self.images.append(image)
+
+        ## Read current params & setup obstacle detector
+        config_filename = os.path.join(prefix, '..', 'obstacle', 'config.json')
+
+        with open(config_filename, 'r') as config_file:
+            config = json.load(config_file)
+
+        self.blob_finder = ObstacleFinder(params=import_params(config))
+
+    def time_find(self):
+        """
+        Time the ObstacleFinder.find function.
+        """
+        for image in self.images:
+            self.blob_finder.find(image, None)
