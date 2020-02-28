@@ -15,6 +15,7 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+
 class TextDetector:
 
     def __init__(self):
@@ -44,7 +45,7 @@ class TextDetector:
 
         n_boxes = len(d['level'])
         box_obs = []
-        contents = d['text'].copy()
+        contents = d['text']
         # print(contents)
         for i in range(n_boxes):
             if not contents[i]:
@@ -52,7 +53,7 @@ class TextDetector:
             else:
                 for j in contents[i]:
                     if j in self.text:
-                        print(contents[i])
+                        # print(contents[i])
                         (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
                         # cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
                         verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
@@ -61,8 +62,8 @@ class TextDetector:
                         box_obs.append(box)
                         break
 
-        cv2.imshow('img', filter_image)
-        cv2.waitKey(0)
+        # cv2.imshow('img', filter_image)
+        # cv2.waitKey(0)
 
         return box_obs
 
@@ -78,7 +79,7 @@ if __name__ == "__main__":
         raise FileNotFoundError("Could not read image!")
 
     detector = TextDetector()
-    result = detector.detect_russian_word(originalImage)
+    result = detector.detect_russian_word(color_image)
     print(result)
 
     print("Time:", time.time() - start)
