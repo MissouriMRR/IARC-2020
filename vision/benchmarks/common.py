@@ -92,10 +92,10 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, sca
 
     output = {}
     for title, amount in amounts.items():
-        color_image = generator(amount, (height, width, 3)).astype(dtype)
-        depth_image = generator(amount, (height, width)).astype(dtype)
+        color_image = generator(amount, (height, width, 3))
+        depth_image = generator(amount, (height, width))
 
-        color_image, depth_image = map(lambda v: np.int_(v * scalar), [color_image, depth_image])
+        color_image, depth_image = map(lambda v: (v * scalar).astype(dtype), [color_image, depth_image])
 
         output.update({title: (color_image, depth_image)})
 
