@@ -1,5 +1,11 @@
 """
 Boat related unit tests.
+
+Parameter Defaults
+------------------
+Resolution=(1280, 720)
+Noise SD=0
+N Objects = 0
 """
 import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))

@@ -1,21 +1,30 @@
 """
 Run time benchmarks.
 
-Processes files in benchmarks/times/ named bench_*.py
-For any benchmark class in files named Time*:
-    Create an instance of benchmark b
-    Attempt to call setup()
+Process
+-------
+files = [filename for filename in 'times/' if 'bench' in filename]
+benchmarks = [class for class in filenames if 'Time' in class_name]
 
-    for method in benchmark named time_*:
-        for p_name, parameters in benchmark.PARAMETERS.items():
-            time method(b, *parameters)
-            log benchmark_name, method_name, p_name, time
+for benchmark in benchmarks:
+    instance = benchmark()
 
-Defaults
---------
-dimensions=720p
-noise: std=0
-n_objects=0
+    try: instance.setup()
+
+    if not hasattr(benchmark, 'PARAMETERS'):
+        benchmark.PARAMETERS = {'': []}
+
+    for method in benchmark if 'time' in method_name:
+        for title, parameters in benchmark.PARAMETERS.items():
+            time(method(instance, *parameters))
+
+            log(benchmark, method, title, time)
+
+Suggested Parameter Defaults
+----------------------------
+Resolution=(1280, 720)
+Noise SD=0
+N Objects = 0
 """
 import timeit
 import numpy as np
