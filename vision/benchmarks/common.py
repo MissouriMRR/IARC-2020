@@ -73,11 +73,11 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, dty
     if amounts is None:
         amounts = {
             'sd=0': 0,
-            'sd=1': .25,
-            'sd=3': 2,
-            'sd=6': 10,
-            'sd=10': 25,
-            'sd=14': 50,
+            'sd=1': 1,
+            'sd=3': 8,
+            'sd=6': 40,
+            'sd=10': 100,
+            'sd=14': 200,
         }
 
     if isinstance(amounts, (int, float)):
