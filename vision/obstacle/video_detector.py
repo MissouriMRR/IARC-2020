@@ -11,7 +11,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
-from vision.blob.blobfind import BlobFinder
+from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
 from vision.camera.bag_file import BagFile
 
@@ -32,7 +32,7 @@ class ObstacleVideo:
         """
         Defines behavior of self.blob_finder = value
         """
-        if not isinstance(value, BlobFinder):
+        if not isinstance(value, ObstacleFinder):
             raise ValueError(f"Requires instance of BlobFinder, got {type(value)}")
         self._blob_finder = value
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
 
-    blob_finder = BlobFinder(params=import_params(config))
+    blob_finder = ObstacleFinder(params=import_params(config))
     video = ObstacleVideo(blob_finder)
 
     if os.path.exists("fieldsafe1.bag"):

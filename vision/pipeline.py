@@ -12,7 +12,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
 from vision.camera.bag_file import BagFile
-from vision.blob.blobfind import import_params, BlobFinder
+from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util import import_params
 from vision.util.blob_plotter import plot_blobs
 
@@ -57,8 +57,8 @@ class Pipeline:
         for i, (depth_image, color_image) in enumerate(vid_file):
             if i == self.alg_time:
                 break
-            obstacle_finder = BlobFinder(params=import_params.import_params(self.config))
-            bboxes = obstacle_finder.find(color_image)
+            obstacle_finder = ObstacleFinder(params=import_params.import_params(self.config))
+            bboxes = obstacle_finder.find(color_image, depth_image)
             self.env.update(bboxes)
 
             plot_blobs(obstacle_finder.keypoints, color_image)
