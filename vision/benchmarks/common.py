@@ -49,7 +49,7 @@ def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
     return output
 
 
-def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, scalar=2, dtype='uint8'):
+def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, dtype='uint8'):
     """
     Generate series of images w/ varying amounts of noise.
 
@@ -61,8 +61,6 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, sca
         Dimensions of images.
     generator: func[amount, height, width], default=np.random.poisson
         Function to generate images - note amounts in [0, 50 safe].
-    scalar: int or float, default=2
-        Amount to scale generated values by.
     dtype: np.dtype, default='uint8'
         Data type of image.
 
@@ -86,16 +84,12 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, sca
         color_image = generator(amounts, (height, width, 3)).astype(dtype)
         depth_image = generator(amounts, (height, width)).astype(dtype)
 
-        color_image, depth_image = map(lambda v: np.int_(v * scalar), [color_image, depth_image])
-
         return color_image, depth_image
 
     output = {}
     for title, amount in amounts.items():
-        color_image = generator(amount, (height, width, 3))
-        depth_image = generator(amount, (height, width))
-
-        color_image, depth_image = map(lambda v: (v * scalar).astype(dtype), [color_image, depth_image])
+        color_image = generator(amount, (height, width, 3)).astype(dtype)
+        depth_image = generator(amount, (height, width)).astype(dtype)
 
         output.update({title: (color_image, depth_image)})
 
