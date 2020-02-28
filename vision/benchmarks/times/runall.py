@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 try:
                     time = timeit.timeit(lambda: method(b_instance, *parameters), number=N_REPEATS) / N_REPEATS
                 except Exception as e:
-                    print(f"{b_name}.{m_name}: error: {e}")
+                    print(f"{b_name}.{m_name}: {p_name} error: {e}")
 
                     output.loc[len(output)] = [b_name, m_name, p_name, np.nan]
                 else:
