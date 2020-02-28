@@ -1,7 +1,7 @@
 import asyncio
 import threading
 from mavsdk import System
-from states import STATES, State
+from .states import STATES, State
 
 
 class Comm:
@@ -48,11 +48,11 @@ async def observe_is_in_air(drone: System) -> None:
             return
 
 
-def flight(comm: Comm, sim: bool) -> None:
+def flight(comm, sim: bool) -> None:
     asyncio.get_event_loop().run_until_complete(go(comm, sim))
 
 
-async def go(comm: Comm, sim: bool) -> None:
+async def go(comm, sim: bool) -> None:
     drone: System = await init_drone(sim)
     await start_flight(comm, drone)
 
@@ -65,11 +65,11 @@ async def init_drone(sim: bool) -> System:
     return drone
 
 
-async def start_flight(comm: Comm, drone: System):
+async def start_flight(comm, drone: System):
     asyncio.ensure_future(print_flight_mode(drone))
     termination_task = asyncio.ensure_future(observe_is_in_air(drone))
 
-    sm: StateMachine = StateMachine(STATES[comm.state](), drone)
+    sm: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
     await sm.run()
 
     await termination_task

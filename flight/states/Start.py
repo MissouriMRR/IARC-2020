@@ -6,5 +6,4 @@ from mavsdk import System
 class Start(State):
     async def run(self, drone: System) -> State:
         print("Start")
-        input("Press enter when ready")
         return Takeoff()
