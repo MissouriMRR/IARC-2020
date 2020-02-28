@@ -5,7 +5,7 @@ import timeit
 from times import modules
 
 
-N_REPEATS = 100
+N_REPEATS = 20
 
 if __name__ == '__main__':
     benchmarks = {}

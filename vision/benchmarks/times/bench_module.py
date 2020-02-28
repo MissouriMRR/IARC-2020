@@ -7,47 +7,38 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-import unittest
 import cv2
 
-from vision.module.in_frame import ModuleInFrame as mif
-#from vision.module.detector import ModuleKMeans as mkm
+from vision.module.in_frame import ModuleInFrame
 
 
-class TimeModuleInFrame(unittest.TestCase):
+class TimeModuleInFrame:
     """
-    Testing module.in_frame functionality.
+    Timing ModuleInFrame.
     """
-    def test_ModuleInFrame(self):
+    def setup(self):
         """
-        Testing ModuleInFrame
-
-        Returns
-        -------
-        ndarray[bool] which images the module was detected in
+        Load images.
         """
+        prefix = '' if os.path.isdir("times") else '..'
 
-        results = []
-        expected_results = {
-            "Block1.jpg" : True,
-            "Block2.jpg" : True,
-            "Block3.jpg" : True,
-            "Block4.jpg" : True
-        }
-        for picname in expected_results.keys():
-            with self.subTest(i=picname):
-                picpath = os.path.join('vision_images', 'module', picname)
+        ## Load images
+        img_folder = os.path.join(prefix, '..', 'vision_images', 'module')
 
-                image = cv2.imread(picpath)
+        self.images = []
+        for filename in os.listdir(img_folder):
+            if filename[-4:] not in ['.png', '.jpg']:
+                continue
 
+            img_path = os.path.join(img_folder, os.fsdecode(filename))
 
-                if image is None:
-                    raise FileNotFoundError(f"Could not read {picpath}!")
+            image = cv2.imread(img_path)
 
-                results.append(mif(image))
+            self.images.append((image, None))
 
-        self.assertListEqual(results, list(expected_results.values()))
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def time_ModuleInFrame(self):
+        """
+        Timing mif.
+        """
+        for color_image, depth_image in self.images:
+            ModuleInFrame(color_image, depth_image)
