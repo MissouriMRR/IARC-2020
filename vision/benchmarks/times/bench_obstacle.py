@@ -3,8 +3,8 @@ Utility to measure performance of obstacle detector.
 
 Parameter Defaults
 ------------------
-Resolution=(1280, 720)
-Noise SD=0
+Resolution = (1280, 720)
+Noise SD = 0
 N Objects = 0
 """
 import os, sys
@@ -14,7 +14,6 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
-import cv2
 
 import common
 
@@ -32,7 +31,7 @@ class TimeObstacle:
         """
         prefix = '' if os.path.isdir("times") else '..'
 
-        ## Load images
+        ## Generate images
         img_folder = os.path.join(prefix, '..', 'vision_images', 'obstacle')
 
         self.PARAMETERS = {}

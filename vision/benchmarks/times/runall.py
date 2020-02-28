@@ -22,8 +22,8 @@ for benchmark in benchmarks:
 
 Suggested Parameter Defaults
 ----------------------------
-Resolution=(1280, 720)
-Noise SD=0
+Resolution = (1280, 720)
+Noise SD = 0
 N Objects = 0
 """
 import timeit
@@ -33,7 +33,7 @@ import pandas as pd
 from times import modules
 
 
-N_REPEATS = 3
+N_REPEATS = 1
 
 if __name__ == '__main__':
     benchmarks = {}

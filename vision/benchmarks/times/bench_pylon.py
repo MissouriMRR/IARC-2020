@@ -3,8 +3,8 @@ Runs through images and determines which have the pylon.
 
 Parameter Defaults
 ------------------
-Resolution=(1280, 720)
-Noise SD=0
+Resolution = (1280, 720)
+Noise SD = 0
 N Objects = 0
 """
 import os, sys
@@ -12,8 +12,6 @@ parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
-
-import cv2
 
 import common
 
@@ -30,7 +28,7 @@ class TimePylon:
         """
         prefix = '' if os.path.isdir("times") else '..'
 
-        ## Load images
+        ## Generate images
         img_folder = os.path.join(prefix, '..', 'vision_images', 'pylon')
 
         self.PARAMETERS = {}

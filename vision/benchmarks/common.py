@@ -1,5 +1,7 @@
 """
 Common functions for benchmarks to make use of.
+
+NOTE: Do no edit, only append!
 """
 import numpy as np
 
@@ -28,6 +30,14 @@ def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
             '1080p blank': (1920, 1080),
             '4k blank': (4096, 2160),
         }
+
+    if isinstance(dimensions, tuple):
+        width, height = dimensions
+
+        color_image = generator((height, width, 3), dtype=dtype)
+        depth_image = generator((height, width), dtype=dtype)
+
+        return color_image, depth_image
 
     output = {}
     for title, (width, height) in dimensions.items():
@@ -60,6 +70,8 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, sca
     -------
     {str: (ndarray[3 channel], ndarray[1 channel])}
     """
+    width, height = dimensions
+
     if amounts is None:
         amounts = {
             'sd=0': 0,
@@ -70,7 +82,13 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, sca
             'sd=14': 50,
         }
 
-    width, height = dimensions
+    if isinstance(amounts, (int, float)):
+        color_image = generator(amounts, (height, width, 3)).astype(dtype)
+        depth_image = generator(amounts, (height, width)).astype(dtype)
+
+        color_image, depth_image = map(lambda v: np.int_(v * scalar), [color_image, depth_image])
+
+        return color_image, depth_image
 
     output = {}
     for title, amount in amounts.items():
