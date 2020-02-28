@@ -10,6 +10,12 @@ For any benchmark class in files named Time*:
         for p_name, parameters in benchmark.PARAMETERS.items():
             time method(b, *parameters)
             log benchmark_name, method_name, p_name, time
+
+Defaults
+--------
+dimensions=720p
+noise: std=0
+n_objects=0
 """
 import timeit
 import numpy as np
@@ -18,7 +24,7 @@ import pandas as pd
 from times import modules
 
 
-N_REPEATS = 5
+N_REPEATS = 3
 
 if __name__ == '__main__':
     benchmarks = {}

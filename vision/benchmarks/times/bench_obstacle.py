@@ -10,6 +10,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import json
 import cv2
 
+import common
+
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
 
@@ -28,6 +30,10 @@ class TimeObstacle:
         img_folder = os.path.join(prefix, '..', 'vision_images', 'obstacle')
 
         self.PARAMETERS = {}
+
+        self.PARAMETERS.update(common.blank_dimensions())
+
+        """
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -37,6 +43,7 @@ class TimeObstacle:
             image = cv2.imread(img_path)
 
             self.PARAMETERS.update({filename: [image, None]})
+        """
 
         ## Read current params & setup obstacle detector
         config_filename = os.path.join(prefix, '..', 'obstacle', 'config.json')

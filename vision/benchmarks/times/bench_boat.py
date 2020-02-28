@@ -9,6 +9,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 
+import common
+
 from boat.detect_words import detect_russian_word
 
 
@@ -26,6 +28,10 @@ class TimeDetectRussianWord:
         img_folder = os.path.join(prefix, '..', 'vision_images', 'boat')
 
         self.PARAMETERS = {}
+
+        self.PARAMETERS.update(common.blank_dimensions())
+
+        """
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -35,6 +41,7 @@ class TimeDetectRussianWord:
             image = cv2.imread(img_path)
 
             self.PARAMETERS.update({filename: [image, None]})
+        """
 
     def time_detector(self, color_image, depth_image):
         """

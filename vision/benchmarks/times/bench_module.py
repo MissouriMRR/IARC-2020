@@ -9,6 +9,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 
+import common
+
 from vision.module.in_frame import ModuleInFrame
 
 
@@ -26,6 +28,10 @@ class TimeModuleInFrame:
         img_folder = os.path.join(prefix, '..', 'vision_images', 'module')
 
         self.PARAMETERS = {}
+
+        self.PARAMETERS.update(common.blank_dimensions())
+
+        """
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -35,6 +41,7 @@ class TimeModuleInFrame:
             image = cv2.imread(img_path)
 
             self.PARAMETERS.update({filename: [image, None]})
+        """
 
     def time_ModuleInFrame(self, color_image, depth_image):
         """
