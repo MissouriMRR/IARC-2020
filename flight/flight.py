@@ -75,6 +75,12 @@ async def start_flight(comm, drone: System):
         sm: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
         await sm.run()
     except:
+        await drone.offboard.set_position_ned(sdk.PositionNedYaw(0, 0, 0, 0))
+        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
+        await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
+
+        await asyncio.sleep(1)
+
         try:
             await drone.offboard.stop()
         except sdk.OffboardError as error:
