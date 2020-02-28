@@ -1,5 +1,15 @@
 """
 Run time benchmarks.
+
+Processes files in benchmarks/times/ named bench_*.py
+For any benchmark class in files named Time*:
+    Create an instance of benchmark b
+    Attempt to call setup()
+
+    for method in benchmark named time_*:
+        for p_name, parameters in benchmark.PARAMETERS.items():
+            time method(b, *parameters)
+            log benchmark_name, method_name, p_name, time
 """
 import timeit
 import numpy as np
