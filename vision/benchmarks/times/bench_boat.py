@@ -7,17 +7,19 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-import unittest
-import os
 import cv2
+
 from boat.detect_words import detect_russian_word
 
 
-class TimeDetectRussianWord(unittest.TestCase):
+class TimeDetectRussianWord:
     """
     Testing the text detector.
     """
-    def test_detector(self):
+    def setup(self):
+        pass
+
+    def ime_detector(self):
         """
         Testing vision.boat.detectRussianWord
 
@@ -88,7 +90,3 @@ class TimeDetectRussianWord(unittest.TestCase):
 
                     accuracy /= len(annotation.findall('object'))
                     print(f"{filename}: {accuracy * 100:.2f}%")
-
-
-if __name__ == '__main__':
-    unittest.main()

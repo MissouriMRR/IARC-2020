@@ -36,7 +36,7 @@ class TimeObstacle:
 
             image = cv2.imread(img_path)
 
-            self.images.append(image)
+            self.images.append((image, None))
 
         ## Read current params & setup obstacle detector
         config_filename = os.path.join(prefix, '..', 'obstacle', 'config.json')
@@ -50,5 +50,5 @@ class TimeObstacle:
         """
         Time the ObstacleFinder.find function.
         """
-        for image in self.images:
-            self.blob_finder.find(image, None)
+        for color_image, depth_image in self.images:
+            self.blob_finder.find(color_image, depth_image)
