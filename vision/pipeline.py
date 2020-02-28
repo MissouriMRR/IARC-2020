@@ -41,7 +41,7 @@ class Pipeline:
             if i == self.alg_time:
                 break
             obstacle_finder = ObstacleFinder(params=import_params.import_params(self.config))
-            bboxes = obstacle_finder.find(color_image)
+            bboxes = obstacle_finder.find(color_image, depth_image)
             self.env.update(bboxes)
 
             #from util.obstacle_plotter import plot_obstacles

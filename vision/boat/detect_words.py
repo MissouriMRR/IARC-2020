@@ -18,10 +18,13 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 class TextDetector:
 
+<<<<<<< HEAD
     def __init__(self):
         self.text = 'модулииртибот'
 
     def detect_russian_word(self, image):
+
+>>>>>>> 31f3654156169abdcd24f7a0526f9c586a0fc043
         """
         Function to detect words pulled from images
         -------
@@ -37,6 +40,7 @@ class TextDetector:
         # shows what the filtered image looks like
         # cv2.imshow('img', filter_image)
         # cv2.waitKey(0)
+
 
         ## only return boxes that have text in them
         ## eg. find a way to check if boxes are repetitive or do not contain text
@@ -72,13 +76,17 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    originalImage = cv2.imread(os.path.join('vision_images', 'boat', '2020-02-23.png'))
+    color_image = cv2.imread(os.path.join('vision_images', 'boat', '2020-02-23.png'))
 
-    if originalImage is None:
+    if color_image is None:
         raise FileNotFoundError("Could not read image!")
 
     detector = TextDetector()
+<<<<<<< HEAD
     result = detector.detect_russian_word(originalImage)
     print(result)
+=======
+    result = detector.detect_russian_word(color_image)
+>>>>>>> 31f3654156169abdcd24f7a0526f9c586a0fc043
 
     print("Time:", time.time() - start)
