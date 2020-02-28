@@ -18,6 +18,9 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 class TextDetector:
 
+    def __init__(self):
+        self.text = 'модулииртибот'
+
     def detect_russian_word(self, image):
         """
         Function to detect words pulled from images
@@ -25,8 +28,7 @@ class TextDetector:
 
         Returns
         -------
-        True if text grabbed from image matches 'модули иртибот'.
-        False if not.
+        A list of box objects that contain desired text
         """
 
         # filter image
@@ -36,27 +38,28 @@ class TextDetector:
         # cv2.imshow('img', filter_image)
         # cv2.waitKey(0)
 
-        # function from library: pytesseract to grab text from image
-        # text = pytesseract.image_to_string(filter_image, lang="uzb_cyrl")
-        # print(text)
-
-        # russian_word = 'модули иртибот'
-        # print(russian_word)
-
-
         ## only return boxes that have text in them
+        ## eg. find a way to check if boxes are repetitive or do not contain text
         d = pytesseract.image_to_data(filter_image, output_type=pytesseract.Output.DICT, lang="uzb_cyrl")
 
         n_boxes = len(d['level'])
         box_obs = []
+        contents = d['text'].copy()
+        # print(contents)
         for i in range(n_boxes):
-            (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
-            # cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
-            cv2.rectangle(filter_image, verts[0], verts[-1], (0, 255, 0), 2)
-            box = BoundingBox(verts, ObjectType('text'))
-            box_obs.append(box)
+            if not contents[i]:
+                continue
+            else:
+                for j in contents[i]:
+                    if j in self.text:
+                        print(contents[i])
+                        (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+                        # cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                        verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
+                        cv2.rectangle(filter_image, verts[0], verts[-1], (0, 255, 0), 2)
+                        box = BoundingBox(verts, ObjectType('text'))
+                        box_obs.append(box)
+                        break
 
         cv2.imshow('img', filter_image)
         cv2.waitKey(0)
@@ -76,5 +79,6 @@ if __name__ == "__main__":
 
     detector = TextDetector()
     result = detector.detect_russian_word(originalImage)
+    print(result)
 
     print("Time:", time.time() - start)
