@@ -1,11 +1,17 @@
 import asyncio
 import math
 import mavsdk as sdk
+from .Land import Land
 
-lat1: int = 0
-lon1: int = 0
-lat2: int = 0
-lon2: int = 0
+lat1: int = 37.9489551
+lon1: int = -91.7844405
+lat2: int = 37.9486433
+lon2: int = -91.7839372
+
+
+async def arange(count):
+    for i in range(count):
+        yield (i)
 
 
 class RunLaps:
@@ -16,7 +22,8 @@ class RunLaps:
         await pos_wait
         pos_wait.cancel()
         del pos_wait
-        async for _ in range(8):
+        async for i in arange(8):
+            print(f"STARTING LAP {i}")
             pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat2, lon2))
             await pos_wait
             pos_wait.cancel()
@@ -37,6 +44,7 @@ class RunLaps:
             await turn
             turn.cancel()
             del turn
+        return Land()
 
     async def wait_pos(self, drone, goal_lat, goal_lon):
 

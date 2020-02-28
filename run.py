@@ -41,6 +41,7 @@ def run_threads(sim: bool) -> None:
         # then create a new instance and start the new process
         # (i.e. restart the process)
         if f.is_alive() == False:
+            print("===========Restarting Flight===========")
             f = Process(target=flight, args=(comm_obj, sim,))
             f.start()
 

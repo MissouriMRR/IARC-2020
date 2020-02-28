@@ -1,6 +1,7 @@
 import asyncio
 import threading
 from mavsdk import System
+import mavsdk as sdk
 from .states import STATES, State
 
 
@@ -19,7 +20,7 @@ class StateMachine:
 
 
 SIM_ADDR: str = "udp://:14540"
-CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0/"
+CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"
 
 
 async def print_flight_mode(drone: System) -> None:
@@ -33,7 +34,7 @@ async def print_flight_mode(drone: System) -> None:
             print(f"Flight mode: {flight_mode}")
 
 
-async def observe_is_in_air(drone: System) -> None:
+async def observe_is_in_air(drone: System, comm) -> None:
     """ Monitors whether the drone is flying or not and
     returns after landing """
 
@@ -44,6 +45,7 @@ async def observe_is_in_air(drone: System) -> None:
             was_in_air: bool = is_in_air
 
         if was_in_air and not is_in_air:
+            comm.set_state("exit")
             await asyncio.get_event_loop().shutdown_asyncgens()
             return
 
@@ -67,10 +69,24 @@ async def init_drone(sim: bool) -> System:
 
 async def start_flight(comm, drone: System):
     asyncio.ensure_future(print_flight_mode(drone))
-    termination_task = asyncio.ensure_future(observe_is_in_air(drone))
+    termination_task = asyncio.ensure_future(observe_is_in_air(drone, comm))
 
-    sm: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
-    await sm.run()
+    try:
+        sm: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
+        await sm.run()
+    except:
+        try:
+            await drone.offboard.stop()
+        except sdk.OffboardError as error:
+            print(
+                f"Stopping offboard mode failed with error code: {error._result.result}"
+            )
+            # Worried about what happens here
+        await asyncio.sleep(1)
+        print("-- Landing")
+        await drone.action.land()
+
+    comm.set_state("exit")
 
     await termination_task
 
