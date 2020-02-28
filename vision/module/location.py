@@ -82,6 +82,38 @@ class ModuleLocation:
 
         return self.center
     
+    def _findCircleDepth(self):
+        """
+        Filters out circles based on the depth at the circles' centers.
+
+        Returns
+        -------
+        ndarray - circles with depth at center.
+        """
+        hole = np.array(0)
+        count = 0
+        
+        for x, y, r in self.circles:
+            if x < 1080:
+                if self.depth[x, y][0] == 0:
+                    if count == 0:
+                        hole = np.array([x, y, r])
+                    else:
+                        hole = np.append(hole, [x, y, r])
+                    count += 1
+
+        if not (hole.size == 1):
+            hole = hole.reshape((-1, 3))
+
+            di = np.copy(self.img)
+            for x, y, r in hole:
+                cv2.circle(img=di, center=(x, y), radius=r, color=(0, 0, 255), thickness=-1)
+
+            cv2.imshow("Module holes", di)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        return hole
+
     def _getHoleLocations(self):
         """
         Finds the locations of the 4 holes on the front face of the module.
@@ -180,7 +212,7 @@ class ModuleLocation:
 
         # Resize circles into 2d array
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
-
+        
         return self.circles
 
     def _increaseBrightness(self, increase):
