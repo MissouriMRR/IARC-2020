@@ -25,7 +25,7 @@ class TimeDetectRussianWord:
         ## Load images
         img_folder = os.path.join(prefix, '..', 'vision_images', 'boat')
 
-        self.images = []
+        self.PARAMETERS = {}
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -34,11 +34,10 @@ class TimeDetectRussianWord:
 
             image = cv2.imread(img_path)
 
-            self.images.append((image, None))
+            self.PARAMETERS.update({filename: [image, None]})
 
-    def time_detector(self):
+    def time_detector(self, color_image, depth_image):
         """
         Timing detectRussianWord.
         """
-        for color_image, depth_image in self.images:
-            detect_russian_word(color_image, depth_image)
+        detect_russian_word(color_image, depth_image)

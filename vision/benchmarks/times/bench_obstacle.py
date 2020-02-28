@@ -27,7 +27,7 @@ class TimeObstacle:
         ## Load images
         img_folder = os.path.join(prefix, '..', 'vision_images', 'obstacle')
 
-        self.images = []
+        self.PARAMETERS = {}
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -36,7 +36,7 @@ class TimeObstacle:
 
             image = cv2.imread(img_path)
 
-            self.images.append((image, None))
+            self.PARAMETERS.update({filename: [image, None]})
 
         ## Read current params & setup obstacle detector
         config_filename = os.path.join(prefix, '..', 'obstacle', 'config.json')
@@ -46,9 +46,8 @@ class TimeObstacle:
 
         self.blob_finder = ObstacleFinder(params=import_params(config))
 
-    def time_find(self):
+    def time_find(self, color_image, depth_image):
         """
         Time the ObstacleFinder.find function.
         """
-        for color_image, depth_image in self.images:
-            self.blob_finder.find(color_image, depth_image)
+        self.blob_finder.find(color_image, depth_image)

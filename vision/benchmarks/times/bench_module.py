@@ -25,7 +25,7 @@ class TimeModuleInFrame:
         ## Load images
         img_folder = os.path.join(prefix, '..', 'vision_images', 'module')
 
-        self.images = []
+        self.PARAMETERS = {}
         for filename in os.listdir(img_folder):
             if filename[-4:] not in ['.png', '.jpg']:
                 continue
@@ -34,11 +34,10 @@ class TimeModuleInFrame:
 
             image = cv2.imread(img_path)
 
-            self.images.append((image, None))
+            self.PARAMETERS.update({filename: [image, None]})
 
-    def time_ModuleInFrame(self):
+    def time_ModuleInFrame(self, color_image, depth_image):
         """
         Timing mif.
         """
-        for color_image, depth_image in self.images:
-            ModuleInFrame(color_image, depth_image)
+        ModuleInFrame(color_image, depth_image)
