@@ -89,6 +89,8 @@ class ModuleLocation:
         Returns
         -------
         ndarray - circles with depth at center.
+
+        Note: not in use
         """
         hole = np.array(0)
         count = 0
@@ -214,6 +216,21 @@ class ModuleLocation:
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
         
         return self.circles
+
+    ## Image Processing
+
+    def _filterDepth(self):
+        """
+        Uses the depth channel to eliminate far away parts of the color image
+
+        Returns
+        -------
+        None
+        """
+        DEPTH_THRESH = 0 # Values from depth image that are "zeroed" in color image
+        # DEPTH_THRESH needs to be updated once more is known about depth image
+        
+        self.img = np.where(self.depth > DEPTH_THRESH, self.img, 0)
 
     def _increaseBrightness(self, increase):
         """
