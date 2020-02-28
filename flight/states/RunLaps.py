@@ -25,22 +25,26 @@ class RunLaps:
         async for i in arange(8):
             print(f"STARTING LAP {i}")
             pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat2, lon2))
+            print(f"         FIRST STRAIGHT")
             await pos_wait
             pos_wait.cancel()
             del pos_wait
 
             turn = asyncio.ensure_future(self.wait_turn(drone))
+            print(f"         FIRST TURN")
             await turn
             turn.cancel()
             del turn
 
             pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat1, lon1))
+            print(f"         SECOND STRAIGHT")
             await pos_wait
 
             pos_wait.cancel()
             del pos_wait
 
             turn = asyncio.ensure_future(self.wait_turn(drone))
+            print(f"         SECOND TURN")
             await turn
             turn.cancel()
             del turn
