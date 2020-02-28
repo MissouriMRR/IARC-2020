@@ -15,16 +15,12 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-
 class TextDetector:
 
-<<<<<<< HEAD
     def __init__(self):
         self.text = 'модулииртибот'
 
     def detect_russian_word(self, image):
-
->>>>>>> 31f3654156169abdcd24f7a0526f9c586a0fc043
         """
         Function to detect words pulled from images
         -------
@@ -82,11 +78,7 @@ if __name__ == "__main__":
         raise FileNotFoundError("Could not read image!")
 
     detector = TextDetector()
-<<<<<<< HEAD
     result = detector.detect_russian_word(originalImage)
     print(result)
-=======
-    result = detector.detect_russian_word(color_image)
->>>>>>> 31f3654156169abdcd24f7a0526f9c586a0fc043
 
     print("Time:", time.time() - start)
