@@ -19,3 +19,11 @@ If more than 300 pairs of parallel slopes are detected, the function will return
 The ModuleKMeans class allows the user to take an image and isolate certain color channels
 using the KMeans algorithm. This can be used as a baseline for detecting when the module is
 in frame.
+
+## ModuleLocation
+
+The ModuleLocation class will take in an image and find the distance to the center of the module.
+
+It will use circle detection and bucket sorting to find the coordinates of the four holes on the front face.
+Then, it will average these coordinates to find the center of the front face.
+It will then find the distance to that coordinate. The distance is based off the depth channel at the center coordinate.
