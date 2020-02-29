@@ -16,34 +16,41 @@ Starting in the benchmarks directory, run
 
 ## Contributing
 
-See the runall of the benchmark type for requirements.
-Use an existing file as a baseline.
-
 ### Times
 
 1. Add a file to times/ named bench_*.py.
 
-2. In this file include a class named Time*
+2. In this file create a class named Time*
 
- - In this method you may optionally include a setup function
-   that will be run before anything else.
+- (Optional) Include a setup function that will run once before anything else.
 
- - After setup there should be a dictionary named PARAMETERS in the class.
-  {'title': [parameters], ...}
+- After setup is run, a dictionary named PARAMETERS should be in the class, {"benchmark_title": [parameters]}
 
-  - Every function in the class named time_* will be timed using these parameters and logged with the given title.
+3. When the benchmark is run, all methods in class named time_* will be run with [parameters].
+
+4. Run time will be logged in the data frame.
 
 ### Accuracy
 
-1. Add file to accuracy/ named bench_*.py
+1. Add a file to accuracy/ named bench_*.py.
 
-2. In this file include a class named Accuracy*
+- Include a variable IMG_FOLDER = '', the folder in vision_images to use.
 
-- FOLDER
+- This folder should include an Annotations folder from blob_annotator.
 
-3. There must be a file named vision_images/FOLDER/benchmark.json
+- This folder should include a benchmark.json file(see below).
 
-- This file must be configured as follows
+2. In this file create a class named Accuracy*
+
+- (Optional) Include a setup function that will run once before anything else.
+
+3. When the benchmark is run, all methods in class named time_* will be run with [parameters] from benchmark.json.
+
+4. Accuracy will be calculated based on classification setting in benchmark.json and logged.
+
+#### benchmark.json
+
+For the accuracy benchmarks
 
 ```json
  {
@@ -59,5 +66,3 @@ Use an existing file as a baseline.
     }
 }
 ```
-
-4. Each function in the class named accuracy_* will be run with each image in data.
