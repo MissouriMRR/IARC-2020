@@ -82,7 +82,7 @@ class TestModuleInFrame(unittest.TestCase):
         ## Ensure does not modify original image
         color_image = 255 * np.ones((100, 100, 3), dtype='uint8')
         color_image = cv2.circle(color_image, (50, 50), 20, (0, 0, 0), 4)
-        
+
         color_parameter = np.copy(color_image)
 
         mif(color_parameter, None)
