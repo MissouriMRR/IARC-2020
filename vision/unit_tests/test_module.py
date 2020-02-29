@@ -70,7 +70,7 @@ class TestModuleInFrame(unittest.TestCase):
         bool
         """
         ##
-        for i in range(1, 6):
+        for i in range(1, 4):
             color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
 
             result = mif(color_image, None)
@@ -78,7 +78,7 @@ class TestModuleInFrame(unittest.TestCase):
             self.assertIn(result, [True, False])
 
         ## Ensure does not modify original image
-        color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+        color_image = np.random.randint(0, 255, size=(100, 200, 3), dtype='uint8')
 
         color_parameter = np.copy(color_image)
 
