@@ -66,6 +66,9 @@ def ModuleInFrame(color_image, depth_image):
     # Converting slopes to degrees
     slopes = np.degrees(np.arctan(slopes))
 
+    if not slopes.size:
+        return False
+
     # Bucket sorting slopes to group parallels
     upper_bound = np.amax(slopes)
     lower_bound = np.amin(slopes)
