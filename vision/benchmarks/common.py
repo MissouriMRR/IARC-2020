@@ -33,9 +33,13 @@ def read_image(path, encoding):
         depth_image = cv2.imread(path)
 
     elif encoding == 'both':
-        ## TODO - figure out what filename should be for other given current
-        color_image = None
-        depth_image = cv2.imread(path)
+        if 'colorImage' in path:
+            color_image = cv2.imread(path)
+            depth_image = cv2.imread(path.replace('colorImage', 'depthImage'))
+
+        elif 'depthImage' in path:
+            color_image = cv2.imread(path.replace('depthImage', 'colorImage'))
+            depth_image = cv2.imread(path)
 
     if color_image is None and encoding in ['color', 'both']:
         raise ValueError(f"Failed to read {path}!")
