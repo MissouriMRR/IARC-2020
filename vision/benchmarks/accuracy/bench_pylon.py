@@ -1,22 +1,23 @@
 """
 Runs through images and determines which have the pylon
 """
-import unittest
-import os
-import sys
-import cv2
+import os, sys
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-# from vision.pylon.detect_pylon import import_params
+import cv2
+
 from vision.pylon.detect_pylon import detect_red
 
 
-class TestPylon(unittest.TestCase):
-    def test_pylon(self):
+class AccuracyPylon:
+    """
+    Accuracy of pylon detector.
+    """
+    def accuracy_pylon(self):
         """
         Tests whether or not the pylon's red is detected in the image
 
@@ -49,7 +50,3 @@ class TestPylon(unittest.TestCase):
                 pylon = detect_red(img_file)
 
                 self.assertEqual(pylon, expected, msg=f"Expected {expected} blobs, did not find pylon in image {filename}")
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -2,28 +2,29 @@
 For testing all module algorithms.
 """
 import os, sys
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path += [parent_dir]
-sys.path += [os.path.dirname(parent_dir)]
 
-import unittest
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
+
 import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
 #from vision.module.detector import ModuleKMeans as mkm
 
 
-class TestModuleInFrame(unittest.TestCase):
+class AccuracyModuleInFrame:
     """
-    Testing module.in_frame functionality.
+    Testing module.in_frame accuracy.
     """
-    def test_ModuleInFrame(self):
+    def accuracy_ModuleInFrame(self):
         """
-        Testing ModuleInFrame
+        Measuring accuracy of ModuleInFrame
 
         Returns
         -------
-        ndarray[bool] which images the module was detected in
+        bool Whether the module is in frame or not.
         """
 
         results = []
@@ -46,7 +47,3 @@ class TestModuleInFrame(unittest.TestCase):
                 results.append(mif(image))
 
         self.assertListEqual(results, list(expected_results.values()))
-
-
-if __name__ == '__main__':
-    unittest.main()
