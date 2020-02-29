@@ -9,10 +9,6 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
-import lxml.etree
-
-import numpy as np
-import cv2
 
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.util.import_params import import_params
