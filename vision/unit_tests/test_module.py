@@ -77,6 +77,15 @@ class TestModuleInFrame(unittest.TestCase):
 
             self.assertIn(result, [True, False])
 
+        ## Ensure does not modify original image
+        color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+
+        color_parameter = np.copy(color_image)
+
+        mif(color_parameter, None)
+
+        np.testing.assert_array_equal(color_image, color_parameter)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -106,6 +106,18 @@ class TestObstacleDetection(unittest.TestCase):
                 self.assertIsInstance(box.object_type, ObjectType)
                 self.assertEqual(box.object_type, ObjectType.AVOID)
 
+        ## Ensure does not modify original image
+        detector = ObstacleFinder(params=self._get_params())
+
+        color_image = np.zeros((1000, 1000, 3), dtype='uint8')
+        cv2.rectangle(color_image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
+
+        color_parameter = np.copy(color_image)
+
+        detector.find(color_parameter, None)
+
+        np.testing.assert_array_equal(color_image, color_parameter)
+
 
 if __name__ == '__main__':
     unittest.main()
