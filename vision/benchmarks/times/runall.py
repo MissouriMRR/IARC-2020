@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
         try:
             b_instance.setup()
-        except AttributeError:
+        except AttributeError as e:
             print(f"No setup method found for {b_name}.")
 
         if not hasattr(b_instance, 'PARAMETERS'):
