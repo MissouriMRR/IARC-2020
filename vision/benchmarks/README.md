@@ -54,15 +54,15 @@ For the accuracy benchmarks
 
 ```json
  {
-    "encoding": "color" or "depth" or "both"
-    "classification": "location" or "in_frame" or ....,
+    "encoding": "color" | "depth" | "both",
+    "classification": "location" | "in_frame",
     "types": {
-        "example_one": "These are images that have lots of background nosie with the module in them.",
-        "example_two": "These are images that have lots of background nosie without the module in them."
+        "side_view": "Module at a side view or close to it.",
+        "bg_noise": "Module with lots of background noise."
     },
     "data": {
-        "filename_1": "example_one",
-        "filename_2": "example_two"
+        "filename_1": "side_view",
+        "filename_2": "bg_noise"
     }
 }
 ```
