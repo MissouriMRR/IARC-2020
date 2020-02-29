@@ -47,6 +47,7 @@ Use an existing file as a baseline.
 
 ```json
  {
+    "encoding": "color" or "depth" or "both"
     "classification": "location" or "in_frame" or ....,
     "types": {
         "example_one": "These are images that have lots of background nosie with the module in them.",

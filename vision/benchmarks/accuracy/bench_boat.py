@@ -17,7 +17,7 @@ class AccuracyRussianWord:
     """
     Testing the text detector.
     """
-    def setup():
+    def setup(self):
         pass
 
     def accuracy_detector(self, color_image, depth_image):

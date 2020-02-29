@@ -28,10 +28,13 @@ import json
 import numpy as np
 import pandas as pd
 
+import lxml  # Move annotation processing to common
+import cv2 ## move image reading to common
+
 from accuracy import modules
 
 
-def accuracy_boundingbox(filename, method, instance):
+def accuracy_boundingbox(filename, encoding, method, instance):
     """
     Calculate how far off each bounding box was
 
@@ -39,65 +42,72 @@ def accuracy_boundingbox(filename, method, instance):
     -------
     float Mean squared error between annotation and given.
     """
-    ## Read color and depth images
+    prefix = '' if os.path.isdir("accuracy") else '..'
+    img_folder = os.path.join(prefix, '..', 'vision_images', 'boat')
+
+    ## Read color and depth images - move to common
+    if encoding == 'color':
+        color_image = cv2.imread(os.path.join(img_folder, filename))
+        depth_image = None
+
+
+    elif encoding == 'depth':
+        pass
+    elif encoding == 'both':
+        pass
+
+    if color_image is None or depth_image is None:
+        pass # come on man
 
     ## Read annotation data
-    prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'boat')
+    
     annotation_folder = os.path.join(img_folder, 'Annotations')
 
     annotations = {filename: lxml.etree.parse(os.path.join(annotation_folder, filename)).getroot() for filename in os.listdir(annotation_folder)}
 
-
-    output = method(instance, color_image, depth_image)
-
     ## Calculate error
     # what if output misses box?
     # better accuracy mectric for this?
-THRESHOLD = 5
-        ## Check accuracy of text detector
-        for _, annotation in annotations.items():
-            filename = annotation.find('path').find('value').text
+    THRESHOLD = 5
 
-            with self.subTest(i=filename):
-                img_path = os.path.join(img_folder, filename)
-                image = cv2.imread(img_path)
+    for _, annotation in annotations.items():
+        a_filename = annotation.find('path').find('value').text
 
-                assert image.shape, f"Failed to read {img_path}!"
+        if a_filename.split('.')[0] != filename.split('.')[0]:
+            continue
 
-                bounding_boxes = detect_russian_word(image)
+        bounding_boxes = method(instance, color_image, depth_image)
 
-                accuracy = 0
+        accuracy = 0
 
-                for value in annotation.findall('object'):
-                    annotation_bounding_box = value.find('bndbox')
+        for value in annotation.findall('object'):
+            annotation_bounding_box = value.find('bndbox')
 
-                    ax1, ay1, ax2, ay2 = [int(annotation_bounding_box.find(param).text) for param in ['xmin', 'ymin', 'xmax', 'ymax']]
+            ax1, ay1, ax2, ay2 = [int(annotation_bounding_box.find(param).text) for param in ['xmin', 'ymin', 'xmax', 'ymax']]
 
-                    for bounding_box in bounding_boxes:
-                        ## Get x's and y's from bounding box
-                        X, Y, Z = [], [], []
-                        for x, y in bounding_box.vertices:
-                            X.append(x)
-                            Y.append(y)
+            for bounding_box in bounding_boxes:
+                ## Get x's and y's from bounding box
+                X, Y, Z = [], [], []
+                for x, y in bounding_box.vertices:
+                    X.append(x)
+                    Y.append(y)
 
-                        X, Y = np.unique(X), np.unique(Y)
-                        bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
+                X, Y = np.unique(X), np.unique(Y)
+                bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
 
-                        ## see if bx1, by1,... within +/- threshold of each ax1, ...
+                ## see if bx1, by1,... within +/- threshold of each ax1, ...
 
-                        x1_close = bx1 - THRESHOLD <= ax1 <= bx1 + THRESHOLD
-                        y1_close = by1 - THRESHOLD <= ay1 <= by1 + THRESHOLD
-                        x2_close = bx2 - THRESHOLD <= ax2 <= bx2 + THRESHOLD
-                        y2_close = by2 - THRESHOLD <= ay2 <= by2 + THRESHOLD
+                x1_close = bx1 - THRESHOLD <= ax1 <= bx1 + THRESHOLD
+                y1_close = by1 - THRESHOLD <= ay1 <= by1 + THRESHOLD
+                x2_close = bx2 - THRESHOLD <= ax2 <= bx2 + THRESHOLD
+                y2_close = by2 - THRESHOLD <= ay2 <= by2 + THRESHOLD
 
-                        if all((x1_close, y1_close, x2_close, y2_close)):
-                            accuracy += 1
+                if all((x1_close, y1_close, x2_close, y2_close)):
+                    accuracy += 1
 
-                    accuracy /= len(annotation.findall('object'))
-                    print(f"{filename}: {accuracy * 100:.2f}%")
+            accuracy /= len(annotation.findall('object'))
 
-    error = 0
+    error = accuracy
 
     return error
 
@@ -117,15 +127,15 @@ if __name__ == '__main__':
     ## Find time benchmarks in modules
     for module in modules:
         for key, value in module.__dict__.items():
-            if key[:4] == 'Accuracy':
+            if 'Accuracy' in key:
                 benchmarks.update({key: value})
 
         ## Read benchmark configuration
         with open(os.path.join('..', 'vision_images', module.__dict__['IMG_FOLDER'], 'benchmark.json')) as file:
             benchmark_config = json.load(file)
-        print(benchmark_config)
 
         classification = benchmark_config['classification']
+        encoding = benchmark_config['encoding']
         types = benchmark_config['types']
         parameters = benchmark_config['data']
 
@@ -146,14 +156,14 @@ if __name__ == '__main__':
 
                 for filename, p_type in parameters.items():
                     try:
-                        result = classification_map[classification](filename, method, )
+                        result = classification_map[classification](filename, encoding, method, b_instance)
 
-                    except Exception as e:
-                        print(f"{b_name}.{m_name}: {p_name} error: {e}")
+                    except SyntaxError as e:  #################################### FIX
+                        print(f"{b_name}.{m_name}: {filename} error: {e}")
 
                         output.loc[len(output)] = [b_name, m_name, p_type, filename, np.nan]
                     else:
-                        print(f"{b_name}.{m_name}: {p_name} {time:.5f}s")
+                        print(f"{b_name}.{m_name}: {filename} {result:.5f}")
 
                         output.loc[len(output)] = [b_name, m_name, p_type, filename, result]
 
