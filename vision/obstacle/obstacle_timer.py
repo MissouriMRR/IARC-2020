@@ -11,7 +11,7 @@ import cv2
 import json
 import timeit
 from vision.obstacle.obstacle_finder import ObstacleFinder
-from vision.util.import_params import import_params
+from vision.import_params.import_params import import_params
 
 
 if __name__ == '__main__':

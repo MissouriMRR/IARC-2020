@@ -11,9 +11,9 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 try:
-    from vision.util.import_params import import_params
+    from vision.common.import_params import import_params
 except ImportError:
-    from util.import_params import import_params
+    from common.import_params import import_params
 
 
 class TestParamsImport(unittest.TestCase):
