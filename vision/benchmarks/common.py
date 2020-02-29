@@ -3,7 +3,70 @@ Common functions for benchmarks to make use of.
 
 NOTE: Do no edit, only append!
 """
+import os
+import lxml
 import numpy as np
+import cv2
+
+
+def read_image(path, encoding):
+    """
+    Read image according to encoding.
+
+    Parameters
+    ----------
+    path: str
+        Location of depth or color image.
+    encoding: color, depth or both
+        How is image data stored.
+
+    Returns
+    -------
+    [color_image, depth_image]
+    """
+    if encoding == 'color':
+        color_image = cv2.imread(path)
+        depth_image = None
+
+    elif encoding == 'depth':
+        color_image = None
+        depth_image = cv2.imread(path)
+
+    elif encoding == 'both':
+        ## TODO - figure out what filename should be for other given current
+        color_image = None
+        depth_image = cv2.imread(path)
+
+    if color_image is None and encoding in ['color', 'both']:
+        raise ValueError(f"Failed to read {path}!")
+    if depth_image is None and encoding in ['depth', 'both']:
+        raise ValueError(f"Failed to read {path}!")
+
+    return [color_image, depth_image]
+
+
+def read_annotations(path):
+    """
+    Read annoatations.
+
+    Parameters
+    ----------
+    path: str
+        Folder where Annotations folder is.
+
+    Returns
+    -------
+    {filename: annotation}
+    """
+    annotation_folder = os.path.join(path, 'Annotations')
+
+    annotations = {}
+    for filename in os.listdir(annotation_folder):
+        annotation = lxml.etree.parse(os.path.join(annotation_folder, filename)).getroot()
+
+        annotations.update({filename.split('.')[0]: annotation})
+
+    return annotations
 
 
 def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
