@@ -16,7 +16,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 from vision.obstacle.obstacle_finder import ObstacleFinder
-from vision.util.import_params import import_params
+from vision.common.import_params import import_params
 
 
 class TestObstacleDetection(unittest.TestCase):
