@@ -12,6 +12,7 @@ the location of this program in terminal, and run using
 import datetime
 import pickle
 import cv2
+import numpy as np
 import airsim
 
 client = airsim.MultirotorClient()
@@ -28,8 +29,8 @@ while True:  # runs as long as the simulator is running, ideally
 
         cv2.imwrite(f"{time}-colorImage.jpg", sceneCameraImage)
 
-        with open(f"{time}-depthImage.obj", 'wb') as file:
-            pickle.dump(depthCameraImage, file)
+        with open(f"{time}-depthImage.npy", 'wb') as file:
+            np.save(file, depthCameraImage)
 
     if key == "e":
         break
