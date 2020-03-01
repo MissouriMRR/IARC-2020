@@ -22,18 +22,18 @@ cv2.imwrite("filename", ndarray) -> bool
 cv2.imread("filename") -> ndarray
 ```
 
-#### .obj
+#### .npy
 
-This is a pickle object file, used for depth images.
+This is a numpy array file, used for depth images.
 
 ```python
-## Saving .obj
-with open('filename.obj', 'wb') as file:
-    pickle.dump(ndarray, file)
+## Saving .npy
+with open('filename.npy', 'wb') as file:
+    pickle.dump(file, ndarray)
 
-## Reading .obj
-with open('filename.obj', 'rb') as file:
-    ndarray = pickle.load(file)
+## Reading .npy
+with open('filename.npy', 'rb') as file:
+    ndarray = numpy.load(file)
 ```
 
 #### .bag
