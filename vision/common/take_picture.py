@@ -2,8 +2,7 @@
 Called to save a depth and color frame with timed labels
 """
 import datetime
-import pickle
-import cv2, numpy as np
+import cv2
 
 
 def save_camera_frame(depth_frame, color_frame):
@@ -20,6 +19,5 @@ def save_camera_frame(depth_frame, color_frame):
     time = str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
 
     cv2.imwrite(f"{time}-colorImage.jpg", color_frame)
+    cv2.imwrite(f"{time}-depthImage.jpg", depth_frame)
 
-    with open(f"{time}-depthImage.npy", 'wb') as file:
-        np.save(file, depth_frame)
