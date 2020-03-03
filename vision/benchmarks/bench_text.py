@@ -1,10 +1,10 @@
 """
-Boat related unit tests.
+Text related unit tests.
 """
 import unittest
 import os
 import cv2
-from boat.detect_words import detect_russian_word
+from text.detect_words import detect_russian_word
 
 class TestDetectRussianWord(unittest.TestCase):
     """
@@ -12,7 +12,7 @@ class TestDetectRussianWord(unittest.TestCase):
     """
     def test_detector(self):
         """
-        Testing vision.boat.detectRussianWord
+        Testing vision.text.detectRussianWord
 
         Settings
         --------
@@ -28,7 +28,7 @@ class TestDetectRussianWord(unittest.TestCase):
         THRESHOLD = 5
 
         prefix = 'vision' if os.path.isdir("vision") else ''
-        img_folder = os.path.join(prefix, 'vision_images', 'boat')
+        img_folder = os.path.join(prefix, 'vision_images', 'text')
         annotation_folder = os.path.join(img_folder, 'Annotations')
 
         ## Read annotations

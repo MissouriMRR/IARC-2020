@@ -73,7 +73,7 @@ if __name__ == "__main__":
     import os
     start = time.time()
 
-    color_image = cv2.imread(os.path.join('vision_images', 'boat', '2020-02-23.png'))
+    color_image = cv2.imread(os.path.join('vision_images', 'text', '2020-02-23.png'))
 
     if color_image is None:
         raise FileNotFoundError("Could not read image!")
