@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 import cv2
 
-from text.detect_words import detect_russian_word
+from text.detect_words import TextDetector
 from bounding_box import BoundingBox, ObjectType
 
 
@@ -45,14 +45,14 @@ class TestDetectRussianWord(unittest.TestCase):
         with self.subTest(i="3 Channel {0..255} Image"):
             color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
 
-            detect_russian_word(color_image, None)
+            TextDetector().detect_russian_word(color_image, None)
 
         ### Ensure returns correct type of BoundingBox
         with self.subTest(i="Object type"):
             color_image = np.zeros((1000, 1000, 3), dtype='uint8')
             cv2.putText(color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
 
-            output = detect_russian_word(color_image, None)
+            output = TextDetector().detect_russian_word(color_image, None)
 
             if output is None:
                 self.fail(msg="Failed to detect obstacle to be able to test.")

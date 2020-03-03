@@ -7,7 +7,6 @@ import numpy as np
 import cv2
 import lxml.etree
 import os, sys
-from bounding_box import BoundingBox, ObjectType
 
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,13 +14,14 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+from bounding_box import BoundingBox, ObjectType
 
 class TextDetector:
 
     def __init__(self):
         self.text = 'модулииртибот'
 
-    def detect_russian_word(self, image):
+    def detect_russian_word(self, color_image, depth_image):
         """
         Function to detect words pulled from images
         -------
@@ -32,7 +32,7 @@ class TextDetector:
         """
 
         # filter image
-        _, filter_image = cv2.threshold(np.mean(image, axis=2), 185, 255, cv2.THRESH_BINARY)
+        _, filter_image = cv2.threshold(np.mean(color_image, axis=2), 185, 255, cv2.THRESH_BINARY)
 
         # shows what the filtered image looks like
         # cv2.imshow('img', filter_image)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
         raise FileNotFoundError("Could not read image!")
 
     detector = TextDetector()
-    result = detector.detect_russian_word(color_image)
+    result = detector.detect_russian_word(color_image, None)
     print(result)
 
     print("Time:", time.time() - start)

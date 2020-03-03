@@ -1,6 +1,6 @@
-# Boat
+# Text
 
-Algorithms relating to the boat, the mast and the russian words on mast.
+Algorithms relating to the text, the mast and the russian words on mast.
 
 ## Detect Russian Word: 'модули иртибот'
 
