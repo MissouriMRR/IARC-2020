@@ -1,5 +1,5 @@
 """
-Boat related unit tests.
+Text related unit tests.
 """
 import sys, os
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 import cv2
 
-from boat.detect_words import detect_russian_word
+from text.detect_words import detect_russian_word
 from bounding_box import BoundingBox, ObjectType
 
 
