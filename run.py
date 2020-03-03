@@ -34,16 +34,23 @@ def run_threads(sim: bool) -> None:
     # Start flight function
     f.start()
 
-    while comm_obj.get_state() != "exit":
+    try:
+        while comm_obj.get_state() != "exit":
 
-        # If the process is no longer alive,
-        # (i.e. error has been raised in this case)
-        # then create a new instance and start the new process
-        # (i.e. restart the process)
-        if f.is_alive() == False:
-            print("===========Restarting Flight===========")
-            f = Process(target=flight, args=(comm_obj, sim,))
-            f.start()
+            # If the process is no longer alive,
+            # (i.e. error has been raised in this case)
+            # then create a new instance and start the new process
+            # (i.e. restart the process)
+            if f.is_alive() == False:
+                print("===========Restarting Flight===========")
+                f = Process(target=flight, args=(comm_obj, sim,))
+                f.start()
+    except KeyboardInterrupt:
+        # Ctrl-C was pressed
+        comm_obj.set_state("land")
+        print("===========Forcing Drone to Stop===========")
+        f = Process(target=flight, args=(comm_obj, sim,))
+        f.start()
 
     # Join flight process before exiting function
     f.join()
