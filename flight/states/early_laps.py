@@ -1,22 +1,30 @@
+"""Runs the 8 laps to get to the mast"""
 import asyncio
 import math
 import mavsdk as sdk
-from .Land import Land
 
+from .land import Land
+
+# Position for pylon 1
 lat1: int = 37.9489551
 lon1: int = -91.7844405
+
+# Position for pylon 2
 lat2: int = 37.9486433
 lon2: int = -91.7839372
 
 
 async def arange(count):
+    """Needed to allows us to do a range asynchronously"""
     for i in range(count):
-        yield (i)
+        yield i
 
 
-class RunLaps:
+class EarlyLaps:
+    """Handles getting the drone around the two pylons 8 times"""
+
     async def run(self, drone):
-
+        """Moves the drone to the first pylon, then begins the 8 laps"""
         print("-- Run Laps")
         pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat1, lon1))
         await pos_wait
@@ -51,7 +59,7 @@ class RunLaps:
         return Land()
 
     async def wait_pos(self, drone, goal_lat, goal_lon):
-
+        """Goes to a position"""
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)
             if altitude >= 12:
@@ -111,7 +119,7 @@ class RunLaps:
                 return True
 
     async def wait_turn(self, drone):
-
+        """Completes a full turn"""
         count = 0
         async for tel in drone.telemetry.attitude_euler():
             current = (360 + round(tel.yaw_deg)) % 360

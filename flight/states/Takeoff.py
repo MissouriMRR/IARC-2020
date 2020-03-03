@@ -1,20 +1,27 @@
+"""The takeoff state"""
 import asyncio
-from mavsdk import System
 import mavsdk as sdk
-from .State import State
-from .RunLaps import RunLaps
+from mavsdk import System
+
+from .state import State
+from .early_laps import EarlyLaps
 
 
 class Takeoff(State):
+    """The state that takes off the drone"""
+
     async def run(self, drone: System) -> None:
-        await self._check_arm_or_arm(drone)
-        print("taking off")
+        """Arms and takes off the drone"""
+        await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         print("-- Taking off")
+        # Takeoff command, goes to altitude specified in params
         await drone.action.takeoff()
-        alt_wait = asyncio.ensure_future(self.wait_alt(drone))
+        # waits for altitude to be close to the specified level
+        alt_wait: asyncio.coroutine = asyncio.ensure_future(self.wait_alt(drone))
         await alt_wait
         alt_wait.cancel()
 
+        # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
         await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
 
@@ -27,16 +34,17 @@ class Takeoff(State):
         )
 
         try:
+            # Enable offboard mode, allowing for computer to control the drone
             await drone.offboard.start()
         except sdk.OffboardError:
             await drone.action.land()
             return
 
-        return RunLaps()
+        return EarlyLaps()  # Return the next state, RunLaps
 
     async def wait_alt(self, drone: System):
-        previous_altitude = None
+        """Checks to see if the drone is near the target altitude"""
         async for position in drone.telemetry.position():
-            altitude = round(position.relative_altitude_m, 2)
+            altitude: float = round(position.relative_altitude_m, 2)
             if altitude >= 2:
                 return True
