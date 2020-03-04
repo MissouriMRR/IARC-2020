@@ -11,10 +11,11 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
+
 from vision.camera.bag_file import BagFile
 from vision.obstacle.obstacle_finder import ObstacleFinder
-from vision.util.blob_plotter import plot_blobs
-from vision.util.import_params import import_params
+from vision.common.blob_plotter import plot_blobs
+from vision.common.import_params import import_params
 
 
 class Pipeline:
