@@ -83,7 +83,7 @@ class TestDetectRussianWord(unittest.TestCase):
 
         color_parameter = np.copy(color_image)
 
-        detect_russian_word(color_parameter, None)
+        TextDetector().detect_russian_word(color_parameter, None)
 
         np.testing.assert_array_equal(color_image, color_parameter)
 
