@@ -33,19 +33,6 @@ class ModuleLocation:
         self.lower_bound = np.array(0) # lower bound of slopes
         self.num_buckets = np.array(0) # number of buckets applied to slopes
 
-    ## Finding Distance to Module
-
-    def getDistance(self):
-        """
-        Finds the distance to the module.
-        Returns
-        -------
-        int - distance to the module.
-        """
-        self.getCenter()
-        self.distance = self.depth[self.center[0], self.center[1], 0]
-        return self.distance
-
     ## Finding the Center
 
     def getCenter(self):
@@ -196,7 +183,7 @@ class ModuleLocation:
         ndarray - circles detected in image.
         """
         # Size of the blur kernel
-        BLUR_SIZE = 5
+        BLUR_SIZE = 9
 
         # Grayscale
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
@@ -227,10 +214,10 @@ class ModuleLocation:
         -------
         None
         """
-        DEPTH_THRESH = 0 # Values from depth image that are "zeroed" in color image
+        DEPTH_THRESH = 200 # Values from depth image that are "zeroed" in color image
         # DEPTH_THRESH needs to be updated once more is known about depth image
-        
-        self.img = np.where(self.depth > DEPTH_THRESH, self.img, 0)
+        tempDepth = np.dstack((self.depth, self.depth, self.depth))
+        self.img = np.where(tempDepth < DEPTH_THRESH, self.img, 0)
 
     def _increaseBrightness(self, increase):
         """
@@ -277,7 +264,9 @@ class ModuleLocation:
         -------
         None
         """
-        cv2.imshow("Module Depth Image", self.depth)
+        threeDepth = np.dstack((self.depth, self.depth, self.depth)) // np.amin(self.depth)
+        print(threeDepth)
+        cv2.imshow("Module Depth Image", threeDepth)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
