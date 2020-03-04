@@ -7,7 +7,6 @@ import numpy as np
 import cv2
 import os, sys
 
-
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -40,7 +39,6 @@ class TextDetector:
 
         ## only return boxes that have text in them
         ## eg. find a way to check if boxes are repetitive or do not contain text
-        print(filter_image)
         d = pytesseract.image_to_data(filter_image, output_type=pytesseract.Output.DICT, lang="uzb_cyrl")
 
         n_boxes = len(d['level'])
