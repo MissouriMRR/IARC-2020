@@ -33,14 +33,15 @@ class Pipeline:
     alg_time: int
         An integer value that corresponds to how long the video loops.
     """
-    def __init__(self, env, camera):
+    def __init__(self, vision_communication, flight_communication, camera):
         if not isinstance(env, Environment):
             raise ValueError(f"Argument env should be type Environment, got {type(env)}")
         if not isinstance(camera, Camera):
             raise ValueError(f"Argument env should be type Camera, got {type(camera)}")
 
         ##
-        self.env = env
+        self.vision_communication = vision_communication
+        self.flight_communication = flight_communication
         self.camera = camera.__iter__()
 
         ##
@@ -68,10 +69,19 @@ class Pipeline:
         vid_file: BagFile
             The .bag video file represented by a BagFile object
         """
+        ##
         depth_image, color_image = self.picture
 
-        bboxes = self.obstacle_finder.find(color_image, depth_image)
-        self.env.update(bboxes)
+        state = self.flight_communication.get_state()
+
+        ##
+        if state == 'avoidance':
+            bboxes = self.obstacle_finder.find(color_image, depth_image)
+        else:
+            raise AttributeError(f"Unrecognized state: {state}")
+
+        ##
+        self.vision_communication.update(bboxes)
 
         plot_blobs(self.obstacle_finder.keypoints, color_image)
 
@@ -81,10 +91,12 @@ if __name__ == '__main__':
 
     env = Environment()
 
+    flight_comm = type('FlightCommunication', (object,), {'get_state': lambda: 'avoidance'})
+
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    pipeline = Pipeline(env, video)
+    pipeline = Pipeline(env, flight_comm, video)
 
     for _ in range(100):
         pipeline.run()
