@@ -12,6 +12,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
 
+from vision.camera.template import Camera
 from vision.camera.bag_file import BagFile
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.common.blob_plotter import plot_blobs
@@ -32,19 +33,32 @@ class Pipeline:
     alg_time: int
         An integer value that corresponds to how long the video loops.
     """
-    def __init__(self, env, obstacle_finder, config, alg_time=98):
+    def __init__(self, env, camera):
         if not isinstance(env, Environment):
             raise ValueError(f"Argument env should be type Environment, got {type(env)}")
-        if type(alg_time) is not int:
-            raise ValueError(f"Argument alg_time should be type int, got {type(alg_time)}")
-        if not isinstance(obstacle_finder, ObstacleFinder):
-            raise ValueError(f"Argument obstacle_finder should be type ObstacleFinder, got {type(obstacle_finder)}")
-        self.env = env
-        self.obstacle_finder = obstacle_finder
-        self.config = config
-        self.alg_time = alg_time
+        if not isinstance(camera, Camera):
+            raise ValueError(f"Argument env should be type Camera, got {type(camera)}")
 
-    def run_algorithm(self, video_file):
+        ##
+        self.env = env
+        self.camera = camera.__iter__()
+
+        ##
+        prefix = 'vision' if os.path.isdir("vision") else ''
+        
+        #
+        config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+
+        with open(config_filename, 'r') as config_file:
+            config = json.load(config_file)
+
+        self.obstacle_finder = ObstacleFinder(params=import_params(config))
+
+    @property
+    def picture(self):
+        return next(self.camera)
+
+    def run(self):
         """
         Method that takes the given video file and environment, and updates the
         environment with detected blobs.
@@ -54,34 +68,23 @@ class Pipeline:
         vid_file: BagFile
             The .bag video file represented by a BagFile object
         """
+        depth_image, color_image = self.picture
 
-        if not isinstance(video_file, BagFile):
-            raise ValueError(f"Argument video_file should be type BagFile, got {type(video_file)}")
+        bboxes = self.obstacle_finder.find(color_image, depth_image)
+        self.env.update(bboxes)
 
-        for i, (depth_image, color_image) in enumerate(video_file):
-            if i == self.alg_time:
-                break
-
-            bboxes = self.obstacle_finder.find(color_image, depth_image)
-            self.env.update(bboxes)
-
-            plot_blobs(self.obstacle_finder.keypoints, color_image)
+        plot_blobs(self.obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
     from vision.interface import Environment
 
-    prefix = 'vision' if os.path.isdir("vision") else ''
-    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
     env = Environment()
-
-    with open(config_filename, 'r') as config_file:
-        config = json.load(config_file)
-
-    obstacle_finder = ObstacleFinder(params=import_params(config))
 
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    pipeline = Pipeline(env, obstacle_finder, config)
-    pipeline.run_algorithm(video)
+    pipeline = Pipeline(env, video)
+
+    for _ in range(100):
+        pipeline.run()
