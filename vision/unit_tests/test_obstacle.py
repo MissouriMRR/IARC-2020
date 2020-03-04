@@ -67,19 +67,19 @@ class TestObstacleDetection(unittest.TestCase):
         with self.subTest(i="3 Channel {0..255} Image"):
             detector = ObstacleFinder(params=self._get_params())
 
-            image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
 
-            detector.find(image)
+            detector.find(color_image, None)
 
         ### Ensure returns correct type of BoundingBox
         with self.subTest(i="Object type"):
             detector = ObstacleFinder(params=self._get_params())
 
             for i in range(1, 9):
-                image = np.zeros((1000, 1000, 3), dtype='uint8')
-                cv2.rectangle(image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
+                color_image = np.zeros((1000, 1000, 3), dtype='uint8')
+                cv2.rectangle(color_image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
 
-                output = detector.find(image)
+                output = detector.find(color_image, None)
 
                 if output is not None:
                     break
@@ -105,6 +105,18 @@ class TestObstacleDetection(unittest.TestCase):
                 ##
                 self.assertIsInstance(box.object_type, ObjectType)
                 self.assertEqual(box.object_type, ObjectType.AVOID)
+
+        ## Ensure does not modify original image
+        detector = ObstacleFinder(params=self._get_params())
+
+        color_image = np.zeros((1000, 1000, 3), dtype='uint8')
+        cv2.rectangle(color_image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
+
+        color_parameter = np.copy(color_image)
+
+        detector.find(color_parameter, None)
+
+        np.testing.assert_array_equal(color_image, color_parameter)
 
 
 if __name__ == '__main__':

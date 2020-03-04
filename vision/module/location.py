@@ -1,4 +1,5 @@
 """
+This file contains the ModuleLocation class to find the location of the center of the module in an image.
 """
 
 import cv2
@@ -6,25 +7,20 @@ import numpy as np
 
 class ModuleLocation:
     """
-    Finds the distance to the front face of the module.
+    Finds the coordinates of the center of the front face of the module.
     """
 
     ## Initialization
 
     def __init__(self):
-        """
-        """
+        np.seterr(all="ignore") # Ignore numpy warnings
+
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
 
-        self.holes = np.arange(8).reshape((4, 2)) # Set of 4 (x, y) coordinates, location of the four holes
+        self.holes = np.arange(8) # Set of 4 (x, y) coordinates, location of the four holes
         
         self.circles = np.array(0) # List of circles detected in color image
-        
-        self.x_heights = np.array(0) # Histogram of x-coordinate values
-        self.x_bounds = np.array(0) # x-coordinate bounds of histogram
-        self.y_heights = np.array(0) # Histogram of y-coordinate values
-        self.y_bounds = np.array(0) # y-coordinate bounds of histogram
 
         self.center = np.array(0) # Coordinates of center
         self.distance = 0 # Distance to the center
@@ -32,6 +28,10 @@ class ModuleLocation:
         self.slopes = np.array(0) # Slopes between circles
         self.slope_heights = np.array(0) # Histogram of slopes
         self.slope_bounds = np.array(0) # Bounds of slope histogram
+
+        self.upper_bound = np.array(0) # upper bound of slopes
+        self.lower_bound = np.array(0) # lower bound of slopes
+        self.num_buckets = np.array(0) # number of buckets applied to slopes
 
     ## Finding Distance to Module
 
@@ -42,20 +42,19 @@ class ModuleLocation:
         -------
         int - distance to the module.
         """
-        self._getCenter()
+        self.getCenter()
         self.distance = self.depth[self.center[0], self.center[1], 0]
         return self.distance
 
     ## Finding the Center
 
-    def _getCenter(self):
+    def getCenter(self):
         """
         Find the center of the front face of the module.
         Returns
         -------
         ndarray - coordinates of the center of the module.
         """
-
         # Circle detection
         self._circleDetection()
 
@@ -72,11 +71,14 @@ class ModuleLocation:
         # Average hole coordinates to find center coordinates
         x_total = 0
         y_total = 0
-        for x, y in self.holes:
+        num_holes = 0
+        for x, y, _ in self.holes:
             x_total += x
             y_total += y
-        self.center[0] = x_total // 4
-        self.center[1] = y_total // 4
+            num_holes += 1
+        
+        self.center[0] = x_total // num_holes
+        self.center[1] = y_total // num_holes
 
         return self.center
     
@@ -89,30 +91,33 @@ class ModuleLocation:
         ndarray - locations of the 4 holes
         """
         NUM_CIRCLES = np.shape(self.circles)[0] # The number of circles
-        MIN_SEP = 1
 
+        sep = self.upper_bound - self.lower_bound / self.num_buckets # seperation from main parallel
 
         # Find Slope with Most Parallels
-        most_parallels = np.amax(self.slope_heights)
-        bucket_ind = np.where(self.slope_heights==most_parallels)[0]
-        parallel = self.slope_bounds[bucket_ind]
-        
+        bucket_ind = np.argmax(self.slope_heights) # highest segment of histogram
+        parallel = self.slope_bounds[bucket_ind] # slope at highest segment is main parallel
+
         # Find Holes Associated with parallels
         idx = 0
         hole_idx = 0
         for slope in self.slopes:
-            if np.abs(slope - parallel) <= MIN_SEP:
+            if np.abs(slope - parallel) <= sep:
+                # x and y are the indexes of 2 circles corresponding to a slope
                 x = idx // (NUM_CIRCLES - 1)
                 y = idx % (NUM_CIRCLES - 1)
                 y += int(y >= x)
+
                 if hole_idx == 0:
-                    self.holes = (x, y)
+                    self.holes = np.array(self.circles[x])
                 else:
-                    np.append(self.holes, self.circles[x, y])
+                    self.holes = np.append(self.holes, self.circles[x])
+                
+                self.holes = np.append(self.holes, self.circles[y])
                 hole_idx += 1
-                print(idx)
             idx += 1
-        print(self.holes)
+
+        self.holes = self.holes.reshape((-1, 3))
         return self.holes
 
     def _groupSlopes(self):
@@ -122,13 +127,15 @@ class ModuleLocation:
         -------
         None
         """
-        BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
+        BUCKET_MODIFIER = .5 # Changes how many buckets are in the range
 
-        upper_bound = np.amax(self.slopes)
-        lower_bound = np.amin(self.slopes)
-        num_buckets = np.int32(upper_bound - lower_bound) * BUCKET_MODIFIER
+        # Get parameters for bucket sorting
+        self.upper_bound = np.amax(self.slopes)
+        self.lower_bound = np.amin(self.slopes)
+        self.num_buckets = np.int32((self.upper_bound - self.lower_bound) * BUCKET_MODIFIER)
 
-        self.slope_heights, self.slope_bounds = np.histogram(self.slopes, num_buckets, (lower_bound, upper_bound))
+        # Bucket sort
+        self.slope_heights, self.slope_bounds = np.histogram(self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound))
 
     def _getSlopes(self):
         """
@@ -186,7 +193,7 @@ class ModuleLocation:
         """
         self.img += increase
 
-    ## Outside Input Functions
+    ## Input Functions
 
     def setImg(self, color, depth):
         """
@@ -242,7 +249,7 @@ class ModuleLocation:
         cv2.imshow("Module Circles", circleImg)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-    
+
     def showCenter(self):
         """
         Shows the image with detected holes and center.
@@ -253,8 +260,8 @@ class ModuleLocation:
         """
         
         centerImg = np.copy(self.img)
-        for x, y in self.holes:
-            cv2.circle(img=centerImg, center=(x, y), radius=10, color=(0, 0, 255), thickness=-1)
+        for x, y, r in self.holes:
+            cv2.circle(img=centerImg, center=(x, y), radius=r, color=(0, 0, 255), thickness=-1)
         
         cv2.circle(img=centerImg, center=(self.center[0], self.center[1]), radius=10, color=(0, 255, 0), thickness=-1)
 
