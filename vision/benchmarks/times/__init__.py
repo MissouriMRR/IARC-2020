@@ -14,7 +14,6 @@ try:
 
         if filename[:5] != 'bench' or filename[-3:] != '.py':
             continue
-        print(filename)
 
         modules.append(__import__(f'{filename[:-3]}'))
 
