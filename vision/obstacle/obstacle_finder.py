@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 from vision.bounding_box import BoundingBox, ObjectType
 import json
-from vision.util.import_params import import_params
+from vision.common.import_params import import_params
 
 
 class ObstacleFinder:
@@ -100,7 +100,7 @@ class ObstacleFinder:
 
 
 if __name__ == '__main__':
-    from vision.util.box_plotter import plot_box
+    from vision.common.box_plotter import plot_box
 
     prefix = 'vision' if os.path.isdir("vision") else ''
     img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
