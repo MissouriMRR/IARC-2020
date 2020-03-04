@@ -13,8 +13,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import json
 from vision.camera.bag_file import BagFile
 from vision.obstacle.obstacle_finder import ObstacleFinder
-from vision.util import import_params
 from vision.util.blob_plotter import plot_blobs
+from vision.util.import_params import import_params
 
 
 class Pipeline:
@@ -31,16 +31,19 @@ class Pipeline:
     alg_time: int
         An integer value that corresponds to how long the video loops.
     """
-    def __init__(self, env, config, alg_time=98):
+    def __init__(self, env, obstacle_finder, config, alg_time=98):
         if not isinstance(env, Environment):
             raise ValueError(f"Argument env should be type Environment, got {type(env)}")
-        self.env = env
         if type(alg_time) is not int:
             raise ValueError(f"Argument alg_time should be type int, got {type(alg_time)}")
-        self.alg_time = alg_time
+        if not isinstance(obstacle_finder, ObstacleFinder):
+            raise ValueError(f"Argument obstacle_finder should be type ObstacleFinder, got {type(obstacle_finder)}")
+        self.env = env
+        self.obstacle_finder = obstacle_finder
         self.config = config
+        self.alg_time = alg_time
 
-    def run_algorithm(self, vid_file):
+    def run_algorithm(self, video_file):
         """
         Method that takes the given video file and environment, and updates the
         environment with detected blobs.
@@ -51,17 +54,17 @@ class Pipeline:
             The .bag video file represented by a BagFile object
         """
 
-        if not isinstance(vid_file, BagFile):
-            raise ValueError(f"Argument vid_file should type BagFile, got {type(vid_file)}")
+        if not isinstance(video_file, BagFile):
+            raise ValueError(f"Argument video_file should be type BagFile, got {type(video_file)}")
 
-        for i, (depth_image, color_image) in enumerate(vid_file):
+        for i, (depth_image, color_image) in enumerate(video_file):
             if i == self.alg_time:
                 break
-            obstacle_finder = ObstacleFinder(params=import_params.import_params(self.config))
-            bboxes = obstacle_finder.find(color_image, depth_image)
+
+            bboxes = self.obstacle_finder.find(color_image, depth_image)
             self.env.update(bboxes)
 
-            plot_blobs(obstacle_finder.keypoints, color_image)
+            plot_blobs(self.obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
@@ -74,10 +77,10 @@ if __name__ == '__main__':
     with open(config_filename, 'r') as config_file:
         config = json.load(config_file)
 
-    module_video = os.path.join('vision_videos', 'module', 'brick-left-right-tilt.bag')
-    sample_video = os.path.join('vision_videos', 'module', 'sampleFrames.bag')
-    module_video_file = BagFile(100, 100, 60, module_video)
-    sample_video_file = BagFile(100, 100, 60, sample_video)
+    obstacle_finder = ObstacleFinder(params=import_params(config))
 
-    pipeline = Pipeline(env, config)
-    pipeline.run_algorithm(sample_video_file)
+    video_file = sys.argv[1]
+    video = BagFile(100, 100, 60, video_file)
+
+    pipeline = Pipeline(env, obstacle_finder, config)
+    pipeline.run_algorithm(video)
