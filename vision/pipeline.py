@@ -26,15 +26,15 @@ class Pipeline:
 
     Parameters
     -------------
-    env: Environment
-        The environment interface that is used by flight code.
-        The pipeline updates the interface.
-
-    alg_time: int
-        An integer value that corresponds to how long the video loops.
+    vision_communication: Environment
+        Interface to share vision information with flight.
+    flight_communication: ?
+        Interface to recieve flight state information from flight.
+    camera: Camera
+        Camera to pull image from.
     """
     def __init__(self, vision_communication, flight_communication, camera):
-        if not isinstance(env, Environment):
+        if not isinstance(vision_communication, Environment):
             raise ValueError(f"Argument env should be type Environment, got {type(env)}")
         if not isinstance(camera, Camera):
             raise ValueError(f"Argument env should be type Camera, got {type(camera)}")
@@ -61,13 +61,7 @@ class Pipeline:
 
     def run(self):
         """
-        Method that takes the given video file and environment, and updates the
-        environment with detected blobs.
-
-        Parameters
-        ----------
-        vid_file: BagFile
-            The .bag video file represented by a BagFile object
+        Process current camera frame.
         """
         ##
         depth_image, color_image = self.picture
@@ -75,7 +69,7 @@ class Pipeline:
         state = self.flight_communication.get_state()
 
         ##
-        if state == 'avoidance':
+        if state == 'early_laps':
             bboxes = self.obstacle_finder.find(color_image, depth_image)
         else:
             raise AttributeError(f"Unrecognized state: {state}")
@@ -91,7 +85,7 @@ if __name__ == '__main__':
 
     env = Environment()
 
-    flight_comm = type('FlightCommunication', (object,), {'get_state': lambda: 'avoidance'})
+    flight_comm = type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
 
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
