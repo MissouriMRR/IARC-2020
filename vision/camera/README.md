@@ -6,6 +6,41 @@ All camera modules have a generic interface so they can be swapped out easily.
 The following are examples of how to use the camera child classes. As always, make sure to either change file import paths,
 or to download everything into the same file.
 
+### Reading Images
+
+#### .jpg/.png
+
+These are standard image formats, used for color images.
+
+```python
+import cv2
+
+## Saving
+cv2.imwrite("filename", ndarray) -> bool
+
+## Reading
+cv2.imread("filename") -> ndarray
+```
+
+#### .npy
+
+This is a numpy array file, used for depth images.
+
+```python
+## Saving .npy
+with open('filename.npy', 'wb') as file:
+    pickle.dump(file, ndarray)
+
+## Reading .npy
+with open('filename.npy', 'rb') as file:
+    ndarray = numpy.load(file)
+```
+
+#### .bag
+
+This is a rosbag file, used for color+depth videos.
+Use the bag_file reader, follow instructions for that class below.
+
 ### Realsense Example
 
 If only one realsense is plugged in, the code will run normally. If you are using more than one camera, make sure to specify the serial number.

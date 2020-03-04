@@ -9,6 +9,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import unittest
 import numpy as np
+import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
 #from vision.module.detector import ModuleKMeans as mkm
@@ -71,11 +72,22 @@ class TestModuleInFrame(unittest.TestCase):
         """
         ##
         for i in range(1, 6):
-            color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+            color_image = 255 * np.ones((i * 100, i * 100, 3), dtype='uint8')
+            color_image = cv2.circle(color_image, (i * 50, i * 50), 20, (0, 0, 0), 4)
 
             result = mif(color_image, None)
 
             self.assertIn(result, [True, False])
+
+        ## Ensure does not modify original image
+        color_image = 255 * np.ones((100, 100, 3), dtype='uint8')
+        color_image = cv2.circle(color_image, (50, 50), 20, (0, 0, 0), 4)
+
+        color_parameter = np.copy(color_image)
+
+        mif(color_parameter, None)
+
+        np.testing.assert_array_equal(color_image, color_parameter)
 
 
 if __name__ == '__main__':

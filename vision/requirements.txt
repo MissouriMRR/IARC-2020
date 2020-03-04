@@ -11,3 +11,5 @@ pyrealsense2
 # Blob annotations
 lxml
 
+# Benchmarks
+pandas
