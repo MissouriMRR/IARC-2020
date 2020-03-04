@@ -6,8 +6,7 @@ python:
   - "3.6"
   - "3.7"
 install:
-  - sudo apt-get install tesseract-ocr
-  - sudo apt-get install tesseract-ocr-[rus]
+  - sudo apt-get install libtesseract-dev libleptonica-dev tesseract-ocr tesseract-ocr-[rus]
   - pip install -r vision/requirements.txt
 script:
   - bash vision/unit_tests/travis_runall.sh
