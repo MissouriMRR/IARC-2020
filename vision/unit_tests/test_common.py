@@ -2,18 +2,19 @@
 Testing vision.util.import_params.
 """
 import unittest
-import os
-import sys
+import os, sys
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+from copy import deepcopy
+
 try:
-    from vision.util.import_params import import_params
+    from vision.common.import_params import import_params
 except ImportError:
-    from util.import_params import import_params
+    from common.import_params import import_params
 
 
 class TestParamsImport(unittest.TestCase):
@@ -53,6 +54,24 @@ class TestParamsImport(unittest.TestCase):
 
                     elif enabled:
                         self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
+
+        ## Ensure does not modify original parameter
+        config_original = {
+            "filterByArea": {
+                "enable": True,
+                "minArea": 200
+            },
+            "filterByColor": {
+                "enable": False,
+                "blobColor": 100
+            }
+        }
+
+        config_parameter = deepcopy(config_original)
+
+        import_params(config_parameter)
+
+        self.assertDictEqual(config_original, config_parameter)
 
 
 if __name__ == '__main__':

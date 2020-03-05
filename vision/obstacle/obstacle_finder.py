@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 from vision.bounding_box import BoundingBox, ObjectType
 import json
-from vision.util.import_params import import_params
+from vision.common.import_params import import_params
 
 
 class ObstacleFinder:
@@ -48,13 +48,15 @@ class ObstacleFinder:
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self, image):
+    def find(self, color_image, depth_image):
         """
         Detects obstacles in the image provided in the constructor
 
         Parameters
         ----------
-        image: np.ndarray
+        color_image: np.ndarray
+            image to find obstacles in
+        depth_image: np.ndarray
             image to find obstacles in
 
         Returns
@@ -63,10 +65,10 @@ class ObstacleFinder:
             a list of bounding boxes represented as Rectangles, each with 8 (x, y, z) coordinates
         """
 
-        if not isinstance(image, np.ndarray):
-            raise ValueError(f"Requires image as np.ndarray, got {type(image)}")
+        if not isinstance(color_image, np.ndarray):
+            raise ValueError(f"Requires image as np.ndarray, got {type(color_image)}")
 
-        keypoints = self.blob_detector.detect(image)
+        keypoints = self.blob_detector.detect(color_image)
         self.keypoints = keypoints
 
         bounding_boxes = []
@@ -81,18 +83,14 @@ class ObstacleFinder:
             pos_dy = center_y + radius
             neg_dy = center_y - radius
 
-            top_left_near = (neg_dx, neg_dy, 0)
-            top_right_near = (pos_dx, neg_dy, 0)
-            bottom_right_near = (pos_dx, pos_dy, 0)
-            bottom_left_near = (neg_dx, pos_dy, 0)
+            top_left_near = (neg_dx, neg_dy)
+            top_right_near = (pos_dx, neg_dy)
+            bottom_right_near = (pos_dx, pos_dy)
+            bottom_left_near = (neg_dx, pos_dy)
 
             # With depth, these will be calculated differently
-            top_left_far = top_left_near
-            top_right_far = top_right_near
-            bottom_right_far = bottom_right_near
-            bottom_left_far = bottom_left_near
 
-            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near, top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near] # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
             bbox = BoundingBox(vertices, ObjectType.AVOID)
@@ -102,7 +100,7 @@ class ObstacleFinder:
 
 
 if __name__ == '__main__':
-    from vision.util.box_plotter import plot_box
+    from vision.common.box_plotter import plot_box
 
     prefix = 'vision' if os.path.isdir("vision") else ''
     img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
@@ -118,6 +116,6 @@ if __name__ == '__main__':
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))
 
         obstacle_finder = ObstacleFinder(params=import_params(config))
-        bboxes = obstacle_finder.find(image)
+        bboxes = obstacle_finder.find(image, None)
 
         plot_box(bboxes, image)

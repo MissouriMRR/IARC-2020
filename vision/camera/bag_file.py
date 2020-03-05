@@ -9,7 +9,7 @@ try:
 except ImportError:
     from template import Camera
 try:
-    from vision.util.take_picture import save_camera_frame
+    from vision.common.take_picture import save_camera_frame
 except ImportError:
     from take_picture import save_camera_frame
 

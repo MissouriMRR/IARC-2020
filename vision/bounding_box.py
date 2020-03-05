@@ -13,6 +13,7 @@ class ObjectType(Enum):
     MODULE = 'module'
     BOAT = 'boat'
     UNKNOWN = 'unknown'
+    TEXT = 'text'
 
 
 class BoundingBox:
