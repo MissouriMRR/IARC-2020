@@ -5,6 +5,8 @@ Determines whether the pylon is in the image or not, ignoring other objects
 import cv2
 import numpy as np
 
+from bounding_box import BoundingBox
+
 # Set the lower and upper color limits
 LOWER_RED = np.array([50, 150, 25])
 UPPER_RED = np.array([255, 255, 120])
@@ -44,9 +46,9 @@ def detect_red(color_image, depth_image):
 
     # Return if the pylon was detected or not
     if red_pixels >= RED_THRESHOLD:
-        return True
+        return [BoundingBox((0, 0, np.shape(color_image)[0], np.shape(color_image)[1]), 'pylon')]
     else:
-        return False
+        return []
 
 
 if __name__ == '__main__':
