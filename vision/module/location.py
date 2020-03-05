@@ -256,20 +256,6 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showDepth(self):
-        """
-        Shows the depth channel image.
-        
-        Returns
-        -------
-        None
-        """
-        threeDepth = np.dstack((self.depth, self.depth, self.depth)) // np.amin(self.depth)
-        print(threeDepth)
-        cv2.imshow("Module Depth Image", threeDepth)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
     def showCircles(self):
         """
         Shows an image of detected circles.
