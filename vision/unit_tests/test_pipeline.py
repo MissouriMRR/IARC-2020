@@ -11,7 +11,15 @@ import unittest
 from unittest.mock import patch, Mock
 import numpy as np
 
-from vision.pipeline import Pipeline
+from vision import pipeline as PIPELINE
+
+
+class FakeObstacleFinder:
+    def __init__(self, *args, **kwargs):
+        self.keypoints = []
+
+    def find(*args, **kwargs):
+        return list(range(12))
 
 
 class TestPipeline(unittest.TestCase):
@@ -25,33 +33,27 @@ class TestPipeline(unittest.TestCase):
 
         config = {
             "env": env,
-            "vid_file": "",
-            "alg_time": 1,
         }
         config.update(kwargs)
 
-        pipeline = Pipeline(None, None, None)
+        pipeline = PIPELINE.Pipeline(config["env"], config["flight_communication"], config["camera"])
 
-        for key, value in config.items():
-            setattr(pipeline, key, value)
+        #for key, value in config.items():
+        #    setattr(pipeline, key, value)
 
         return pipeline, env
 
     def patch_pipeline(func):
         image_generator = ((np.ones((300, 300)), np.ones((300, 300))) for _ in range(1000))
 
-        @patch('pipeline.BagFile.__init__', autospec=True, return_value=None)
-        @patch('pipeline.BagFile.__iter__', autospec=True, return_value=image_generator)
-        @patch('pipeline.import_params.import_params')
-        @patch('pipeline.ObstacleFinder.__init__', return_value=None)
-        @patch('pipeline.ObstacleFinder.find', return_value=list(range(12)))
+        @patch.object(PIPELINE.ObstacleFinder, '__new__', return_value=FakeObstacleFinder())
         def patched_function(*args, **kwargs):
             return func(*args, **kwargs)
 
         return patched_function
 
     @patch_pipeline
-    def test_run(self, Obstacle__find__, Obstacle__init__, import_params, Bag__iter__, Bag__init__):
+    def test_run(self, Obstacle__init__):
         """
         Testing Pipeline.run_algorithm.
 
@@ -70,20 +72,15 @@ class TestPipeline(unittest.TestCase):
         The bounding boxes generated given to env, and further plot obstacles.
         """
         ## Ensure runs without error & correct values passed around
-        VID_FILE = "testttttttt"
+        flight_communication = type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
 
-        pipeline, env = self._get_pipeline(vid_file=VID_FILE)
-        pipeline.run_algorithm()
+        camera = type('Camera', (object,), {'__iter__': lambda: ((np.ones((3, 3, 3), dtype='uint8'), np.ones((3, 3), dtype='uint8')) for _ in range(100))})
 
-        # obstacle(0, 0, 0, filename)
-        self.assertEqual(Bag__init__.call_args_list[0][0][-1], VID_FILE)
-
-        # obstacle.find(image) -> [bounding_box]
-        self.assertIsInstance(Obstacle__find__.call_args_list[0][0][0], np.ndarray)
+        pipeline, env = self._get_pipeline(flight_communication=flight_communication, camera=camera)
+        pipeline.run()
 
         # env.update <- [bounding_box]
         self.assertIsInstance(env.update.call_args_list[0][0][0], list)
-
 
 
 if __name__ == '__main__':
