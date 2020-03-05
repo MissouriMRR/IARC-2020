@@ -12,8 +12,6 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
 
-from vision.camera.template import Camera
-from vision.camera.bag_file import BagFile
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.common.blob_plotter import plot_blobs
 from vision.common.import_params import import_params
@@ -34,14 +32,10 @@ class Pipeline:
         Camera to pull image from.
     """
     def __init__(self, vision_communication, flight_communication, camera):
-        if not isinstance(vision_communication, Environment):
-            raise ValueError(f"Argument env should be type Environment, got {type(env)}")
-        if not isinstance(camera, Camera):
-            raise ValueError(f"Argument env should be type Camera, got {type(camera)}")
-
         ##
         self.vision_communication = vision_communication
         self.flight_communication = flight_communication
+
         self.camera = camera.__iter__()
 
         ##
@@ -81,6 +75,9 @@ class Pipeline:
 
 
 if __name__ == '__main__':
+    from vision.camera.template import Camera
+    from vision.camera.bag_file import BagFile
+
     from vision.interface import Environment
 
     env = Environment()
