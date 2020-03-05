@@ -17,11 +17,14 @@ def main() -> None:
     # Input loop
     # start will start the run_threads function to start flight and vision
     # exit will do nothing and simpy exit the program
+
+    select = input('>>> Type \'start\' to start the drone, or \'exit\' to exit.')
+
     while select != 'start' and select != 'exit':
         select = input('>>> Type \'start\' to start the drone, or \'exit\' to exit.')
 
     # If the user input is start, start run_threads to start flight and vision
-    if select == 'start': 
+    if select == 'start':
         run_threads(args.simulation)
 
 
