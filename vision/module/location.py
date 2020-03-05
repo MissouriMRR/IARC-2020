@@ -213,9 +213,11 @@ class ModuleLocation:
         Returns
         -------
         None
+
+        Note: not in use
         """
         DEPTH_THRESH = 200 # Values from depth image that are "zeroed" in color image
-        # DEPTH_THRESH needs to be updated once more is known about depth image
+        
         tempDepth = np.dstack((self.depth, self.depth, self.depth))
         self.img = np.where(tempDepth < DEPTH_THRESH, self.img, 0)
 
