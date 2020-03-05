@@ -56,7 +56,6 @@ def run_threads(sim: bool) -> None:
 
     # Join flight process before exiting function
     f.join()
-    v.join()
 
     print("----End of Processes----")
 
