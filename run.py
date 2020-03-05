@@ -13,7 +13,16 @@ def main() -> None:
         "-s", "--simulation", help="using the simulator", action="store_true"
     )
     args = parser.parse_args()
-    run_threads(args.simulation)
+
+    # Input loop
+    # start will start the run_threads function to start flight and vision
+    # exit will do nothing and simpy exit the program
+    while select != 'start' and select != 'exit':
+        select = input('>>> Type \'start\' to start the drone, or \'exit\' to exit.')
+
+    # If the user input is start, start run_threads to start flight and vision
+    if select == 'start': 
+        run_threads(args.simulation)
 
 
 def run_threads(sim: bool) -> None:
@@ -26,6 +35,8 @@ def run_threads(sim: bool) -> None:
     manager.start()
     # Create Communication object from manager
     comm_obj = manager.Communication()
+
+    comm_obj.set_state('takeoff')
 
     # Create new processes
     print("-----Begin Processes-----")
