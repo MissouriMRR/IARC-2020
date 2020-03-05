@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from multiprocessing.managers import BaseManager
 from communication import Communication
 from flight.flight import flight
 import argparse
-
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -26,6 +25,9 @@ def run_threads(sim: bool) -> None:
     manager.start()
     # Create Communication object from manager
     comm_obj = manager.Communication()
+
+    flight_queue = Queue()
+    vision_queue = Queue()
 
     # Create new processes
     print("-----Begin Processes-----")
@@ -54,6 +56,7 @@ def run_threads(sim: bool) -> None:
 
     # Join flight process before exiting function
     f.join()
+    v.join()
 
     print("----End of Processes----")
 
