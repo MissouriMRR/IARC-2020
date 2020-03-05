@@ -77,6 +77,16 @@ class TestDetectRussianWord(unittest.TestCase):
                 self.assertIsInstance(box.object_type, ObjectType)
                 self.assertEqual(box.object_type, ObjectType.TEXT)
 
+        ## Ensure does not modify original image
+        color_image = np.zeros((1000, 1000, 3), dtype='uint8')
+        cv2.putText(color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+
+        color_parameter = np.copy(color_image)
+
+        TextDetector().detect_russian_word(color_parameter, None)
+
+        np.testing.assert_array_equal(color_image, color_parameter)
+
 
 if __name__ == '__main__':
     unittest.main()

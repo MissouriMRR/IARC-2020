@@ -5,9 +5,7 @@ It returns 'Match' if it identifies 'модули иртибот' and 'Not Match
 import pytesseract
 import numpy as np
 import cv2
-import lxml.etree
 import os, sys
-
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)

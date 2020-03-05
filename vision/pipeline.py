@@ -6,7 +6,7 @@ import os
 import json
 from camera.bag_file import BagFile
 from obstacle.obstacle_finder import ObstacleFinder
-from util import import_params
+from common import import_params
 
 
 class Pipeline:

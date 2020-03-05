@@ -37,8 +37,8 @@ class SimCamera(Camera):
             scene_responses = self.client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)])
             scene_response = scene_responses[0]
 
-            depth_np_1d = np.fromstring(depth_response.image_data_uint8, dtype=np.uint8)
-            color_np_1d = np.fromstring(scene_response.image_data_uint8, dtype=np.uint8)
+            depth_np_1d = np.frombuffer(depth_response.image_data_uint8, dtype=np.uint8)
+            color_np_1d = np.frombuffer(scene_response.image_data_uint8, dtype=np.uint8)
 
             depth_np = depth_np_1d.reshape(depth_response.height, depth_response.width, 3)
             color_np = color_np_1d.reshape(scene_response.height, scene_response.width, 3)
@@ -66,4 +66,3 @@ class SimCamera(Camera):
             if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
                 cv2.destroyAllWindows()
                 break
-
