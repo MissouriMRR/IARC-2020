@@ -23,14 +23,10 @@ def get_module_depth(depth_image, coordinates):
     """
     x_pos, y_pos = coordinates
 
-    depth_values_in_radius = []
+    depth_values_in_radius = depth_image[y_pos - SEARCH_RADIUS:y_pos + SEARCH_RADIUS, x_pos - SEARCH_RADIUS: x_pos + SEARCH_RADIUS]
 
-    for x in range(SEARCH_RADIUS):
-        for y in range(SEARCH_RADIUS):
-            depth_values_in_radius.append(depth_image[x_pos + x][y_pos + y])
-            depth_values_in_radius.append(depth_image[x_pos - x][y_pos + y])
-            depth_values_in_radius.append(depth_image[x_pos + x][y_pos - y])
-            depth_values_in_radius.append(depth_image[x_pos - x][y_pos - y])
+    # Gets rid of 0 depth values
+    depth_values_in_radius = depth_values_in_radius[depth_values_in_radius != 0]
 
     return np.mean(depth_values_in_radius)
 
@@ -58,5 +54,6 @@ if __name__ == "__main__":
 
     depthImage = np.load(depthNpy)
 
-    print("Depth of module: " + str(get_module_depth(depthImage, (550, 650))))
-    print("Depth at center parameter: " + str(depthImage[550][650]))
+    # Hard code the x and y coordinates as of now, until the module center detection is complete
+    print("Depth of module: " + str(get_module_depth(depthImage, (650, 650))))
+    print("Depth at center parameter: " + str(depthImage[650][650]))
