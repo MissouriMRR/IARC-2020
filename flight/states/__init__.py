@@ -1,10 +1,10 @@
 """Used to export the states"""
-from .state import State
-from .start import Start
-from .takeoff import Takeoff
-from .land import Land
-from .final import Final
-from .early_laps import EarlyLaps
+from flight.states.state import State
+from flight.states.start import Start
+from flight.states.takeoff import Takeoff
+from flight.states.land import Land
+from flight.states.final import Final
+from flight.states.early_laps import EarlyLaps
 
 STATES = {
     "start": Start,

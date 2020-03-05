@@ -1,24 +1,31 @@
 """Launch code for flight state machine"""
 import asyncio
+import logging
+
 from mavsdk import System
 import mavsdk as sdk
-from .states import STATES, State
+
+from flight.states import STATES, State
+
+
+class DroneNotFoundError(Exception):
+    pass
 
 
 class StateMachine:
-    """ 
+    """
     Initializes the state machine and runs the states.
-      
-    Attributes: 
+
+    Attributes:
         current_state (State): State that is currently being executed.
         drone (System): Our drone object; used for all flight functions.
     """
 
     def __init__(self, initial_state: State, drone: System) -> None:
-        """ 
-        The constructor for StateMachine class. 
-  
-        Parameters: 
+        """
+        The constructor for StateMachine class.
+
+        Parameters:
             current_state (State): State that is currently being executed.
             drone (System): Our drone object; used for all flight functions.
         """
@@ -26,7 +33,7 @@ class StateMachine:
         self.drone: System = drone
 
     async def run(self) -> None:
-        """ 
+        """
         Runs the state machine by infinitely replacing current_state until a
         state return None.
         """
@@ -65,15 +72,31 @@ async def observe_is_in_air(drone: System, comm) -> None:
             return
 
 
-def flight(comm, sim: bool) -> None:
+async def wait_for_drone(drone: System) -> None:
+    async for state in drone.core.connection_state():
+        if state.is_connected:
+            logging.info("Connected to drone with UUID %s", state.uuid)
+            return
+
+
+def flight(comm, sim: bool, log_queue, worker_configurer) -> None:
     """Starts the asyncronous event loop for the flight code"""
+    worker_configurer(log_queue)
+    logging.debug("Flight process started")
     asyncio.get_event_loop().run_until_complete(init_and_begin(comm, sim))
 
 
 async def init_and_begin(comm, sim: bool) -> None:
     """Creates drone object and passes it to start_flight"""
-    drone: System = await init_drone(sim)
-    await start_flight(comm, drone)
+    try:
+        drone: System = await init_drone(sim)
+        await start_flight(comm, drone)
+    except DroneNotFoundError:
+        logging.exception("Drone was not found")
+        return
+    except:
+        logging.exception("Uncaught error occurred")
+        return
 
 
 async def init_drone(sim: bool) -> System:
@@ -81,6 +104,12 @@ async def init_drone(sim: bool) -> System:
     sys_addr: str = SIM_ADDR if sim else CONTROLLER_ADDR
     drone: System = System()
     await drone.connect(system_address=sys_addr)
+    logging.debug("Waiting for drone to connect...")
+    try:
+        await asyncio.wait_for(wait_for_drone(drone), timeout=5)
+    except asyncio.TimeoutError:
+        raise DroneNotFoundError()
+
     # Add lines to control takeoff height
     return drone
 
