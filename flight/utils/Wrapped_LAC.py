@@ -1,8 +1,3 @@
-#!/usr/bin/python
-import asyncio
-from lac import *
-from mavsdk import System
-
 '''
 Given:
   Distance = value/1024 * stroke
@@ -27,12 +22,18 @@ Notes:
 '''
 
 '''
+Imports
+'''
+
+from lac import LAC
+import time
+
+'''
 Constants
 '''
 #Default IDs
 vendorID = 0x4D8
 productID= 0xFC5F
-
 
 #Retract
 rLimit = 1 #Retract limit
@@ -56,12 +57,15 @@ stroke = 300 #max length of LAC (mm)
 
 
 class sLAC:
-
   def __init__(self):
     self.piston = LAC(vendorID,productID)
-    var = self.setupLAC()
-    if (not var):
-      raise Exception("Min and Max are set to mechanical stops.")
+    self.setupLAC()
+    
+    #Ensures the LAC will not hit mechanical stops
+    if (rPosition <= rMechStop):
+      raise Exception("Retract is set to the mechanical stop.")
+    elif (ePosition >= eMechStop):
+      raise Exception("Extend is set to the mechanical stop.")
   
   #Automatically sets up the LAC
   def setupLAC(self):
@@ -98,13 +102,7 @@ class sLAC:
     self.piston.set_speed(maxSpeed)
     print("Piston set to max speed")
     
-    #Ensures the LAC will not hit mechanical stops
-    if (rPosition <= rMechStop):
-      return False
-    elif (ePosition >= eMechStop):
-      return False
-    else:
-      return True
+    
 
   #Extends the LAC to the max value without hitting mechanical stop
   #Takes 5 seconds to fully extend
