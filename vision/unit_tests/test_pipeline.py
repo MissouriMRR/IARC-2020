@@ -11,6 +11,8 @@ import unittest
 from unittest.mock import patch, Mock
 import numpy as np
 
+from multiprocessing import Queue
+
 from vision import pipeline as PIPELINE
 
 
@@ -36,12 +38,12 @@ class TestPipeline(unittest.TestCase):
         }
         config.update(kwargs)
 
-        pipeline = PIPELINE.Pipeline(config["env"], config["flight_communication"], config["camera"])
+        pipeline = PIPELINE.Pipeline(Queue(), Queue(), config["camera"])
 
         #for key, value in config.items():
         #    setattr(pipeline, key, value)
 
-        return pipeline, env
+        return pipeline
 
     def patch_pipeline(func):
         image_generator = ((np.ones((300, 300)), np.ones((300, 300))) for _ in range(1000))
@@ -71,16 +73,13 @@ class TestPipeline(unittest.TestCase):
         Iterates through ReadBag and passes images into ObstacleFinder.
         The bounding boxes generated given to env, and further plot obstacles.
         """
-        ## Ensure runs without error & correct values passed around
+        ## Ensure runs without error
         flight_communication = type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
 
         camera = type('Camera', (object,), {'__iter__': lambda: ((np.ones((3, 3, 3), dtype='uint8'), np.ones((3, 3), dtype='uint8')) for _ in range(100))})
 
-        pipeline, env = self._get_pipeline(flight_communication=flight_communication, camera=camera)
-        pipeline.run()
-
-        # env.update <- [bounding_box]
-        self.assertIsInstance(env.update.call_args_list[0][0][0], list)
+        pipeline = self._get_pipeline(flight_communication=flight_communication, camera=camera)
+        pipeline.run('start')
 
 
 if __name__ == '__main__':
