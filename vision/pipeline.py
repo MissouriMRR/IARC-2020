@@ -85,14 +85,16 @@ class Pipeline:
 
         return state
 
-    def call_me(self):
-        """
-        Alex, call this function - not run.
-        """
-        prev_state = 'start'
+def init_pipeline(vision_comm, flight_comm, video, runtime=100):
+    """
+    Alex, call this function - not run.
+    """
+    pipeline = Pipeline(vision_comm, flight_comm, video)
 
-        for _ in range(100):
-            prev_state = pipeline.run(prev_state)
+    prev_state = 'start'
+
+    for _ in range(runtime):
+        prev_state = pipeline.run(prev_state)
 
 
 if __name__ == '__main__':
@@ -106,8 +108,7 @@ if __name__ == '__main__':
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    pipeline = Pipeline(vision_comm, flight_comm, video)
-    pipeline.call_me()
+    init_pipeline(vision_comm, flight_comm, video)
 
     from time import sleep
     sleep(1)
