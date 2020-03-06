@@ -79,7 +79,7 @@ class TestPylonClassifier(unittest.TestCase):
             for box in result:
                 self.assertIsInstance(box, BoundingBox, msg=f"{type(box)}")
                 self.assertEqual(box.object_type, ObjectType.PYLON)
-            
+
             if len(result):
                 break
         else:
