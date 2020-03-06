@@ -76,10 +76,10 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
             bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
 
             ##
-            x1_close = bx1 - THRESHOLD <= ax1 <= bx1 + THRESHOLD
-            y1_close = by1 - THRESHOLD <= ay1 <= by1 + THRESHOLD
-            x2_close = bx2 - THRESHOLD <= ax2 <= bx2 + THRESHOLD
-            y2_close = by2 - THRESHOLD <= ay2 <= by2 + THRESHOLD
+            x1_close = bx1 - FOUND_THRESHOLD <= ax1 <= bx1 + FOUND_THRESHOLD
+            y1_close = by1 - FOUND_THRESHOLD <= ay1 <= by1 + FOUND_THRESHOLD
+            x2_close = bx2 - FOUND_THRESHOLD <= ax2 <= bx2 + FOUND_THRESHOLD
+            y2_close = by2 - FOUND_THRESHOLD <= ay2 <= by2 + FOUND_THRESHOLD
 
             if all((x1_close, y1_close, x2_close, y2_close)):
                 boxes_found += 1
