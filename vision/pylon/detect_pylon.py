@@ -1,11 +1,18 @@
 """
 Determines whether the pylon is in the image or not, ignoring other objects
 """
+import os
+import sys
+
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
 
-from bounding_box import BoundingBox
+from vision.bounding_box import BoundingBox, ObjectType
 
 # Set the lower and upper color limits
 LOWER_RED = np.array([50, 150, 25])
@@ -46,7 +53,7 @@ def detect_red(color_image, depth_image):
 
     # Return if the pylon was detected or not
     if red_pixels >= RED_THRESHOLD:
-        return [BoundingBox((0, 0, np.shape(color_image)[0], np.shape(color_image)[1]), 'pylon')]
+        return [BoundingBox((0, 0, np.shape(color_image)[0], np.shape(color_image)[1]), ObjectType.PYLON)]
     else:
         return []
 

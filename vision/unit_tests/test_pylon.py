@@ -11,6 +11,7 @@ import unittest
 import numpy as np
 
 from vision.pylon.detect_pylon import detect_red
+from vision.bounding_box import BoundingBox, ObjectType
 
 
 class TestPylonClassifier(unittest.TestCase):
@@ -39,7 +40,11 @@ class TestPylonClassifier(unittest.TestCase):
 
             result = detect_red(color_image, None)
 
-            self.assertIn(result, [True, False])
+            self.assertIsInstance(result, list)
+
+            for box in result:
+                self.assertIsInstance(box, BoundingBox)
+                self.assertEqual(box.object_type, ObjectType.PYLON)
 
         ## 4 Channel [0, 1] Image
         with self.subTest(i="4 Channel [0, 1] Image"):
@@ -71,7 +76,14 @@ class TestPylonClassifier(unittest.TestCase):
 
             result = detect_red(color_image, None)
 
-            self.assertIn(result, [True, False])
+            for box in result:
+                self.assertIsInstance(box, BoundingBox, msg=f"{type(box)}")
+                self.assertEqual(box.object_type, ObjectType.PYLON)
+            
+            if len(result):
+                break
+        else:
+            self.fail("Failed to detect pylon in any sample image.")
 
         ## Ensure does not modify original image
         color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
