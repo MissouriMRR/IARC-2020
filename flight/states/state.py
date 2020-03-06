@@ -40,6 +40,7 @@ class State:
         drone : System
             The drone system; used for flight operations.
         """
+        await drone.action.arm()
         async for is_armed in drone.telemetry.armed():
             if not is_armed:
                 print("Not armed -- Arming")
