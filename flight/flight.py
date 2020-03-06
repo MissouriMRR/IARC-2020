@@ -3,7 +3,7 @@ import asyncio
 from mavsdk import System
 import mavsdk as sdk
 from .states import STATES, State
-
+from .config import Constant
 
 class StateMachine:
     """ 
@@ -73,6 +73,9 @@ def flight(comm, sim: bool) -> None:
 async def init_and_begin(comm, sim: bool) -> None:
     """Creates drone object and passes it to start_flight"""
     drone: System = await init_drone(sim)
+    #config drone param's
+    const=Constant()
+    await const.config_param(drone)
     await start_flight(comm, drone)
 
 
