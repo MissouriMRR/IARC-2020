@@ -7,7 +7,8 @@ from logging.handlers import QueueHandler, QueueListener
 from colorlog import ColoredFormatter
 
 LOG_FILE: str = f"logs/{datetime.now()}.log"
-LOG_FORMAT: str = "%(log_color)s%(levelname)s | %(asctime)s @  %(processName)s:%(funcName)s > %(message)s%(reset)s"
+COLOR_LOG_FORMAT: str = "%(log_color)s%(levelname)s | %(asctime)s @  %(processName)s:%(funcName)s > %(message)s%(reset)s"
+LOG_FORMAT: str = "%(levelname)s | %(asctime)s @  %(processName)s:%(funcName)s > %(message)s"
 LOG_LEVEL = logging.DEBUG
 
 
@@ -16,13 +17,14 @@ def init_logger(queue):
     Creates a QueueListener that will process all log messages throughout
     the application
     """
-    formatter: Formatter = ColoredFormatter(LOG_FORMAT)
+    console_formatter: Formatter = ColoredFormatter(COLOR_LOG_FORMAT)
+    file_formatter: Formatter = logging.Formatter(LOG_FORMAT)
 
     file: FileHandler = logging.FileHandler(LOG_FILE, "a")
-    file.setFormatter(formatter)
+    file.setFormatter(file_formatter)
 
     console: StreamHandler = logging.StreamHandler()
-    console.setFormatter(formatter)
+    console.setFormatter(console_formatter)
 
     return QueueListener(queue, file, console)
 
