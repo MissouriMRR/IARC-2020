@@ -10,5 +10,4 @@ class Start(State):
 
     async def run(self, drone: System) -> State:
         """Begins the state machine and returns the takeoff state"""
-        print("Start")
         return Takeoff()

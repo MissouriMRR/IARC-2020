@@ -7,8 +7,13 @@ import mavsdk as sdk
 
 from flight.states import STATES, State
 
+SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
+CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
+
 
 class DroneNotFoundError(Exception):
+    """Exception for when the drone doesn't connect"""
+
     pass
 
 
@@ -41,19 +46,15 @@ class StateMachine:
             self.current_state: State = await self.current_state.run(self.drone)
 
 
-SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
-CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
-
-
-async def print_flight_mode(drone: System) -> None:
-    """ Prints the flight mode when it changes """
+async def log_flight_mode(drone: System) -> None:
+    """ Logs the flight mode when it changes """
 
     previous_flight_mode: str = None
 
     async for flight_mode in drone.telemetry.flight_mode():
         if flight_mode is not previous_flight_mode:
             previous_flight_mode: str = flight_mode
-            print(f"Flight mode: {flight_mode}")
+            logging.debug("Flight mode: %s", flight_mode)
 
 
 async def observe_is_in_air(drone: System, comm) -> None:
@@ -68,11 +69,11 @@ async def observe_is_in_air(drone: System, comm) -> None:
 
         if was_in_air and not is_in_air:
             comm.set_state("exit")
-            await asyncio.get_event_loop().shutdown_asyncgens()
             return
 
 
 async def wait_for_drone(drone: System) -> None:
+    """Waits for the drone to be connected and returns"""
     async for state in drone.core.connection_state():
         if state.is_connected:
             logging.info("Connected to drone with UUID %s", state.uuid)
@@ -116,8 +117,8 @@ async def init_drone(sim: bool) -> System:
 
 async def start_flight(comm, drone: System):
     """Creates the state machine and watches for exceptions"""
-    # Continuously print flight mode changes
-    asyncio.ensure_future(print_flight_mode(drone))
+    # Continuously log flight mode changes
+    flight_mode_task = asyncio.ensure_future(log_flight_mode(drone))
     # Will stop flight code if the drone lands
     termination_task = asyncio.ensure_future(observe_is_in_air(drone, comm))
 
@@ -125,8 +126,8 @@ async def start_flight(comm, drone: System):
         # Initialize the state machine at the current state
         state_machine: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
         await state_machine.run()
-    except Exception as err:
-        print(str(err))
+    except Exception:
+        logging.exception("Exception occurred in state machine")
         try:
             await drone.offboard.set_position_ned(sdk.PositionNedYaw(0, 0, 0, 0))
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
@@ -137,16 +138,20 @@ async def start_flight(comm, drone: System):
             try:
                 await drone.offboard.stop()
             except sdk.OffboardError as error:
-                print(f"Stopping offboard mode failed with error code: {str(error)}")
+                logging.exception(
+                    "Stopping offboard mode failed with error code: %s", str(error)
+                )
                 # Worried about what happens here
             await asyncio.sleep(1)
-            print("-- Landing")
+            logging.info("Landing the drone")
             await drone.action.land()
         except:
-            print("No system")
+            logging.error("No system available")
             comm.set_state("final")
             return
 
     comm.set_state("final")
 
     await termination_task
+    flight_mode_task.cancel()
+
