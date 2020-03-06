@@ -4,6 +4,7 @@ from multiprocessing import Process, Queue
 from multiprocessing.managers import BaseManager
 from communication import Communication
 from flight.flight import flight
+from vision.camera.realsense import Realsense
 import argparse
 
 def main() -> None:
@@ -26,8 +27,12 @@ def run_threads(sim: bool) -> None:
     # Create Communication object from manager
     comm_obj = manager.Communication()
 
+    # Create Flight and vision queues
     flight_queue = Queue()
     vision_queue = Queue()
+
+    # Create Camera object
+    camera = Realsense(1080, 720, 30)
 
     # Create new processes
     print("-----Begin Processes-----")
