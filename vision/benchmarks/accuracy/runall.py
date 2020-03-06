@@ -40,21 +40,24 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
     Parameters
     ----------
     data: color_image, depth_image
-    TODO
+
+    annotation: pascal voc annotation
+
+    method: function(instance, *data)
+
+    instance: instance of object
 
     Returns
     -------
-    float Mean squared error between annotation and given.
-    \"""
+    (int, int, int) boxes_found, boxes_missed, boxes_extra.
+    """
+    FOUND_THRESHOLD = 5  # pixels
+
+    ##
     bounding_boxes = method(instance, *data)
 
-    ## Calculate error
-    # what if output misses box?
-    # better accuracy mectric for this?
-    # what if gives extra box
-    THRESHOLD = 5
-
-    accuracy = 0
+    ##
+    boxes_found, boxes_missed, boxes_extra = 0, 0, 0
 
     for value in annotation.findall('object'):
         annotation_bounding_box = value.find('bndbox')
@@ -62,7 +65,6 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
         ax1, ay1, ax2, ay2 = [int(annotation_bounding_box.find(param).text) for param in ['xmin', 'ymin', 'xmax', 'ymax']]
 
         for bounding_box in bounding_boxes:
-            ## Get x's and y's from bounding box
             X, Y, Z = [], [], []
             for x, y in bounding_box.vertices:
                 X.append(x)
@@ -71,22 +73,19 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
             X, Y = np.unique(X), np.unique(Y)
             bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
 
-            ## see if bx1, by1,... within +/- threshold of each ax1, ...
-
+            ##
             x1_close = bx1 - THRESHOLD <= ax1 <= bx1 + THRESHOLD
             y1_close = by1 - THRESHOLD <= ay1 <= by1 + THRESHOLD
             x2_close = bx2 - THRESHOLD <= ax2 <= bx2 + THRESHOLD
             y2_close = by2 - THRESHOLD <= ay2 <= by2 + THRESHOLD
 
             if all((x1_close, y1_close, x2_close, y2_close)):
-                accuracy += 1
+                boxes_found += 1
 
-        accuracy /= len(annotation.findall('object'))
+    boxes_missed = len(annotation.findall('object')) - boxes_found
+    boxes_extra = len(bounding_boxes) - boxes_found
 
-    error = accuracy
-
-    return error
-    """
+    return boxes_found, boxes_missed, boxes_extra
 
 
 def accuracy_boolean(data, annotation, method, instance):
