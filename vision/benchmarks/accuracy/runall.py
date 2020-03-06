@@ -1,6 +1,8 @@
 """
 Run time benchmarks.
 
+Results: (found, missed, extra)
+
 Process
 -------
 files = [filename for filename in 'times/' if 'bench' in filename]
@@ -101,7 +103,7 @@ def accuracy_boolean(data, annotation, method, instance):
 
     Returns
     -------
-    float Accuracy of model.
+    found, missed, extra
     """
     ## Prediction
     bounding_boxes = method(instance, *data)
@@ -112,9 +114,11 @@ def accuracy_boolean(data, annotation, method, instance):
     expected = bool(len(annotation.findall('object')))
 
     ## Calculate accuracy
-    accuracy = int(prediction == expected)
+    found = int(prediction == expected)
+    missed = 1 - found
+    extra = 0
 
-    return accuracy
+    return found, missed, extra
 
 
 classification_map = {
@@ -151,7 +155,7 @@ if __name__ == '__main__':
         annotations = common.read_annotations(path)
 
         ## Run benchmarks
-        output = pd.DataFrame(columns=['class', 'method', 'type', 'filename', 'result'])
+        output = pd.DataFrame(columns=['class', 'method', 'type', 'filename', 'found', 'missed', 'extra'])
 
         for b_name, benchmark in benchmarks.items():
             b_instance = benchmark()
@@ -178,9 +182,9 @@ if __name__ == '__main__':
 
                         output.loc[len(output)] = [b_name, m_name, p_type, filename, np.nan]
                     else:
-                        print(f"{b_name}.{m_name}: {filename} {result:.5f}")
+                        print(f"{b_name}.{m_name}: {filename} {result}")
 
-                        output.loc[len(output)] = [b_name, m_name, p_type, filename, result]
+                        output.loc[len(output)] = [b_name, m_name, p_type, filename, *result]
 
     # print(output.head(15))
     # output.to_csv('', index=False)
