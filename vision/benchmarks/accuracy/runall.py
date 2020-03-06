@@ -24,6 +24,7 @@ Noise SD = 0
 N Objects = 0
 """
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
@@ -125,10 +126,13 @@ classification_map = {
 if __name__ == '__main__':
     benchmarks = {}
 
+    ## Command line args
+    keyword = sys.argv[1] if len(sys.argv) > 1 else ''
+
     ## Find time benchmarks in modules
     for module in modules:
         for key, value in module.__dict__.items():
-            if 'Accuracy' in key:
+            if 'Accuracy' in key and keyword.lower() in key.lower():
                 benchmarks.update({key: value})
 
         ## Read benchmark configuration
