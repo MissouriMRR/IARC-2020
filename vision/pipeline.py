@@ -66,12 +66,12 @@ class Pipeline:
         if state == 'early_laps':
             bboxes = self.obstacle_finder.find(color_image, depth_image)
         else:
-            raise AttributeError(f"Unrecognized state: {state}")
+            pass  # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
         self.vision_communication.update(bboxes)
 
-        plot_blobs(self.obstacle_finder.keypoints, color_image)
+        # plot_blobs(self.obstacle_finder.keypoints, color_image)
 
 
 if __name__ == '__main__':
