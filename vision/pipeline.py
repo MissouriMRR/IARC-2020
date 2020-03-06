@@ -11,9 +11,10 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import json
+from multiprocessing import Queue
+from queue import Empty
 
 from vision.obstacle.obstacle_finder import ObstacleFinder
-from vision.common.blob_plotter import plot_blobs
 from vision.common.import_params import import_params
 
 
@@ -24,13 +25,15 @@ class Pipeline:
 
     Parameters
     -------------
-    vision_communication: Environment
+    vision_communication: multiprocessing queue
         Interface to share vision information with flight.
-    flight_communication: ?
+    flight_communication: multiprocessing queue
         Interface to recieve flight state information from flight.
     camera: Camera
         Camera to pull image from.
     """
+    PUT_TIMEOUT = 1  # Expected time for results to be irrelevant.
+
     def __init__(self, vision_communication, flight_communication, camera):
         ##
         self.vision_communication = vision_communication
@@ -53,40 +56,61 @@ class Pipeline:
     def picture(self):
         return next(self.camera)
 
-    def run(self):
+    def run(self, prev_state):
         """
         Process current camera frame.
         """
         ##
         depth_image, color_image = self.picture
 
-        state = self.flight_communication.get_state()
+        try:
+            state = self.flight_communication.get_nowait()
+        except Empty:
+            state = prev_state
 
         ##
+        bboxes = []
+
         if state == 'early_laps':
             bboxes = self.obstacle_finder.find(color_image, depth_image)
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
-        self.vision_communication.update(bboxes)
+        for bbox in bboxes:
+            self.vision_communication.put(bbox, self.PUT_TIMEOUT)
 
+        # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
+
+        return state
+
+    def call_me(self):
+        """
+        Alex, call this function - not run.
+        """
+        prev_state = 'start'
+
+        for _ in range(100):
+            prev_state = pipeline.run(prev_state)
 
 
 if __name__ == '__main__':
     from vision.camera.bag_file import BagFile
 
-    from vision.interface import Environment
+    vision_comm = Queue(100000)
 
-    env = Environment()
-
-    flight_comm = type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
+    flight_comm = Queue()  # type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
+    flight_comm.put('early_laps')
 
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    pipeline = Pipeline(env, flight_comm, video)
+    pipeline = Pipeline(vision_comm, flight_comm, video)
+    pipeline.call_me()
 
-    for _ in range(100):
-        pipeline.run()
+    from time import sleep
+    sleep(1)
+
+    vision_comm.close()
+    flight_comm.close()
