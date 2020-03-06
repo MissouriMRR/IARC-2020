@@ -169,7 +169,8 @@ if __name__ == '__main__':
                 for filename, p_type in parameters.items():
                     try:
                         images = common.read_image(os.path.join(path, filename), encoding)
-                        annotation = annotations[filename.split('.')[0]]
+
+                        annotation = annotations[filename.split('.')[0].split('\\')[-1]]
 
                         result = classification_method(images, annotation, method, b_instance)
 
