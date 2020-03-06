@@ -16,7 +16,9 @@ from annotation.generate_annotation import generate_pascvalvoc_annotation_from_i
 
 
 class PascalVocAnnotator(object):
-    """Annotates images in the Pascal VOC annotation format."""
+    """
+    Allows a user to annotate images and save data to pascal voc format.
+    """
     WINDOW_TITLE = 'Annotator'
     TEST_DIRECTORY = 'test_images'
     CONFIG_PATH = 'config.json'
@@ -219,7 +221,7 @@ class PascalVocAnnotator(object):
 
 
 if __name__ == '__main__':
-    DATASET_PATH = os.path.join("..", "..", "vision_images", "blob")
+    DATASET_PATH = os.path.join("..", "..", "vision_images", "obstacle")
 
     with PascalVocAnnotator(DATASET_PATH) as annotator:
         while annotator.update():
