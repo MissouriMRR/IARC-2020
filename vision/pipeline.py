@@ -40,7 +40,7 @@ class Pipeline:
 
         ##
         prefix = 'vision' if os.path.isdir("vision") else ''
-        
+
         #
         config_filename = os.path.join(prefix, 'obstacle', 'config.json')
 
@@ -75,7 +75,6 @@ class Pipeline:
 
 
 if __name__ == '__main__':
-    from vision.camera.template import Camera
     from vision.camera.bag_file import BagFile
 
     from vision.interface import Environment
