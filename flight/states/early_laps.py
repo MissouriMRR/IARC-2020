@@ -4,7 +4,7 @@ import asyncio
 import math
 import mavsdk as sdk
 
-from flight.config import Constant as const
+from flight.config import Constant
 from flight.utils.latlon import LatLon
 
 
@@ -22,6 +22,7 @@ class EarlyLaps:
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
+        const = Constant()
         # Go to pylon 1
         await self.wait_pos(drone, const.pylon1)
         async for i in arange(2):
@@ -41,6 +42,7 @@ class EarlyLaps:
 
     async def wait_pos(self, drone, pylon):
         """Goes to a position"""
+        const = Constant()
         count = 0
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)

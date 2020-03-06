@@ -6,6 +6,7 @@ from mavsdk import System
 import mavsdk as sdk
 
 from flight.states import STATES, State
+from .config import Constant
 
 SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
 CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
@@ -91,6 +92,9 @@ async def init_and_begin(comm, sim: bool) -> None:
     """Creates drone object and passes it to start_flight"""
     try:
         drone: System = await init_drone(sim)
+        # config drone param's
+        const = Constant()
+        await const.config_param(drone)
         await start_flight(comm, drone)
     except DroneNotFoundError:
         logging.exception("Drone was not found")
