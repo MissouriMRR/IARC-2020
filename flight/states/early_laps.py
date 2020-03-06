@@ -4,15 +4,11 @@ import asyncio
 import math
 import mavsdk as sdk
 
+from flight.config import Constant as const
+from flight.utils.latlon import LatLon
+
+
 from .land import Land
-
-# Position for pylon 1
-lat1: int = 37.9489551
-lon1: int = -91.7844405
-
-# Position for pylon 2
-lat2: int = 37.9486433
-lon2: int = -91.7839372
 
 
 async def arange(count):
@@ -27,81 +23,72 @@ class EarlyLaps:
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
         # Go to pylon 1
-        await self.wait_pos(drone, lat1, lon1)
-        async for i in arange(8):
+        await self.wait_pos(drone, const.pylon1)
+        async for i in arange(2):
             logging.info("Starting lap: %d", i)
             logging.debug("Lap %d: Straight one", i)
-            await self.wait_pos(drone, lat2, lon2)  # move to pylon 2
+            await self.wait_pos(drone, const.pylon2)  # move to pylon 2
 
             logging.debug("Lap %d: Turn one", i)
             await self.wait_turn(drone)  # turn around pylon 2
 
             logging.debug("Lap %d: Straight two", i)
-            await self.wait_pos(drone, lat1, lon1)  # move to pylon 1
+            await self.wait_pos(drone, const.pylon1)  # move to pylon 1
 
             logging.debug("Lap %d: Turn two", i)
             await self.wait_turn(drone)  # turn around pylon 1
         return Land()
 
-    async def wait_pos(self, drone, goal_lat, goal_lon):
+    async def wait_pos(self, drone, pylon):
         """Goes to a position"""
+        count = 0
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)
-            if altitude >= 3:
-                alt = 0.2
-            elif altitude <= 2:
-                alt = -0.2
+
+            if altitude >= const.ALT_RANGE_MAX:
+                alt = const.ALT_CORRECTION_SPEED  # go down m/s
+            elif altitude <= const.ALT_RANGE_MIN:
+                alt = -const.ALT_CORRECTION_SPEED  # go up m/s
             else:
-                alt = 0
+                alt = 0  # don't move
+
             lat = round(gps.latitude_deg, 8)
             lon = round(gps.longitude_deg, 8)
-            x = (
-                (goal_lon - lon)
-                * 40000
-                * math.cos((goal_lat + lat) * math.pi / 360)
-                / 360
-            ) * 1000
-            y = ((goal_lat - lat) * 40000 / 360) * 1000
+            point1 = LatLon(lat, lon)  # you are here
 
-            try:  # calcualte what degree to point at
-                deg = round((((math.atan(x / y) / math.pi) * 180)))
-
-                if y < 0:
-                    z = 180
-                    z = math.copysign(z, deg)
-                    deg = z + deg
-            except ZeroDivisionError:
-                deg = round(
-                    (
-                        (
-                            (math.asin(x / (math.sqrt((x ** 2) + (y ** 2)))) / math.pi)
-                            * 180
-                        )
-                    )
-                )
-
-                if y < 0:
-                    z = 180
-                    deg = -deg
-                    z = math.copysign(z, deg)
-                    deg = z + deg
-
+            # offset pylon
+            point2 = pylon  # goto here
+            dist = point1.distance(pylon)
+            deg = point1.heading_initial(point2)
+            x = dist * math.sin(math.radians(deg)) * 1000  # from km to m
+            y = dist * math.cos(math.radians(deg)) * 1000  # from km to m
+            if count == 0:
+                reference_x: float = abs(x)
+                reference_y: float = abs(y)
             try:  # deturman what velocity should go at
-                dx = math.copysign(35 * math.cos(math.atan(y / x)), x)
-                dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
+                dx = math.copysign(const.MAX_SPEED * math.cos(math.atan(y / x)), x)
+                dy = math.copysign(const.MAX_SPEED * math.sin(math.atan(y / x)), y)
 
             except ZeroDivisionError:
                 dx = math.copysign(
-                    35 * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
+                    const.MAX_SPEED
+                    * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    x,
                 )
                 dy = math.copysign(
-                    35 * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
+                    const.MAX_SPEED
+                    * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    y,
                 )
 
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
-            if abs(x) <= 10 and abs(y) <= 10:
+            if (
+                abs(x) <= reference_x * const.POINT_PERCENT_ACCURACY
+                and abs(y) <= reference_y * const.POINT_PERCENT_ACCURACY
+            ):
                 return True
+            count += 1
 
     async def wait_turn(self, drone):
         """Completes a full turn"""
