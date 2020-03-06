@@ -5,6 +5,7 @@ from multiprocessing.managers import BaseManager
 from communication import Communication
 from flight.flight import flight
 from vision.camera.realsense import Realsense
+from time import sleep
 import argparse
 
 def main() -> None:
@@ -61,6 +62,10 @@ def run_threads(sim: bool) -> None:
 
     # Join flight process before exiting function
     f.join()
+
+    # Close flight and vision queues
+    flight_queue.close()
+    vision_queue.close()
 
     print("----End of Processes----")
 
