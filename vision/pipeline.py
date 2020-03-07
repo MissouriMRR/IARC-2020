@@ -85,7 +85,7 @@ class Pipeline:
 
         return state
 
-def init_pipeline(vision_comm, flight_comm, video, runtime=100):
+def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
     Alex, call this function - not run.
     """
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    init_pipeline(vision_comm, flight_comm, video)
+    init_vision(vision_comm, flight_comm, video)
 
     from time import sleep
     sleep(1)
