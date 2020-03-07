@@ -58,15 +58,15 @@ stroke = 300 #max length of LAC (mm)
 
 class sLAC:
   def __init__(self):
-    self.piston = LAC(vendorID,productID)
-    self.setupLAC()
-    
     #Ensures the LAC will not hit mechanical stops
     if (rPosition <= rMechStop):
       raise Exception("Retract is set to the mechanical stop.")
     elif (ePosition >= eMechStop):
       raise Exception("Extend is set to the mechanical stop.")
-  
+    
+    self.piston = LAC(vendorID,productID)
+    self.setupLAC()
+    
   #Automatically sets up the LAC
   def setupLAC(self):
     
