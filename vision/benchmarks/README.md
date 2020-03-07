@@ -14,6 +14,12 @@ Starting in the benchmarks directory, run
     python3 times/runall.py
 ```
 
+Optionally, you can specify what benchmark to run,
+
+```bash
+    python3 accuracy/runall.py obstacle #<- Runs accuracy benchmarks w/ obstacle in name
+```
+
 ## Contributing
 
 ### Times
