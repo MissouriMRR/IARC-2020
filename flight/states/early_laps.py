@@ -101,7 +101,7 @@ class EarlyLaps:
                 temp = (current + 180) % 360
 
             await drone.offboard.set_velocity_body(
-                sdk.VelocityBodyYawspeed(60, -55, 0.25, -90)
+                sdk.VelocityBodyYawspeed(60, -55, 0.0, -90)
             )
             if current == temp:
                 return True

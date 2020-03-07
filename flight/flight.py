@@ -137,7 +137,7 @@ async def start_flight(comm, drone: System):
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
             await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
 
             try:
                 await drone.offboard.stop()
@@ -146,7 +146,7 @@ async def start_flight(comm, drone: System):
                     "Stopping offboard mode failed with error code: %s", str(error)
                 )
                 # Worried about what happens here
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
             logging.info("Landing the drone")
             await drone.action.land()
         except:

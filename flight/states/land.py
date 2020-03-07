@@ -24,7 +24,7 @@ class Land(State):
         await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
         try:
             await drone.offboard.stop()
