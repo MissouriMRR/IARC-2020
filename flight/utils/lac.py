@@ -45,7 +45,7 @@ class LAC:
         time.sleep(.05)  # Just to be sure it's all well and sent
         response = self.device.read(0x81, 3, 100)  # 3 because there's three bytes to a packet
         return (response[2] << 8) + response[1]  # High byte moved left, then tack on the low byte
-        
+  
     # How close to target distance is accepted
     # value/1024 * stroke gives distance, where stroke is max
     # extension length (all values in mm). Round to nearest
