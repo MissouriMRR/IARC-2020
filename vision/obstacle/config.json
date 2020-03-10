@@ -7,11 +7,11 @@
   },
   "filterByArea": {
     "enable": true,
-    "minArea": 100,
-    "maxArea": 200000
+    "minArea": 10,
+    "maxArea": 2000000
   },
   "filterByCircularity": {
-    "enable": true,
+    "enable": false,
     "minCircularity": 0.40,
     "maxCircularity": 0.95
   },
