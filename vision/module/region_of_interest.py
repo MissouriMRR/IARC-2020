@@ -23,10 +23,9 @@ PADDING_CONSTANT = .85
 # TODO: account for general orientation (horizontal or vertical) and switch horizontal/vertical accordingly
 # keep in mind that, as of right now, the method assumes that the module is vertically oriented, and the best
 #   solution to account for it is to decrease the PADDING_CONSTANT
-# TODO: remove testing components, such as passing depth_frame to method and modifying data for visualization
 
 
-def region_of_interest(depth_val, depth_frame):
+def region_of_interest(depth_val):
     """
     Finds region of interest of the module in frame
 
@@ -48,10 +47,7 @@ def region_of_interest(depth_val, depth_frame):
     vertical_image_portion = int((vertical_angle_ratio * VERTICAL_RES / 2) * PADDING_CONSTANT)
     horizontal_image_portion = int((horizontal_angle_ratio * HORIZONTAL_RES / 2) * PADDING_CONSTANT)
 
-    depth_frame[650 - vertical_image_portion:650 + vertical_image_portion, 560 - horizontal_image_portion:560 + horizontal_image_portion] = 0
-
-    plt.imshow(depth_frame)
-    plt.show()
+    return depth_frame[650 - vertical_image_portion:650 + vertical_image_portion, 560 - horizontal_image_portion:560 + horizontal_image_portion]
 
 
 if __name__ == "__main__":
@@ -73,6 +69,6 @@ if __name__ == "__main__":
 
     depthImage = np.load(args.input)
 
-    region_of_interest(depthImage[560][650], depthImage)
+    region_of_interest(depthImage[560][650])
 
 
