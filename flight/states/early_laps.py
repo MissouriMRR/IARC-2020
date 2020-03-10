@@ -1,4 +1,5 @@
 """Runs the 8 laps to get to the mast"""
+import logging
 import asyncio
 import math
 import mavsdk as sdk
@@ -25,47 +26,31 @@ class EarlyLaps:
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        print("-- Run Laps")
-        pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat1, lon1))
-        await pos_wait
-        pos_wait.cancel()
-        del pos_wait
+        # Go to pylon 1
+        await self.wait_pos(drone, lat1, lon1)
         async for i in arange(8):
-            print(f"STARTING LAP {i}")
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat2, lon2))
-            print(f"         FIRST STRAIGHT")
-            await pos_wait
-            pos_wait.cancel()
-            del pos_wait
+            logging.info("Starting lap: %d", i)
+            logging.debug("Lap %d: Straight one", i)
+            await self.wait_pos(drone, lat2, lon2)  # move to pylon 2
 
-            turn = asyncio.ensure_future(self.wait_turn(drone))
-            print(f"         FIRST TURN")
-            await turn
-            turn.cancel()
-            del turn
+            logging.debug("Lap %d: Turn one", i)
+            await self.wait_turn(drone)  # turn around pylon 2
 
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, lat1, lon1))
-            print(f"         SECOND STRAIGHT")
-            await pos_wait
+            logging.debug("Lap %d: Straight two", i)
+            await self.wait_pos(drone, lat1, lon1)  # move to pylon 1
 
-            pos_wait.cancel()
-            del pos_wait
-
-            turn = asyncio.ensure_future(self.wait_turn(drone))
-            print(f"         SECOND TURN")
-            await turn
-            turn.cancel()
-            del turn
+            logging.debug("Lap %d: Turn two", i)
+            await self.wait_turn(drone)  # turn around pylon 1
         return Land()
 
     async def wait_pos(self, drone, goal_lat, goal_lon):
         """Goes to a position"""
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)
-            if altitude >= 12:
-                alt = 0.25
-            elif altitude <= 9:
-                alt = -0.25
+            if altitude >= 3:
+                alt = 0.2
+            elif altitude <= 2:
+                alt = -0.2
             else:
                 alt = 0
             lat = round(gps.latitude_deg, 8)

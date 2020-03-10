@@ -8,7 +8,7 @@ from ui.geometry import ResizableBox
 
 
 class Annotation(object):
-    '''Represents a particular object annoation'''
+    '''Represents a particular object annotation'''
     detector = None
 
     def __init__(self, x, y, color, label, w=1, h=1):
@@ -50,7 +50,7 @@ class Annotation(object):
             bbox = obj.find('bndbox')
             x, y, x1, y1 = (int(bbox.find('xmin').text), int(bbox.find('ymin').text), int(bbox.find('xmax').text), int(bbox.find('ymax').text))
 
-            color = color_map[label]
+            color = (color_map["blob"])
             annotations.append(Annotation(x, y, color, label, x1-x, y1-y))
 
         return annotations, path

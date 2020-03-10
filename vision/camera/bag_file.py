@@ -11,7 +11,7 @@ except ImportError:
 try:
     from vision.common.take_picture import save_camera_frame
 except ImportError:
-    from take_picture import save_camera_frame
+    from common.take_picture import save_camera_frame
 
 
 class BagFile(Camera):
@@ -118,3 +118,6 @@ class BagFile(Camera):
                 cv2.destroyAllWindows()
                 break
 
+if __name__ == '__main__':
+    import sys
+    BagFile(720, 1080, 0, sys.argv[1]).display_in_window()
