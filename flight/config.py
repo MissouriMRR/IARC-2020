@@ -3,7 +3,7 @@ import asyncio
 from mavsdk import System
 
 
-MAX_SPEED: float =2.352 #m/s
+MAX_SPEED: float =6.352 #m/s
 ALT_CORRECTION_SPEED: float = 0.25 #m/s down
 MAX_ALT: float = 3.0 #m
 TAKEOFF_ALT: float = 3.0 #m
