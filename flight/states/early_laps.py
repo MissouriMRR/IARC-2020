@@ -3,7 +3,7 @@ import asyncio
 import math
 import mavsdk as sdk
 
-from flight.config import Constant
+from flight import config
 from flight.utils.latlon import LatLon
 
 
@@ -21,15 +21,14 @@ class EarlyLaps:
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        const=Constant()
         print("-- Run Laps")
-        pos_wait = asyncio.ensure_future(self.wait_pos(drone, const.pylon1))
+        pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon1))
         await pos_wait
         pos_wait.cancel()
         del pos_wait
-        async for i in arange(1):
+        async for i in arange(3):
             print(f"STARTING LAP {i}")
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, const.pylon2))
+            pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon2))
             print(f"         FIRST STRAIGHT")
             await pos_wait
             pos_wait.cancel()
@@ -41,7 +40,7 @@ class EarlyLaps:
             turn.cancel()
             del turn
 
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, const.pylon1))
+            pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon1))
             print(f"         SECOND STRAIGHT")
             await pos_wait
             pos_wait.cancel()
@@ -56,15 +55,14 @@ class EarlyLaps:
 
     async def wait_pos(self, drone,pylon):
         """Goes to a position"""
-        const=Constant()
         count=0
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)
 
-            if altitude >= const.ALT_RANGE_MAX:
-                alt = const.ALT_CORRECTION_SPEED # go down m/s
-            elif altitude <= const.ALT_RANGE_MIN:
-                alt = -const.ALT_CORRECTION_SPEED # go up m/s
+            if altitude >= config.ALT_RANGE_MAX:
+                alt = config.ALT_CORRECTION_SPEED # go down m/s
+            elif altitude <= config.ALT_RANGE_MIN:
+                alt = -config.ALT_CORRECTION_SPEED # go up m/s
             else:
                 alt = 0 # don't move
 
@@ -73,29 +71,33 @@ class EarlyLaps:
             point1 = LatLon(lat,lon) # you are here
 
             #offset pylon
-            point2 = pylon # goto here
             dist = point1.distance(pylon)
+            deg = point1.heading_initial(pylon)
+
+            point2 = pylon.offset(deg+config.DEG_OFFSET, config.OFFSET)
+            dist = point1.distance(point2)
             deg = point1.heading_initial(point2)
+
             x=dist*math.sin(math.radians(deg))*1000 # from km to m
             y=dist*math.cos(math.radians(deg))*1000 # from km to m
             if count == 0:
                 reference_x: float = abs(x)
                 reference_y: float = abs(y)
             try:  # deturman what velocity should go at
-                dx = math.copysign(const.MAX_SPEED * math.cos(math.atan(y / x)), x)
-                dy = math.copysign(const.MAX_SPEED * math.sin(math.atan(y / x)), y)
+                dx = math.copysign(config.MAX_SPEED * math.cos(math.atan(y / x)), x)
+                dy = math.copysign(config.MAX_SPEED * math.sin(math.atan(y / x)), y)
 
             except ZeroDivisionError:
                 dx = math.copysign(
-                    const.MAX_SPEED * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
+                    config.MAX_SPEED * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
                 )
                 dy = math.copysign(
-                    const.MAX_SPEED * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
+                    config.MAX_SPEED * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
                 )
 
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
-            if abs(x) <= reference_x*const.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*const.POINT_PERCENT_ACCURACY:
+            if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
                 return True
             count+=1
 
@@ -108,8 +110,12 @@ class EarlyLaps:
                 temp = (current + 180) % 360
 
             await drone.offboard.set_velocity_body(
-                sdk.VelocityBodyYawspeed(60, -55, 0.25, -90)
+                sdk.VelocityBodyYawspeed(5, -3, -0.1, -60)
             )
-            if current == temp:
+            asyncio.sleep(1)
+            val = abs(current - temp)
+            # Need to add case so that it can overshoot
+            if val < 10:
+                logging.info("Finished Turn")
                 return True
             count += 1

@@ -2,55 +2,73 @@ from flight.utils.latlon import LatLon
 import asyncio
 from mavsdk import System
 
-class Constant:
-    def __init__(self):
-        self.MAX_SPEED: float =2.352 #m/s
-        self.ALT_CORRECTION_SPEED: float = 0.25 #m/s down
-        self.MAX_ALT: float = 15.0 #m
-        self.TAKEOFF_ALT: float = 3.0 #m
-        # What percentage of the hight can we loos/gain before unsafe
-        self.ALT_PERCENT_ACCURACY: float = 0.25 
-        self.ALT_RANGE_MAX: float = self.TAKEOFF_ALT+(self.TAKEOFF_ALT*self.ALT_PERCENT_ACCURACY) #m
-        self.ALT_RANGE_MIN: float = self.TAKEOFF_ALT-(self.TAKEOFF_ALT*self.ALT_PERCENT_ACCURACY) #m
 
-        self.POINT_PERCENT_ACCURACY: float = 0.25
+MAX_SPEED: float =2.352 #m/s
+ALT_CORRECTION_SPEED: float = 0.25 #m/s down
+MAX_ALT: float = 3.0 #m
+TAKEOFF_ALT: float = 3.0 #m
+# What percentage of the hight can we loos/gain before unsafe
+ALT_PERCENT_ACCURACY: float = 0.25 
+ALT_RANGE_MAX: float = TAKEOFF_ALT+(TAKEOFF_ALT*ALT_PERCENT_ACCURACY) #m
+ALT_RANGE_MIN: float = TAKEOFF_ALT-(TAKEOFF_ALT*ALT_PERCENT_ACCURACY) #m
 
-        # Position for pylon 1
-        self.lat1: float = 37.9489551
-        self.lon1: float = -91.7844405
-        self.pylon1: LatLon = LatLon(self.lat1, self.lon1)
+POINT_PERCENT_ACCURACY: float = 0.15
 
-        # Position for pylon 2
-        self.lat2: float = 37.9486433
-        self.lon2: float = -91.7839372
-        self.pylon2: LatLon = LatLon(self.lat2, self.lon2)
+# Position for pylon 1
+lat1: float = 37.9487773
+lon1: float = -91.7842396
+pylon1: LatLon = LatLon(lat1, lon1)
+
+# Position for pylon 2
+#lat2: float = 37.9486433
+#lon2: float = -91.7839372
+lat2: float = 37.9481946
+lon2: float = -91.7834122
+pylon2: LatLon = LatLon(lat2, lon2)
+
+OFFSET: float = .005 #km
+DEG_OFFSET: int = 90 #deg
 
 
 
-    async def config_param(self, drone: System):
-        await drone.param.set_float_param('MIS_TAKEOFF_ALT', self.TAKEOFF_ALT)
-        await drone.param.set_float_param('MPC_CRUISE_90', self.MAX_SPEED)
-        await drone.param.set_float_param('MPC_XY_VEL_MAX', self.MAX_SPEED)
-        await drone.param.set_float_param('MPC_XY_CRUISE', self.MAX_SPEED)
-        await drone.action.set_maximum_speed(self.MAX_SPEED)
-        #Set data link loss failsafe mode HOLD
-        await drone.param.set_int_param('NAV_DLL_ACT', 1)
-        #Set RC loss failsafe mode HOLD
-        #await drone.param.set_int_param('NAV_RCL_ACT', 1)
-        #Set offboard loss failsafe mode HOLD
-        await drone.param.set_int_param('COM_OBL_ACT', 1)
-        #Set offboard loss failsafe mode when RC is available HOLD
-        await drone.param.set_int_param('COM_OBL_RC_ACT', 5)
-        return
+async def config_param(drone: System):
+    await drone.param.set_float_param('MIS_TAKEOFF_ALT', TAKEOFF_ALT)
+    await drone.param.set_float_param('MPC_CRUISE_90', MAX_SPEED)
+    await drone.param.set_float_param('MPC_XY_VEL_MAX', MAX_SPEED)
+    await drone.param.set_float_param('MPC_XY_CRUISE', MAX_SPEED)
+    await drone.action.set_maximum_speed(MAX_SPEED)
+    #Set data link loss failsafe mode HOLD
+    await drone.param.set_int_param('NAV_DLL_ACT', 1)
+    #Set offboard loss failsafe mode HOLD
+    await drone.param.set_int_param('COM_OBL_ACT', 1)
+    #Set offboard loss failsafe mode when RC is available HOLD
+    await drone.param.set_int_param('COM_OBL_RC_ACT', 5)
+
+    #Set RC loss failsafe mode HOLD
+    await drone.param.set_int_param('NAV_RCL_ACT', 1)
+    await drone.param.set_float_param('LNDMC_XY_VEL_MAX', .5)
+    await drone.param.set_float_param('LNDMC_FFALL_THR', .5)
+    await drone.param.set_float_param('LNDMC_FFALL_TTRI', .15)
+
+    return
         
 
-#COM_OBL_ACT*
-#COM_OBL_RC_ACT*
+#COM_OBL_ACT* 0
+#COM_OBL_RC_ACT* 0
 #COM_RC_OVERRIDE
 #GPS_DUMP_COMM
-#NAV_DLL_ACT*
-#NAV_RCL_ACT*
+#NAV_DLL_ACT* 0
+#NAV_RCL_ACT* 2
 #MC_AIRMODE
+
+#COM_POSCTL_NAVL-
+#LNDMC_ALT_MAX 
+#LNDMC_FFALL_THR free-fall detection m/s^2  2
+#LNDMC_FFALL_TTRI Multicopter free-fall trigger time s .3
+#LNDMC_XY_VEL_MAX  m/s 1.5
+#LNDMC_Z_VEL_MAX 
+#MAV_0_MODE
+#MAV_0_RATE 
 
 #EKF2
 #Local position Estimator

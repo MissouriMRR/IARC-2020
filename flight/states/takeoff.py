@@ -6,7 +6,7 @@ from mavsdk import System
 from .state import State
 from .early_laps import EarlyLaps
 
-from flight.config import Constant
+from flight import config
 
 
 class Takeoff(State):
@@ -46,8 +46,7 @@ class Takeoff(State):
 
     async def wait_alt(self, drone: System):
         """Checks to see if the drone is near the target altitude"""
-        const=Constant()
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= const.ALT_RANGE_MIN:
+            if altitude >= config.ALT_RANGE_MIN:
                 return True
