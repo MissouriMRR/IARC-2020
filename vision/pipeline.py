@@ -18,6 +18,12 @@ from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.common.import_params import import_params
 
 
+CAMERA_IDS = {
+    'obstacle': '',
+    'module': '',
+    'peg': '',
+}
+
 class Pipeline:
     """
     This is a pipeline class that takes in a video, runs an obstacle detection algorithm,
@@ -52,21 +58,21 @@ class Pipeline:
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
 
-    @property
-    def picture(self):
-        return next(self.camera)
-
     def run(self, prev_state):
         """
         Process current camera frame.
         """
         ##
-        depth_image, color_image = self.picture
-
         try:
             state = self.flight_communication.get_nowait()
         except Empty:
             state = prev_state
+
+        ##
+        try:
+            depth_image, color_image = self.camera.take_picture(CAMERA_IDS[state])
+        except KeyError:
+            depth_image, color_image = None, None
 
         ##
         bboxes = []
