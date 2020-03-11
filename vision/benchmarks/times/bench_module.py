@@ -11,7 +11,8 @@ import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
-sys.path += [parent_dir, gparent_dir, ggparent_dir]
+gggparent_dir = os.path.dirname(ggparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
 import numpy as np
 import cv2
