@@ -1,5 +1,6 @@
 """The takeoff state"""
 import asyncio
+import logging
 import mavsdk as sdk
 from mavsdk import System
 
@@ -15,13 +16,11 @@ class Takeoff(State):
     async def run(self, drone: System) -> None:
         """Arms and takes off the drone"""
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
-        print("-- Taking off")
+        logging.info("Taking off")
         # Takeoff command, goes to altitude specified in params
         await drone.action.takeoff()
         # waits for altitude to be close to the specified level
-        alt_wait: asyncio.coroutine = asyncio.ensure_future(self.wait_alt(drone))
-        await alt_wait
-        alt_wait.cancel()
+        await self.wait_alt(drone)
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
@@ -46,6 +45,7 @@ class Takeoff(State):
 
     async def wait_alt(self, drone: System):
         """Checks to see if the drone is near the target altitude"""
+        const=Constant()
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
             if altitude >= config.ALT_RANGE_MIN:

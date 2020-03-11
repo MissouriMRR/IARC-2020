@@ -10,6 +10,8 @@ black = "*"
 [packages]
 mavsdk = "*"
 black = "*"
+colorlog = "*"
+pyproj = "*"
 
 [requires]
 python_version = "3.8"

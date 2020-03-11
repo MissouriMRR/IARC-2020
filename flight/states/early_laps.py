@@ -1,4 +1,5 @@
 """Runs the 8 laps to get to the mast"""
+import logging
 import asyncio
 import math
 import mavsdk as sdk
@@ -21,54 +22,39 @@ class EarlyLaps:
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        print("-- Run Laps")
-        pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon1))
-        await pos_wait
-        pos_wait.cancel()
-        del pos_wait
-        async for i in arange(3):
-            print(f"STARTING LAP {i}")
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon2))
-            print(f"         FIRST STRAIGHT")
-            await pos_wait
-            pos_wait.cancel()
-            del pos_wait
+        # Go to pylon 1
+        await self.wait_pos(drone, config.pylon1)
+        async for i in arange(2):
+            logging.info("Starting lap: %d", i)
+            logging.debug("Lap %d: Straight one", i)
+            await self.wait_pos(drone, config.pylon2)  # move to pylon 2
 
-            turn = asyncio.ensure_future(self.wait_turn(drone))
-            print(f"         FIRST TURN")
-            await turn
-            turn.cancel()
-            del turn
+            logging.debug("Lap %d: Turn one", i)
+            await self.wait_turn(drone)  # turn around pylon 2
 
-            pos_wait = asyncio.ensure_future(self.wait_pos(drone, config.pylon1))
-            print(f"         SECOND STRAIGHT")
-            await pos_wait
-            pos_wait.cancel()
-            del pos_wait
+            logging.debug("Lap %d: Straight two", i)
+            await self.wait_pos(drone, config.pylon1)  # move to pylon 1
 
-            turn = asyncio.ensure_future(self.wait_turn(drone))
-            print(f"         SECOND TURN")
-            await turn
-            turn.cancel()
-            del turn
+            logging.debug("Lap %d: Turn two", i)
+            await self.wait_turn(drone)  # turn around pylon 1
         return Land()
 
-    async def wait_pos(self, drone,pylon):
+    async def wait_pos(self, drone, pylon):
         """Goes to a position"""
-        count=0
+        count = 0
         async for gps in drone.telemetry.position():
             altitude = round(gps.relative_altitude_m, 2)
 
             if altitude >= config.ALT_RANGE_MAX:
-                alt = config.ALT_CORRECTION_SPEED # go down m/s
+                alt = config.ALT_CORRECTION_SPEED  # go down m/s
             elif altitude <= config.ALT_RANGE_MIN:
-                alt = -config.ALT_CORRECTION_SPEED # go up m/s
+                alt = -config.ALT_CORRECTION_SPEED  # go up m/s
             else:
-                alt = 0 # don't move
+                alt = 0  # don't move
 
             lat = round(gps.latitude_deg, 8)
             lon = round(gps.longitude_deg, 8)
-            point1 = LatLon(lat,lon) # you are here
+            point1 = LatLon(lat, lon)  # you are here
 
             #offset pylon
             dist = point1.distance(pylon)

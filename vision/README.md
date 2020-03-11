@@ -70,24 +70,25 @@ The vision team is responsible for processing images in order to extract informa
             ...
             main.py  <- Code, runnable from IARC/
             README.md  <- Feature goal, use instructions
-            requirements.txt  <- All necessary pip packages
+
         camera/
             ...
             main.py
             README.md
-            requirements.txt
+            
         vision_images/  # Downloaded from team drive(see below)
-            blob/
+            obstacle/
             ...
         vision_videos/  # Downloaded from team drive(see below)
-            blob/
+            obstacle/
             ...
         main.py  <- Will bootstrap all vision code
         README.md  <- This file.
+        requirements.txt  <- All necessary pip packages
 
     unit_tests/
-        test_classification.py  <- Follows Unit Testing specs from below
-        test_blobbing.py
+        test_camera.py  <- Follows Unit Testing specs from below
+        test_obstacle.py
         ...
         runall.sh  <- Runs every unit test
 ```

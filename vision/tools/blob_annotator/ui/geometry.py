@@ -64,7 +64,7 @@ class Rectangle(Shape):
 
     @property
     def midpoint(self):
-        return (int((self.x+self.x1)//2), int((self.y + self.y1)//2))
+        return int((self.x+self.x1)//2), int((self.y + self.y1)//2)
 
     def get_bounds(self):
         return self
@@ -216,13 +216,17 @@ class ResizableBox(object):
 
             elif self._is_resizing_box:
                 if not self._invert_resize_x_axis:
+                    # Right side
                     self.w = x - self.x
                 else:
+                    # Left side
                     self.w = self.x1 - x
 
                 if not self._invert_resize_y_axis:
+                    # Bottom
                     self.h = y - self.y
                 else:
+                    # Top
                     self.h = self.y1 - y
 
             elif (self._selected_handle is not None and not self._selected_handle.is_inside(x, y)) or self._selected_handle is None:
@@ -236,14 +240,14 @@ class ResizableBox(object):
                         self._handle_colors[circle] = self._darker_handle_color
 
                         if self._selected_handle.x < self.x1:
-                            self._invert_resize_x_axis = True
+                            self._invert_resize_x_axis = False
                         else:
                             self._invert_resize_x_axis = False
 
                         if self._selected_handle.y < self.y1:
                             self._invert_resize_y_axis = True
                         else:
-                                self._invert_resize_y_axis = False
+                            self._invert_resize_y_axis = False
 
         elif event == cv2.EVENT_LBUTTONDOWN:
             if self._selected_handle is not None:

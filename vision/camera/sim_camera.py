@@ -1,6 +1,13 @@
 """
 SimCamera is a child class of camera, designed to be used for simulator depth/color streams
 """
+import os
+import sys
+
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
@@ -66,3 +73,28 @@ class SimCamera(Camera):
             if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
                 cv2.destroyAllWindows()
                 break
+
+
+if __name__ == '__main__':
+    ## Display algorithm output on simulator
+    import json
+    from vision.obstacle.obstacle_finder import ObstacleFinder
+    from vision.common.import_params import import_params
+
+    camera = SimCamera()
+
+    prefix = 'vision' if os.path.isdir("vision") else ''
+    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+
+    with open(config_filename, 'r') as config_file:
+        config = json.load(config_file)
+
+    obstacle_finder = ObstacleFinder(params=import_params(config))
+
+    for depth_image, color_image in camera:
+        bboxes = []
+
+        bboxes = obstacle_finder.find(color_image, depth_image)
+
+        from vision.common.blob_plotter import plot_blobs
+        plot_blobs(obstacle_finder.keypoints, color_image)

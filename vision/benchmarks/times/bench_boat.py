@@ -28,7 +28,7 @@ class TimeDetectRussianWord:
     """
     Testing the text detector.
     """
-    DEFAULT_WORD = 'holye'  # pronounced hol.ee
+    DEFAULT_WORD = 'holye'
     DEFAULT_DIMS = (1280, 720)
     DEFAULT_SIZE = 3
 

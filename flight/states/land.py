@@ -1,5 +1,6 @@
 """State to land the drone"""
 import asyncio
+import logging
 import mavsdk as sdk
 
 from mavsdk import System
@@ -23,16 +24,18 @@ class Land(State):
         await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
 
         try:
             await drone.offboard.stop()
         except sdk.OffboardError as error:
-            print(f"Stopping offboard mode failed with error code: {str(error)}")
+            logging.exception(
+                "Stopping offboard mode failed with error code: %s", str(error)
+            )
             # TODO Worried about what happens here
 
         await asyncio.sleep(1)
 
-        print("-- Landing")
+        logging.info("Landing the drone")
         await drone.action.land()
         return Final()

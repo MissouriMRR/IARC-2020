@@ -1,6 +1,10 @@
 """
 Run time benchmarks.
 
+    python times/runall.py module
+will only run benchmarks w/ module in name.
+
+
 Process
 -------
 files = [filename for filename in 'times/' if 'bench' in filename]
@@ -26,6 +30,7 @@ Resolution = (1280, 720)
 Noise SD = 0
 N Objects = 0
 """
+import sys
 import timeit
 import numpy as np
 import pandas as pd
@@ -38,10 +43,13 @@ N_REPEATS = 1
 if __name__ == '__main__':
     benchmarks = {}
 
+    ## Command line args
+    keyword = sys.argv[1] if len(sys.argv) > 1 else ''
+
     ## Find time benchmarks in modules
     for module in modules:
         for key, value in module.__dict__.items():
-            if key[:4] == 'Time':
+            if key[:4] == 'Time' and keyword.lower() in key.lower():
                 benchmarks.update({key: value})
 
     ## Run benchmarks
