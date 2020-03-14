@@ -28,9 +28,9 @@ Imports
 from lac import LAC
 import time
 
-'''
-Constants
-'''
+
+#Constants#
+
 #Default IDs
 vendorID = 0x4D8
 productID= 0xFC5F
@@ -69,7 +69,6 @@ class sLAC:
     
   #Automatically sets up the LAC
   def setupLAC(self):
-    
     #Retract limit set to 1mm (0-1023)
     self.piston.set_retract_limit(rLimit)
     print("Retract limit set")
@@ -101,8 +100,6 @@ class sLAC:
     #Keep on max speed [1,1022]
     self.piston.set_speed(maxSpeed)
     print("Piston set to max speed")
-    
-    
 
   #Extends the LAC to the max value without hitting mechanical stop
   #Takes 5 seconds to fully extend
@@ -124,12 +121,10 @@ class sLAC:
     distance = (actualPos * stroke)/eLimit #Calculate metric distance
     print(str(distance) + "mm")
     return actualPos
-  
+
   #Retracts LAC to the original position
   #Factory reset to solve stalling issue
   def resetLAC(self):
     print("Resetting...")
     self.retractLAC()
     self.piston.reset()
-
-
