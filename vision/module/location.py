@@ -17,15 +17,13 @@ class ModuleLocation:
 
         self.img = np.array(0) # Color image input
         self.depth = np.array(0) # Depth image input
-
-        self.holes = np.arange(8) # Set of 4 (x, y) coordinates, location of the four holes
         
-        self.circles = np.array(0) # List of circles detected in color image
+        self.circles = np.array(0) # Array of circles detected in color image
 
-        self.center = np.array(0) # Coordinates of center
-        self.distance = 0 # Distance to the center
+        self.center = np.array(0) # x, y coordinates of center
+        self.holes = np.arange(8) # Set of (x, y) coordinates, location of the holes
 
-        self.slopes = np.array(0) # Slopes between circles
+        self.slopes = np.array(0) # Slopes between detected circles
         self.slope_heights = np.array(0) # Histogram of slopes
         self.slope_bounds = np.array(0) # Bounds of slope histogram
 
@@ -228,6 +226,8 @@ class ModuleLocation:
         Returns
         -------
         None
+
+        Note: not in use
         """
         self.img += increase
 
