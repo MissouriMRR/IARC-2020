@@ -40,36 +40,41 @@ class ModuleLocation:
         -------
         ndarray - coordinates of the center of the module.
         """
+        MAX_CIRCLES = 100 # slope calculations are not performed if there are more than MAX_CIRCLES circles
+
         # Circle detection
         self._circleDetection()
 
         # Filter out far away circles
         self._filterCircleDepth()
 
-        # Get Slopes and Parallels
-        self._getSlopes()
-        self._groupSlopes()
+        # Only perform more calculations if there are few circles
+        if np.shape(self.circles)[0] <= MAX_CIRCLES:
+            # Get Slopes and Parallels
+            self._getSlopes()
+            self._groupSlopes()
 
-        # Find the Holes
-        self._getHoleLocations()
+            # Find the Holes
+            self._getHoleLocations()
 
-        # Coordinates of the center of the front face of the module
-        self.center = np.arange(0, 2)
+            # Coordinates of the center of the front face of the module
+            self.center = np.arange(0, 2)
 
-        # Average hole coordinates to find center coordinates
-        x_total = 0
-        y_total = 0
-        num_holes = 0
-        for x, y, _ in self.holes:
-            x_total += x
-            y_total += y
-            num_holes += 1
-        
-        self.center[0] = x_total // num_holes
-        self.center[1] = y_total // num_holes
+            # Average hole coordinates to find center coordinates
+            x_total = 0
+            y_total = 0
+            num_holes = 0
+            for x, y, _ in self.holes:
+                x_total += x
+                y_total += y
+                num_holes += 1
+            
+            self.center[0] = x_total // num_holes
+            self.center[1] = y_total // num_holes
 
-        return self.center
-        
+            return self.center
+        else:
+            return self.center
     
     def _filterCircleDepth(self):
         """
