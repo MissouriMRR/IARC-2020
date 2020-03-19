@@ -46,7 +46,13 @@ class Takeoff(State):
 
         # Probably need to put takeoff() here (before EarlyLaps())
         # await self.test_takeoff(drone)
+        logging.info("DRONE TAKING OFF")
         await self.takeoff(drone)
+        logging.info("TAKE OFF FUNCTION FINISHED")
+        # Stop drone
+        # await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0,0.0,0.0,0.0))
+        # await drone.action.land()
+        logging.info("STARTING LAPS FUNCTION")
         return EarlyLaps()  # Return the next state, RunLaps
 
     async def wait_alt(self, drone: System):
@@ -62,7 +68,7 @@ class Takeoff(State):
 
         # Need to calculate current position relative to lat and lon
 
-        up_speed: float = -.5
+        up_speed: float = -2
 
         async for gps in drone.telemetry.position():
 
@@ -70,44 +76,54 @@ class Takeoff(State):
             curr_lat = round(gps.latitude_deg, 8)
             curr_lon = round(gps.longitude_deg, 8)
 
-            break
+            x = ( (target_lon - curr_lon) * 40000 * math.cos( (target_lat + curr_lat) * math.pi / 360) / 360 ) * 1000
 
-        x = ( (target_lon - curr_lon) * 40000 * math.cos( (target_lat + curr_lat) * math.pi / 360) / 360 ) * 1000
+            y = ( (target_lat - curr_lat) * 40000 / 360) * 1000
 
-        y = ( (target_lat - curr_lat) * 40000 / 360) * 1000
+            # Calculate the degree to point the drone at
+            try:
+                deg = round(((( math.atan(x / y) / math.pi) *180)))
 
-        # Calculate the degree to point the drone at
-        try:
-            deg = round(((( math.atan(x / y) / math.pi) *180)))
+                if y < 0:
+                    z = 180
+                    z = math.copysign(z, deg)
+                    deg = z + deg
+            except ZeroDivisionError:
+                deg = round(((( math.asin( x / ( math.sqrt(( x**2 ) + ( y**2 )))) / math.pi) * 180 )))
 
-            if y < 0:
-                z = 180
-                z = math.copysign(z, deg)
-                deg = z + deg
-        except ZeroDivisionError:
-            deg = round(((( math.asin( x / ( math.sqrt(( x**2 ) + ( y**2 )))) / math.pi) * 180 )))
+                if y < 0:
+                    z = 180
+                    z = math.copysign(z, deg)
+                    deg = z + deg
 
-            if y < 0:
-                z = 180
-                z = math.copysign(z, deg)
-                deg = z + deg
+            # Calculate the needed velocity needed to reach the target lat lon points
+            try:
+                dx = math.copysign(35 * math.cos(math.atan(y / x)), x)
+                dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
 
-        # Calculate the needed velocity for x and y
-        try:
-            dx = math.copysign(35 * math.cos(math.atan(y / x)), x)
-            dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
+            except ZeroDivisionError:
+                dx = math.copysign(
+                        35 * math.cos(math.asin(y / (math.sqrt((x**2) + (y**2))))), x
+                )
+                dy = math.copysign(
+                        35 * math.sin(math.asin(y / (math.sqrt((x**2) + (y**2))))), y
+                )
 
-        except ZeroDivisionError:
-            dx = math.copysign(
-                    35 * math.cos(math.asin(y / (math.sqrt((x**2) + (y**2))))), x
+            # Start the drone pointing in the direction of the first pylon
+            await drone.offboard.set_velocity_ned(
+                sdk.VelocityNedYaw(dy,dx,up_speed,deg)
             )
-            dy = math.copysign(
-                    35 * math.sin(math.asin(y / (math.sqrt((x**2) + (y**2))))), y
-            )
 
-        await drone.offboard.set_velocity_ned(
-            sdk.VelocityNedYaw(2.0,2.0,up_speed,70)
-        )
+            # Loops until the desired altitude has been attained,
+            # then sets the upward velocity to 0 and returns
+            if await self.wait_alt(drone) == True:
+                # If the drone has reached the desired altitude
+                # Leave it moving towards the first pylon,
+                # but set the upwared velocity to 0, so it stops going up
+                await drone.offboard.set_velocity_ned(
+                    sdk.VelocityNedYaw(dy,dx,0,deg)
+                )
+                return
 
 
     async def test_takeoff(self, drone: System) -> None:
