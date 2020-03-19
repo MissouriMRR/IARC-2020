@@ -30,6 +30,8 @@ Resolution = (1280, 720)
 Noise SD = 0
 N Objects = 0
 """
+import __init__
+
 import sys
 import timeit
 import numpy as np

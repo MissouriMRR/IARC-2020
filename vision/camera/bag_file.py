@@ -105,7 +105,7 @@ class BagFile(Camera):
                 images = np.hstack((color_image, depth_colormap))
 
             cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Depth/Color Stream', (self.width, int(self.height / 2)))
+            cv2.resizeWindow('Depth/Color Stream', self.width, int(self.height / 2))
             cv2.imshow('Depth/Color Stream', images)
 
             key = cv2.waitKey(1)
