@@ -19,10 +19,6 @@ class Takeoff(State):
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
 
-        # await drone.action.takeoff()
-        # waits for altitude to be close to the specified level
-        # await self.wait_alt(drone)
-
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
         await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
@@ -42,15 +38,10 @@ class Takeoff(State):
             await drone.action.land()
             return
 
-        # Probably need to put takeoff() here (before EarlyLaps())
-        # await self.test_takeoff(drone)
-        logging.info("DRONE TAKING OFF")
+        # Start drone in direction of the first pylon
         await self.takeoff(drone)
-        logging.info("TAKE OFF FUNCTION FINISHED")
-        # Stop drone
-        # await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0,0.0,0.0,0.0))
-        # await drone.action.land()
-        logging.info("STARTING LAPS FUNCTION")
+
+        # Start laps after desired altitude is reached
         return EarlyLaps()  # Return the next state, RunLaps
 
     async def wait_alt(self, drone: System):
@@ -61,9 +52,8 @@ class Takeoff(State):
                 return True
 
     async def takeoff(self, drone: System) -> None:
-        logging.info("Taking off")
 
-        # Need to calculate current position relative to lat and lon
+        logging.info("Taking off towards first pylon")
 
         up_speed: float = -2
 
@@ -73,12 +63,7 @@ class Takeoff(State):
             curr_lat = round(gps.latitude_deg, 8)
             curr_lon = round(gps.longitude_deg, 8)
 
-            x = (
-                (target_lon - curr_lon)
-                * 40000
-                * math.cos((target_lat + curr_lat) * math.pi / 360)
-                / 360
-            ) * 1000
+            x = ((target_lon - curr_lon)* 40000 * math.cos((target_lat + curr_lat) * math.pi / 360) / 360) * 1000
 
             y = ((target_lat - curr_lat) * 40000 / 360) * 1000
 
@@ -91,14 +76,7 @@ class Takeoff(State):
                     z = math.copysign(z, deg)
                     deg = z + deg
             except ZeroDivisionError:
-                deg = round(
-                    (
-                        (
-                            (math.asin(x / (math.sqrt((x ** 2) + (y ** 2)))) / math.pi)
-                            * 180
-                        )
-                    )
-                )
+                deg = round((((math.asin(x / (math.sqrt((x ** 2) + (y ** 2)))) / math.pi)* 180)))
 
                 if y < 0:
                     z = 180
@@ -111,12 +89,8 @@ class Takeoff(State):
                 dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
 
             except ZeroDivisionError:
-                dx = math.copysign(
-                    35 * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
-                )
-                dy = math.copysign(
-                    35 * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
-                )
+                dx = math.copysign(35 * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x)
+                dy = math.copysign(35 * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y)
 
             # Start the drone pointing in the direction of the first pylon
             await drone.offboard.set_velocity_ned(
@@ -132,4 +106,4 @@ class Takeoff(State):
                 await drone.offboard.set_velocity_ned(
                     sdk.VelocityNedYaw(dy, dx, 0, deg)
                 )
-                return
+                return True
