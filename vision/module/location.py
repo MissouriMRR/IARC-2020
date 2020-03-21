@@ -2,18 +2,8 @@
 This file contains the ModuleLocation class to find the location of the center of the module in an image.
 """
 
-import os
-import sys
-
-parent_dir = os.path.dirname(os.path.abspath(__file__))
-gparent_dir = os.path.dirname(parent_dir)
-ggparent_dir = os.path.dirname(gparent_dir)
-sys.path += [parent_dir, gparent_dir, ggparent_dir]
-
 import cv2
 import numpy as np
-
-from vision.bounding_box import BoundingBox, ObjectType
 
 class ModuleLocation:
     """
@@ -30,7 +20,7 @@ class ModuleLocation:
         
         self.circles = np.array(0) # Array of circles detected in color image
 
-        self.center = np.array(0) # x, y coordinates of center
+        self.center = np.arange(2) # x, y coordinates of center
         self.holes = np.arange(8) # Set of (x, y) coordinates, location of the holes
 
         self.slopes = np.array(0) # Slopes between detected circles
@@ -48,7 +38,7 @@ class ModuleLocation:
         Find the center of the front face of the module.
         Returns
         -------
-        list<BoundingBox> - either empty or the coordinates of the center
+        ndarray - coordinates of the center of the module.
         """
         MAX_CIRCLES = 100 # slope calculations are not performed if there are more than MAX_CIRCLES circles
 
@@ -82,9 +72,9 @@ class ModuleLocation:
             self.center[0] = x_total // num_holes
             self.center[1] = y_total // num_holes
 
-            return [BoundingBox((self.center[0], self.center[1], self.center[0], self.center[1]), ObjectType.MODULE)]
-        else:
-            return []
+        # Returns either the center in the current image
+        # or the previous center if no slope calculations were performed
+        return self.center
     
     def _filterCircleDepth(self):
         """
