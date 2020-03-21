@@ -23,8 +23,10 @@ class EarlyLaps:
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
         # Go to pylon 1
+        logging.info("Moving to pylon 1")
         await self.wait_pos(drone, config.pylon1)
-        async for i in arange(2):
+        logging.info("Arrived at pylon 1")
+        async for i in arange(config.NUM_LAPS):
             logging.info("Starting lap: %d", i)
             logging.debug("Lap %d: Straight one", i)
             await self.wait_pos(drone, config.pylon2)  # move to pylon 2
@@ -50,26 +52,27 @@ class EarlyLaps:
             elif altitude <= config.ALT_RANGE_MIN:
                 alt = -config.ALT_CORRECTION_SPEED  # go up m/s
             else:
-                alt = 0  # don't move
+                alt = -0.15  # don't move
 
             lat = round(gps.latitude_deg, 8)
             lon = round(gps.longitude_deg, 8)
-            point1 = LatLon(lat, lon)  # you are here
+            current = LatLon(lat, lon)  # you are here
 
-            #offset pylon
-            dist = point1.distance(pylon)
-            deg = point1.heading_initial(pylon)
-
-            point2 = pylon.offset(deg+config.DEG_OFFSET, config.OFFSET)
-            dist = point1.distance(point2)
-            deg = point1.heading_initial(point2)
+            if count==0:
+                #offset pylon
+                deg_to_pylon = current.heading_initial(pylon)
+                offset_point = pylon.offset(deg_to_pylon+config.DEG_OFFSET, config.OFFSET)
+                logging.warning(offset_point.to_string('d% %m% %S% %H'))# you are here
+                
+            dist = current.distance(offset_point)
+            deg = current.heading_initial(offset_point)
 
             x=dist*math.sin(math.radians(deg))*1000 # from km to m
             y=dist*math.cos(math.radians(deg))*1000 # from km to m
             if count == 0:
                 reference_x: float = abs(x)
                 reference_y: float = abs(y)
-            try:  # deturman what velocity should go at
+            try:  # determine what velocity should go at
                 dx = math.copysign(config.MAX_SPEED * math.cos(math.atan(y / x)), x)
                 dy = math.copysign(config.MAX_SPEED * math.sin(math.atan(y / x)), y)
 
@@ -83,6 +86,9 @@ class EarlyLaps:
 
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
+            logging.debug("CHECKING CLOSENESS")
+            logging.debug("x :: %f <= %f", x, reference_x*config.POINT_PERCENT_ACCURACY)
+            logging.debug("y :: %f <= %f", y, reference_y*config.POINT_PERCENT_ACCURACY)
             if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
                 return True
             count+=1
@@ -98,7 +104,7 @@ class EarlyLaps:
             await drone.offboard.set_velocity_body(
                 sdk.VelocityBodyYawspeed(5, -3, -0.1, -60)
             )
-            asyncio.sleep(1)
+            await asyncio.sleep(1)
             val = abs(current - temp)
             # Need to add case so that it can overshoot
             if val < 10:
