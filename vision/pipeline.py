@@ -10,6 +10,8 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+from vision.bounding_box import BoundingBox, ObjectType
+
 import json
 from multiprocessing import Queue
 from queue import Empty
@@ -17,6 +19,8 @@ from queue import Empty
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.common.import_params import import_params
 
+from vision.module.location import ModuleLocation
+from vision.module.get_module_depth import get_module_depth
 
 class Pipeline:
     """
@@ -52,6 +56,8 @@ class Pipeline:
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
 
+        self.module_location = ModuleLocation()
+
     @property
     def picture(self):
         return next(self.camera)
@@ -75,6 +81,14 @@ class Pipeline:
             bboxes = self.obstacle_finder.find(color_image, depth_image)
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
+
+        ##
+        if state == 'module_detection':
+            self.module_location.setImg(color_image, depth_image)
+            center = self.module_location.getCenter()
+            bboxes = [BoundingBox([center, center], ObjectType.MODULE)]
+        else:
+            pass # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
         for bbox in bboxes:
