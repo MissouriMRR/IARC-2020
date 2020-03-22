@@ -14,6 +14,28 @@ async def wait_alt(drone: System):
             return True
 
 async def takeoff(drone: System, target: tuple ) -> None:
+    """This function expects that the drone is already armed."""
+    """Function creates initial set points, starts offboard, and starts the drone \
+       in the direction of the specified lat lon coordinates"""
+
+    # Setting set points for the next 3 lines (used to basically set drone center)
+    # (NSm, EWm, DUm, Ydeg)
+    await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
+
+    # (NSm/s, EWm/s, DUm/s, Ydeg)
+    await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
+
+    # (FBm/s, RLm/s, DUm/s, Yspdeg/s)
+    await drone.offboard.set_velocity_body(
+        sdk.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+    )
+
+    try:
+        # Enable offboard mode, allowing for computer to control the drone
+        await drone.offboard.start()
+    except sdk.OffboardError:
+        await drone.action.land()
+        return
 
     target_lat = target[0]
     target_lon = target[1]
@@ -62,11 +84,12 @@ async def takeoff(drone: System, target: tuple ) -> None:
 
         # Loops until the desired altitude has been attained,
         # then sets the upward velocity to 0 and returns
-        if await wait_alt(drone):
-            # If the drone has reached the desired altitude
-            # Leave it moving towards the first pylon,
-            # but set the upwared velocity to 0, so it stops going up
-            await drone.offboard.set_velocity_ned(
-                sdk.VelocityNedYaw(dy, dx, 0, deg)
-            )
-            return
+        await wait_alt(drone)
+
+        # If the drone has reached the desired altitude
+        # Leave it moving towards the first pylon,
+        # but set the upwared velocity to 0, so it stops going up
+        await drone.offboard.set_velocity_ned(
+            sdk.VelocityNedYaw(dy, dx, 0, deg)
+        )
+        return
