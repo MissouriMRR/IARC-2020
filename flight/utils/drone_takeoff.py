@@ -6,7 +6,7 @@ from mavsdk import System
 
 up_speed: int = -2
 
-async def wait_alt(drone: System):
+async def wait_alt(drone: System) -> bool:
     """Checks to see if the drone is near the target altitude"""
     async for position in drone.telemetry.position():
         altitude: float = round(position.relative_altitude_m, 2)
