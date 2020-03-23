@@ -5,6 +5,7 @@ import math
 import mavsdk as sdk
 
 from .land import Land
+from ..utils.drone_takeoff import getPosition, getVelocity
 
 # Position for pylon 1
 lat1: int = 37.9489551
@@ -45,63 +46,41 @@ class EarlyLaps:
 
     async def wait_pos(self, drone, goal_lat, goal_lon):
         """Goes to a position"""
-        async for gps in drone.telemetry.position():
-            altitude = round(gps.relative_altitude_m, 2)
-            if altitude >= 3:
-                alt = 0.2
-            elif altitude <= 2:
-                alt = -0.2
-            else:
-                alt = 0
-            lat = round(gps.latitude_deg, 8)
-            lon = round(gps.longitude_deg, 8)
-            x = (
-                (goal_lon - lon)
-                * 40000
-                * math.cos((goal_lat + lat) * math.pi / 360)
-                / 360
-            ) * 1000
-            y = ((goal_lat - lat) * 40000 / 360) * 1000
 
-            try:  # calcualte what degree to point at
-                deg = round((((math.atan(x / y) / math.pi) * 180)))
+        # Get the x-velocity, y-velocity, and degree to send the drone towards
+        # the first pylon
+        velocity = await getVelocity(drone, goal_lat, goal_lon)
 
-                if y < 0:
-                    z = 180
-                    z = math.copysign(z, deg)
-                    deg = z + deg
-            except ZeroDivisionError:
-                deg = round(
-                    (
-                        (
-                            (math.asin(x / (math.sqrt((x ** 2) + (y ** 2)))) / math.pi)
-                            * 180
-                        )
-                    )
-                )
+        # X-velocity
+        dx = velocity[0]
+        # Y-velocity
+        dy = velocity[1]
+        # Altitude
+        alt = velocity[2]
+        # Degree
+        deg = velocity[3]
 
-                if y < 0:
-                    z = 180
-                    deg = -deg
-                    z = math.copysign(z, deg)
-                    deg = z + deg
+        # Start the drone towards the given position
+        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
-            try:  # deturman what velocity should go at
-                dx = math.copysign(35 * math.cos(math.atan(y / x)), x)
-                dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
+        # Loop until the drone is close to the given position
+        while True:
+            try:
+                position = await getPosition(drone, goal_lat, goal_lon)
+                x = position[0]
+                y = position[1]
 
-            except ZeroDivisionError:
-                dx = math.copysign(
-                    35 * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
-                )
-                dy = math.copysign(
-                    35 * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
-                )
-
-            await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
-
-            if abs(x) <= 10 and abs(y) <= 10:
-                return True
+                if abs(x) <= 10 and abs(y) <= 10:
+                    return True
+            # NOTE: Found a weird bug where if Ctrl+C was pressed while enroute to the
+            # first pylon, the drone would continue on forever
+            # Added this as a fail safe.  If Ctrl+C is pressed and the exception
+            # is not caught in run.py for whatever reason, set all velocities to 0
+            # and land the drone at whatver the current position is
+            # NOTE: should update to land at specific point once manual land is implemented
+            except KeyboardInterrupt:
+                drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0,0.0,0.0,0.0))
+                drone.action.land()
 
     async def wait_turn(self, drone):
         """Completes a full turn"""
