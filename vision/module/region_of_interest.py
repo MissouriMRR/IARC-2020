@@ -6,7 +6,6 @@ The __main__ of this file acts as a driver for testing region_of_interest
 """
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
 
 # Constant
 MODULE_HEIGHT = 76.2  # mm
@@ -20,12 +19,8 @@ HORIZONTAL_RES = 1920  # p
 #   this should be used to ensure that the region_of_interest is trustworthy despite tilt
 PADDING_CONSTANT = .85
 
-# TODO: account for general orientation (horizontal or vertical) and switch horizontal/vertical accordingly
-# keep in mind that, as of right now, the method assumes that the module is vertically oriented, and the best
-#   solution to account for it is to decrease the PADDING_CONSTANT
 
-
-def region_of_interest(depth_val):
+def region_of_interest(depth_val, center):
     """
     Finds region of interest of the module in frame
 
@@ -33,7 +28,10 @@ def region_of_interest(depth_val):
     ----------
     depth_val: float
         Measured value for the depth of the module from the camera
+    center: integer tuple
     """
+    x_pos, y_pos = center
+
     # vertical angle of the module in the frame, from the center of the module to the top of the module
     vertical_region_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth_val))
 
@@ -47,12 +45,12 @@ def region_of_interest(depth_val):
     vertical_image_portion = int((vertical_angle_ratio * VERTICAL_RES / 2) * PADDING_CONSTANT)
     horizontal_image_portion = int((horizontal_angle_ratio * HORIZONTAL_RES / 2) * PADDING_CONSTANT)
 
-    return depth_frame[650 - vertical_image_portion:650 + vertical_image_portion, 560 - horizontal_image_portion:560 + horizontal_image_portion]
+    return depth_frame[y_pos - vertical_image_portion:y_pos + vertical_image_portion, x_pos - horizontal_image_portion:x_pos + horizontal_image_portion]
 
 
 if __name__ == "__main__":
     """
-    
+    Driver for testing region_of_interest
     """
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
@@ -62,13 +60,13 @@ if __name__ == "__main__":
     # # Parse the command line arguments to an object
     args = parser.parse_args()
 
-    # if args.input:
-    #     depthNpy = args.input
-    # else:
-    #     raise FileNotFoundError("No input parameter has been given. For help type --help")
+    if args.input:
+        depthImage = args.input
+    else:
+        raise FileNotFoundError("No input parameter has been given. For help type --help")
 
-    depthImage = np.load(args.input)
+    # gets rid of outliers, should be done before the arguments are calculated at all
+    depthImage = np.clip(image, np.percentile(image, 10), np.percentile(image, 90))
 
-    region_of_interest(depthImage[560][650])
-
-
+    # test values, should be replaced with values found using other vision tools
+    region_of_interest(depthImage[560][650], (650, 560))
