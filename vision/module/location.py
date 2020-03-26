@@ -38,7 +38,7 @@ class ModuleLocation:
         Find the center of the front face of the module.
         Returns
         -------
-        ndarray - coordinates of the center of the module.
+        tuple - (x, y) coordinates of the center of the module.
         """
         MAX_CIRCLES = 100 # slope calculations are not performed if there are more than MAX_CIRCLES circles
 
@@ -74,7 +74,7 @@ class ModuleLocation:
 
         # Returns either the center in the current image
         # or the previous center if no slope calculations were performed
-        return self.center
+        return tuple(self.center)
     
     def _filterCircleDepth(self):
         """
