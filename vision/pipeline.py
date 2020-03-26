@@ -21,6 +21,7 @@ from vision.common.import_params import import_params
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
+#import orientation
 
 class Pipeline:
     """
@@ -86,7 +87,9 @@ class Pipeline:
         if state == 'module_detection':
             self.module_location.setImg(color_image, depth_image)
             center = self.module_location.getCenter()
-            bboxes = [BoundingBox([center, center], ObjectType.MODULE)]
+            depth = get_module_depth(depth_image, center)
+            #orientation = ...
+            bboxes = [BoundingBox([center, center, center, center], ObjectType.MODULE)]
         else:
             pass # raise AttributeError(f"Unrecognized state: {state}")
 
