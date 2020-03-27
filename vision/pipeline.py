@@ -88,8 +88,15 @@ class Pipeline:
             self.module_location.setImg(color_image, depth_image)
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
+            
             #orientation = ...
-            bboxes = [BoundingBox([center, center, center, center], ObjectType.MODULE)]
+            
+            box = BoundingBox([center, center, center, center], ObjectType.MODULE)
+            box.nearness = depth
+            
+            #bbox.orientation = orientation
+            
+            bboxes.append(box)
         else:
             pass # raise AttributeError(f"Unrecognized state: {state}")
 
