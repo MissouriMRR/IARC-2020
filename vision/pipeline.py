@@ -10,6 +10,7 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+import datetime
 import json
 from multiprocessing import Queue
 from queue import Empty
@@ -25,9 +26,9 @@ class Pipeline:
 
     Parameters
     -------------
-    vision_communication: multiprocessing queue
+    vision_communication: multiprocessing Queue
         Interface to share vision information with flight.
-    flight_communication: multiprocessing queue
+    flight_communication: multiprocessing Queue
         Interface to recieve flight state information from flight.
     camera: Camera
         Camera to pull image from.
@@ -77,8 +78,7 @@ class Pipeline:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
-        for bbox in bboxes:
-            self.vision_communication.put(bbox, self.PUT_TIMEOUT)
+        self.vision_communication.put((datetime.datetime.now(), bboxes), self.PUT_TIMEOUT)
 
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
