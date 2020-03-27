@@ -10,6 +10,7 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+import datetime
 import json
 from multiprocessing import Queue
 from queue import Empty
@@ -42,8 +43,6 @@ class Pipeline:
         self.camera = camera.__iter__()
 
         ##
-        self.time = 0
-
         prefix = 'vision' if os.path.isdir("vision") else ''
 
         #
@@ -62,8 +61,6 @@ class Pipeline:
         """
         Process current camera frame.
         """
-        self.time += 1
-
         ##
         depth_image, color_image = self.picture
 
@@ -81,7 +78,7 @@ class Pipeline:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
-        self.vision_communication.put((self.time, bboxes), self.PUT_TIMEOUT)
+        self.vision_communication.put((datetime.datetime.now(), bboxes), self.PUT_TIMEOUT)
 
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
