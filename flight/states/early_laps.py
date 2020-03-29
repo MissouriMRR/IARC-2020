@@ -30,32 +30,32 @@ class EarlyLaps:
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
         # Go to pylon 1
-        await self.wait_pos(drone, lat1, lon1)
-        async for i in arange(8):
+        await self.wait_pos( drone, config.pylon1 )
+        async for i in arange(config.NUM_LAPS):
             logging.info("Starting lap: %d", i)
             logging.debug("Lap %d: Straight one", i)
-            await self.wait_pos(drone, lat2, lon2)  # move to pylon 2
+            await self.wait_pos(drone, config.pylon2)  # move to pylon 2
 
             logging.debug("Lap %d: Turn one", i)
             await self.wait_turn(drone)  # turn around pylon 2
 
             logging.debug("Lap %d: Straight two", i)
-            await self.wait_pos(drone, lat1, lon1)  # move to pylon 1
+            await self.wait_pos(drone, config.pylon1)  # move to pylon 1
 
             logging.debug("Lap %d: Turn two", i)
             await self.wait_turn(drone)  # turn around pylon 1
         return Land()
 
-    async def wait_pos(self, drone, goal_lat, goal_lon):
+    async def wait_pos(self, drone, pylon):
         """Goes to a position"""
 
-        position = await getPosition(drone, goal_lat, goal_lon)
+        position = await getPosition(drone, pylon)
         reference_x = abs(position[0])
         reference_y = abs(position[1])
 
         # Get the x-velocity, y-velocity, and degree to send the drone towards
         # the first pylon
-        velocity = await getVelocity(drone, goal_lat, goal_lon)
+        velocity = await getVelocity(drone, pylon)
 
         # X-velocity
         dx = velocity[0]
@@ -72,7 +72,7 @@ class EarlyLaps:
         # Loop until the drone is close to the given position
         while True:
             try:
-                position = await getPosition(drone, goal_lat, goal_lon)
+                position = await getPosition(drone, pylon)
                 x = position[0]
                 y = position[1]
 
