@@ -6,7 +6,7 @@ import mavsdk as sdk
 
 from .land import Land
 from flight import config
-from flight.utils.movement import wait_pos
+from flight.utils.movement import wait_pos, wait_turn
 
 # Position for pylon 1
 lat1: int = 37.9489551
