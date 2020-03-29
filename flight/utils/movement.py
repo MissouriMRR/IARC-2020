@@ -1,8 +1,11 @@
+import logging
+import asyncio
+import math
+
 import mavsdk as sdk
 from mavsdk import System
 from flight.utils.latlon.lat_lon import LatLon
 from flight import config
-import math
 
 
 async def wait_alt(drone: System) -> bool:
@@ -12,7 +15,7 @@ async def wait_alt(drone: System) -> bool:
         if altitude >= 2:
             return True
 
-async def getPosition(drone: System, pylon):
+async def get_distance(drone: System, pylon):
     """Gets x and y distance between 2 sets of latitude and longitude points"""
 
     async for gps in drone.telemetry.position():
@@ -35,7 +38,7 @@ async def getPosition(drone: System, pylon):
 
         return (x, y, altitude, deg)
 
-async def getVelocity(drone: System, pylon):
+async def get_velocity(drone: System, pylon):
     """Returns the needed x-velocity dx, y-velocity \
        dy, altitude speed, and needed degree deg of \
        the drone to go to a given position."""
@@ -43,12 +46,12 @@ async def getVelocity(drone: System, pylon):
 
     # Get x and y distance from target lat and lon points, and
     # altitude
-    position = await getPosition(drone, pylon)
+    distance = await get_distance(drone, pylon)
 
-    x = position[0]
-    y = position[1]
-    altitude = position[2]
-    deg = position[3]
+    x = distance[0]
+    y = distance[1]
+    altitude = distance[2]
+    deg = distance[3]
 
     if altitude >= 3:
         alt = config.ALT_CORRECTION_SPEED
@@ -59,16 +62,11 @@ async def getVelocity(drone: System, pylon):
 
     # Calculate the needed velocity needed to reach the target lat lon points
     try:
-        # dx = math.copysign(35 * math.cos(math.atan(y / x)), x)
-        # dy = math.copysign(35 * math.sin(math.atan(y / x)), y)
         dx = math.copysign( config.MAX_SPEED * math.cos( math.atan( y / x) ), x)
         dy = math.copysign( config.MAX_SPEED * math.sin( math.atan( y / x) ), y)
 
     except ZeroDivisionError:
-        # dx = math.copysign(35 * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x)
-        # dy = math.copysign(35 * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y)
         dx = math.copysign( config.MAX_SPEED * math.cos( math.asin( y / ( math.sqrt( x**2 + y**2 )))), x )
-
         dy = math.copysign( config.MAX_SPEED * math.sin( math.asin( y / ( math.sqrt( x**2 + y**2 )))), y )
 
     return (dx, dy, alt, deg)
@@ -76,13 +74,13 @@ async def getVelocity(drone: System, pylon):
 async def wait_pos(drone, pylon):
     """Goes to a position"""
 
-    position = await getPosition(drone, pylon)
-    reference_x = abs(position[0])
-    reference_y = abs(position[1])
+    distance = await get_distance(drone, pylon)
+    reference_x = abs(distance[0])
+    reference_y = abs(distance[1])
 
     # Get the x-velocity, y-velocity, and degree to send the drone towards
     # the first pylon
-    velocity = await getVelocity(drone, pylon)
+    velocity = await get_velocity(drone, pylon)
 
     # X-velocity
     dx = velocity[0]
@@ -99,7 +97,7 @@ async def wait_pos(drone, pylon):
     # Loop until the drone is close to the given position
     while True:
         try:
-            position = await getPosition(drone, pylon)
+            position = await get_distance(drone, pylon)
             x = position[0]
             y = position[1]
 
@@ -114,8 +112,9 @@ async def wait_pos(drone, pylon):
         except KeyboardInterrupt:
             drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0,0.0,0.0,0.0))
             drone.action.land()
+            return True
 
-async def wait_turn(self, drone):
+async def wait_turn(drone):
     """Completes a full turn"""
     count = 0
     async for tel in drone.telemetry.attitude_euler():
@@ -124,8 +123,12 @@ async def wait_turn(self, drone):
             temp = (current + 180) % 360
 
         await drone.offboard.set_velocity_body(
-            sdk.VelocityBodyYawspeed(60, -55, 0.25, -90)
+            sdk.VelocityBodyYawspeed(5, -3, -0.1, -60)
         )
-        if current == temp:
+
+        await asyncio.sleep(1)
+        val = abs(current - temp)
+        if val < 10:
+            logging.info("Finished Turn")
             return True
         count += 1

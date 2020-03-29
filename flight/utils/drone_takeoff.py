@@ -3,7 +3,7 @@ import logging
 import math
 import mavsdk as sdk
 from mavsdk import System
-from flight.utils.movement import getVelocity, wait_alt
+from flight.utils.movement import get_velocity, wait_alt
 
 async def takeoff(drone: System, pylon ) -> None:
     """This function expects that the drone is already armed."""
@@ -34,7 +34,7 @@ async def takeoff(drone: System, pylon ) -> None:
 
     # Get the x-velocity, y-velocity, and degree to send the drone towards
     # the first pylon
-    velocity = await getVelocity(drone, pylon)
+    velocity = await get_velocity(drone, pylon)
 
     # X-velocity
     dx = velocity[0]
