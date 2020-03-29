@@ -5,6 +5,8 @@ import math
 import mavsdk as sdk
 
 from .land import Land
+from flight.utils.latlon.lat_lon import LatLon
+from flight import config
 from ..utils.drone_takeoff import getPosition, getVelocity
 
 # Position for pylon 1
@@ -47,6 +49,10 @@ class EarlyLaps:
     async def wait_pos(self, drone, goal_lat, goal_lon):
         """Goes to a position"""
 
+        position = await getPosition(drone, goal_lat, goal_lon)
+        reference_x = abs(position[0])
+        reference_y = abs(position[1])
+
         # Get the x-velocity, y-velocity, and degree to send the drone towards
         # the first pylon
         velocity = await getVelocity(drone, goal_lat, goal_lon)
@@ -70,7 +76,7 @@ class EarlyLaps:
                 x = position[0]
                 y = position[1]
 
-                if abs(x) <= 10 and abs(y) <= 10:
+                if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
                     return True
             # NOTE: Found a weird bug where if Ctrl+C was pressed while enroute to the
             # first pylon, the drone would continue on forever
