@@ -20,12 +20,13 @@ HORIZONTAL_RES = 1920  # p
 PADDING_CONSTANT = .85
 
 
-def region_of_interest(depth_val, center):
+def region_of_interest(depth_frame, depth_val, center):
     """
     Finds region of interest of the module in frame
 
     Parameters
     ----------
+    depth_frame: np array
     depth_val: float
         Measured value for the depth of the module from the camera
     center: integer tuple
@@ -61,12 +62,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.input:
-        depthImage = args.input
+        depthImage = np.load(args.input)
     else:
         raise FileNotFoundError("No input parameter has been given. For help type --help")
 
     # gets rid of outliers, should be done before the arguments are calculated at all
-    depthImage = np.clip(image, np.percentile(image, 10), np.percentile(image, 90))
+    depthImage = np.clip(depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90))
 
     # test values, should be replaced with values found using other vision tools
-    region_of_interest(depthImage[560][650], (650, 560))
+    region_of_interest(depthImage, depthImage[560][650], (650, 560))
