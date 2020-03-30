@@ -62,8 +62,8 @@ class EarlyLaps:
                 #offset pylon
                 deg_to_pylon = current.heading_initial(pylon)
                 offset_point = pylon.offset(deg_to_pylon+config.DEG_OFFSET, config.OFFSET)
-                logging.warning(offset_point.to_string('d% %m% %S% %H'))# you are here
-                
+                logging.debug(offset_point.to_string('d% %m% %S% %H'))# you are here
+
             dist = current.distance(offset_point)
             deg = current.heading_initial(offset_point)
 
@@ -86,9 +86,6 @@ class EarlyLaps:
 
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
-            logging.debug("CHECKING CLOSENESS")
-            logging.debug("x :: %f <= %f", x, reference_x*config.POINT_PERCENT_ACCURACY)
-            logging.debug("y :: %f <= %f", y, reference_y*config.POINT_PERCENT_ACCURACY)
             if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
                 return True
             count+=1
@@ -104,10 +101,10 @@ class EarlyLaps:
             await drone.offboard.set_velocity_body(
                 sdk.VelocityBodyYawspeed(5, -3, -0.1, -60)
             )
-            await asyncio.sleep(1)
+            await asyncio.sleep(config.FAST_THINK_S)
             val = abs(current - temp)
-            # Need to add case so that it can overshoot
+            # TODO: Add case so that it can overshoot the point and still complete
             if val < 10:
-                logging.info("Finished Turn")
+                logging.debug("Finished Turn")
                 return True
             count += 1

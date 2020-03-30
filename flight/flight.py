@@ -92,8 +92,6 @@ async def init_and_begin(comm, sim: bool) -> None:
     """Creates drone object and passes it to start_flight"""
     try:
         drone: System = await init_drone(sim)
-        # config drone param's
-        await config.config_param(drone)
         await start_flight(comm, drone)
     except DroneNotFoundError:
         logging.exception("Drone was not found")
@@ -115,6 +113,8 @@ async def init_drone(sim: bool) -> System:
         raise DroneNotFoundError()
 
     # Add lines to control takeoff height
+    # config drone param's
+    await config.config_params(drone)
     return drone
 
 
@@ -136,7 +136,7 @@ async def start_flight(comm, drone: System):
             await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
             await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(config.THINK_FOR_S)
 
             try:
                 await drone.offboard.stop()
@@ -145,7 +145,7 @@ async def start_flight(comm, drone: System):
                     "Stopping offboard mode failed with error code: %s", str(error)
                 )
                 # Worried about what happens here
-            await asyncio.sleep(2)
+            await asyncio.sleep(config.THINK_FOR_S)
             logging.info("Landing the drone")
             await drone.action.land()
         except:
