@@ -1,14 +1,11 @@
-import asyncio
 import logging
-import math
 import mavsdk as sdk
 from mavsdk import System
 from flight.utils.movement import get_velocity, wait_alt
 
 async def takeoff(drone: System, pylon ) -> None:
     """This function expects that the drone is already armed."""
-    """Function creates initial set points, starts offboard, and starts the drone \
-       in the direction of the specified lat lon coordinates"""
+    """Function creates initial set points, starts offboard, and starts the drone in the direction of the specified lat lon coordinates"""
 
     # Setting set points for the next 3 lines (used to basically set drone center)
     # (NSm, EWm, DUm, Ydeg)
