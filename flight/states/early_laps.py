@@ -1,8 +1,6 @@
 """Runs the 8 laps to get to the mast"""
 import logging
 import asyncio
-import math
-import mavsdk as sdk
 
 from .land import Land
 from flight import config

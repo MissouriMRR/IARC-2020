@@ -1,14 +1,9 @@
 """The takeoff state"""
 import asyncio
-import logging
-import math
-import mavsdk as sdk
 from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
-from .early_laps import lat1 as target_lat
-from .early_laps import lon1 as target_lon
 from ..utils.drone_takeoff import takeoff
 from flight.config import pylon1
 
