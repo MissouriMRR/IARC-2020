@@ -36,7 +36,7 @@ Author: Gen Del Raye
 class GeoCoord:
     '''
     Abstract class representing geographic coordinates (i.e. latitude or longitude)
-    Not meant to be used directly - access through Subclasses Latitude() and Longitude() 
+    Not meant to be used directly - access through Subclasses Latitude() and Longitude()
     '''
     __metaclass__ = abc.ABCMeta
     
@@ -116,7 +116,7 @@ class GeoCoord:
         Output lat, lon coordinates as string in chosen format
         Inputs:
             format (str) - A string of the form A%B%C where A, B and C are identifiers.
-              Unknown identifiers (e.g. ' ', ', ' or '_' will be inserted as separators 
+              Unknown identifiers (e.g. ' ', ', ' or '_' will be inserted as separators
               in a position corresponding to the position in format.
         Examples:
             >> palmyra = LatLon(5.8833, -162.0833)
@@ -292,12 +292,12 @@ def string2geocoord(coord_str, coord_class, format_str = 'D'):
     '''
     Create a GeoCoord object (e.g. Latitude or Longitude) from a string.
     Inputs:
-        coord_str (str) - a string representation of a geographic coordinate (e.g. '5.083 N'). Each 
+        coord_str (str) - a string representation of a geographic coordinate (e.g. '5.083 N'). Each
           section of the string must be separated by some kind of a separator character ('5.083N' is
           invalid).
         coord_class (class) - a class inheriting from GeoCoord that includes a set_hemisphere method.
           Can be either Latitude or Longitude
-        format_str (str) - a string representation of the sections of coord_str. Possible letter values 
+        format_str (str) - a string representation of the sections of coord_str. Possible letter values
         correspond to the keys of the dictionary format2value, where
               'H' is a hemisphere identifier (e.g. N, S, E or W)
               'D' is a coordinate in decimal degrees notation
@@ -306,7 +306,7 @@ def string2geocoord(coord_str, coord_class, format_str = 'D'):
               'm' is a coordinate in minutes notation
               'S' is a coordinate in seconds notation
               Any other characters (e.g. ' ' or ', ') will be treated as a separator between the above components.
-          All components should be separated by the '%' character. For example, if the coord_str is 
+          All components should be separated by the '%' character. For example, if the coord_str is
           '5, 52, 59.88_N', the format_str would be 'd%, %m%, %S%_%H'
     Returns:
         GeoCoord object initialized with the coordinate information from coord_str
@@ -346,8 +346,8 @@ class LatLon:
         '''
         Input:
             lat (class instance or scalar) - an instance of class Latitude or a scalar. A Latitude object
-              can be instantiated directly in the __init__ call for example by calling LatLon(Latitude(5.8), 
-              Longitude(162.5)). If lat is specified as a scalar, the scalar will be assumed to be in 
+              can be instantiated directly in the __init__ call for example by calling LatLon(Latitude(5.8),
+              Longitude(162.5)). If lat is specified as a scalar, the scalar will be assumed to be in
               decimal degrees.
             lon (class instance or scalar) - an instance of class Longitude or a scalar. If lat is
               specified as a scalar, the scalar will be assumed to be in decimal degrees.
@@ -441,14 +441,14 @@ class LatLon:
         # theta is longitude
         theta1 = lon1*pi
         theta2 = lon2 *pi
-        cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) + 
+        cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
                math.cos(phi1)*math.cos(phi2))
         arc = math.acos(cos)
         return arc*radius
     
     def offset(self, heading_initial, distance, ellipse = 'WGS84'):
         '''
-        Offset a LatLon object by a heading (in degrees) and distance (in km) 
+        Offset a LatLon object by a heading (in degrees) and distance (in km)
         to return a new LatLon object
         '''
         lat1, lon1 = self.lat.decimal_degree, self.lon.decimal_degree
@@ -552,8 +552,8 @@ def string2latlon(lat_str, lon_str, format_str):
     Inputs:
         lat_str (str) - string representation of a latitude (e.g. '5 52 59.88 N')
         lon_str (str) - string representation of a longitude (e.g. '162 4 59.88 W')
-        format_str (str) - format in which the coordinate strings are given (e.g. 
-          for the above examples this would be 'd% %m% %S% %H'). See function 
+        format_str (str) - format in which the coordinate strings are given (e.g.
+          for the above examples this would be 'd% %m% %S% %H'). See function
           string2geocoord for a detailed explanation on how to specify formats.
     Returns:
         A LatLon object initialized with coordinate data from lat_str and lon_str
@@ -599,9 +599,9 @@ class GeoVector:
     
     def _angle_or_heading(self, angle_or_heading):
         '''
-        Convert angle degrees (i.e. starting at coordinates (1, 0) or 
-        due East and going clockwise to 360) into heading (i.e. starting 
-        at coordinates (0, 1) or due North and going counterclockwise to 
+        Convert angle degrees (i.e. starting at coordinates (1, 0) or
+        due East and going clockwise to 360) into heading (i.e. starting
+        at coordinates (0, 1) or due North and going counterclockwise to
         360) or vice versa.
         '''
         heading_or_angle = (90 - angle_or_heading)%360
@@ -626,8 +626,8 @@ class GeoVector:
         '''
         Sometimes required for comparing GeoVectors if float error has
         occurred. Determine if self and other (another GeoVector) are
-        equal to within e km of each other in dx and dy. The default 
-        (e = 0.000001) will return True if self and other are less than 
+        equal to within e km of each other in dx and dy. The default
+        (e = 0.000001) will return True if self and other are less than
         1 mm apart in distance.
         '''
         return abs(self.dx - other.dx) < e and abs(self.dy - other.dy) < e
@@ -730,4 +730,4 @@ def demonstration():
 
 if __name__ == '__main__':
     demonstration()
-        
+
