@@ -3,6 +3,8 @@ import asyncio
 import logging
 import mavsdk as sdk
 
+from flight import config
+
 from mavsdk import System
 
 from .state import State
@@ -24,7 +26,7 @@ class Land(State):
         await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(config.THINK_FOR_S)
 
         try:
             await drone.offboard.stop()
@@ -34,7 +36,7 @@ class Land(State):
             )
             # TODO Worried about what happens here
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(config.THINK_FOR_S)
 
         logging.info("Landing the drone")
         await drone.action.land()

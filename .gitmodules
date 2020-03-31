@@ -1,0 +1,3 @@
+[submodule "flight/utils/latlon"]
+	path = flight/utils/latlon
+	url = https://github.com/search5/latlon
