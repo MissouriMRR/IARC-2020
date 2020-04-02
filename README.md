@@ -63,6 +63,18 @@ To run our competition code, you will need:
       and testing in AirSim, so start with jMAVSim
     - Run the make command in the PX4 Firmware repository
 
+5. Clone this repository to any location with
+  ```bash
+  git clone --recursive https://github.com/MissouriMRR/IARC-2020
+  ```
+
+6. Install pre-commit for auto-formatting and sanity checking from [here](https://pre-commit.com/#install)
+
+7. Run the pre-commit linker
+  ```bash
+  pre-commit install
+  ```
+
 5. In the root of this repository, run the following to create a virtual
    environment and install our packages:
 
@@ -111,4 +123,3 @@ To run our competition code, you will need:
 
 We adopt the MIT License for our projects. Please read the [LICENSE](https://github.com/MissouriMRR/IARC-2020/blob/master/LICENSE)
 file for more info
-
