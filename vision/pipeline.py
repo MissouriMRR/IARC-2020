@@ -85,13 +85,15 @@ class Pipeline:
 
         ##
         if state == 'module_detection':
+            TEMP_CENT_DIST = 10
+
             self.module_location.setImg(color_image, depth_image)
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
             
             #orientation = ...
             
-            box = BoundingBox([center, center, center, center], ObjectType.MODULE)
+            box = BoundingBox([center-TEMP_CENT_DIST, center-TEMP_CENT_DIST, center+TEMP_CENT_DIST, center+TEMP_CENT_DIST], ObjectType.MODULE)
             box.nearness = depth
             
             #bbox.orientation = orientation
