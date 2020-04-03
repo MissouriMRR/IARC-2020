@@ -28,17 +28,7 @@ The vision team is responsible for processing images in order to extract informa
     pip install -r requirements.txt
 ```
 
-3.  (For Vision Tests) Download the test images from the team drive.
-
-3a.    Ask leadership for access to the MRR team drive.
-
-3b.    In google drive, click the shared drives link and open the Multirotor Robot folder.
-
-3c.    Navigate to IARC Mission 9/.
-
-3d.    Download vision_images folder as a whole.
-
-3e.    Extract the zip file into the repo -- IARC-2020/vision/vision_images
+3.  (Optional, for benchmarks) Download the test images from the team drive, [details](#storing-images).
 
 4.  (Optional) Run unit tests.
 
@@ -48,19 +38,19 @@ The vision team is responsible for processing images in order to extract informa
 
 5.  Contributing
 
-5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
+    5a. Go to the [Projects section of the repository.](https://github.com/MissouriMRR/IARC-2020/projects)
 
-5b. In any project, choose an issue from the To do section.
+    5b. In any project, choose an issue from the To do section.
 
-5c. Create a plan for solving this issue and get approved by leadership.
+    5c. Create a plan for solving this issue and get approved by leadership.
 
-5d. Checkout respective branch in repository and write code.
+    5d. Checkout respective branch in repository and write code.
 
-5e. When finished, go to the repository website and submit a pull request.
+    5e. When finished, go to the repository website and submit a pull request.
 
-5f. Have pull request reviewed.
+    5f. Have pull request reviewed.
 
-5g. Merge branch into develop when approved.
+    5g. Merge branch into develop when approved.
 
 ## Directory Structure
 
@@ -79,10 +69,12 @@ The vision team is responsible for processing images in order to extract informa
         vision_images/  # Downloaded from team drive(see below)
             obstacle/
             ...
+
         vision_videos/  # Downloaded from team drive(see below)
             obstacle/
             ...
-        main.py  <- Will bootstrap all vision code
+
+        pipeline.py  <- Will bootstrap all vision code
         README.md  <- This file.
         requirements.txt  <- All necessary pip packages
 
@@ -95,15 +87,15 @@ The vision team is responsible for processing images in order to extract informa
 
 ## Storing Images
 
-*Images & Videos should never be commited into any part of the repo at any time!*
+*Images & Videos should never be commited into any part of the repo!*
 
 Uploading Images & Videos: Upload all content to the MRR Team Drive in *IARC Mission 9/vision_images or videos* then to the respective project folder.
 
-Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/vision_images or videos* and save it in your copy of the repository as *IARC-2020/vision/vision_images (or _videos)*. Code and unit tests should work as if all content is located in these folders.
+Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/vision_images or vision_videos* and save the zip file. Extract its contents into your copy of the repository as *IARC-2020/vision/vision_images (or vision_videos)*.
 
 ## Documentation
 
-### Code Files
+### Modules
 
 ```python
     """
@@ -114,9 +106,9 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 ### Classes
 
 ```python
-    Class Neuron:
+    class SpikingNeuron:
         """
-        A group of neurons capable of emergent learning.
+        A group of neurons with temporal dynamics.
 
         Parameters
         -----------
@@ -134,11 +126,11 @@ Downloading Images & Videos: From the MRR Team Drive, download *IARC Mission 9/v
 ```python
     def stdp(spike_train):
         """
-        An asynchronous hebbian learning rule to suggest synapse weight updates.
+        An asynchronous hebbian learning rule that suggests synapse weight updates.
 
         Parameters
         ----------
-        spike_train: ndarray[t, n], boolean values
+        spike_train: ndarray[t, n] w/ boolean values
             Log of neuron fires at each timestep.
 
         Raises
@@ -195,7 +187,6 @@ There should be a test case for each major function of each class/function.
 
                 real_fires = neuron.fire()
 
-                ## only works with python lists
                 self.assertListEqual(list(expected_fires), list(real_fires))
 
 
