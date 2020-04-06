@@ -46,13 +46,13 @@ class EarlyLaps:
     async def wait_pos(self, drone, pylon):
         """Goes to a position"""
 
-        position = await getPosition(drone, goal_lat, goal_lon)
+        position = await getPosition(drone, pylon)
         reference_x = abs(position[0])
         reference_y = abs(position[1])
 
         # Get the x-velocity, y-velocity, and degree to send the drone towards
         # the first pylon
-        velocity = await getVelocity(drone, goal_lat, goal_lon)
+        velocity = await getVelocity(drone, pylon)
 
         # X-velocity
         dx = velocity[0]
@@ -69,7 +69,7 @@ class EarlyLaps:
         # Loop until the drone is close to the given position
         while True:
             try:
-                position = await getPosition(drone, goal_lat, goal_lon)
+                position = await getPosition(drone, pylon)
                 x = position[0]
                 y = position[1]
 

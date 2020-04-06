@@ -3,6 +3,8 @@ import logging
 import math
 import mavsdk as sdk
 from mavsdk import System
+from flight.utils.latlon.lat_lon import LatLon
+from flight import config
 
 up_speed: int = -2
 
@@ -13,7 +15,7 @@ async def wait_alt(drone: System) -> bool:
         if altitude >= 2:
             return True
 
-async def getPosition(drone: System, target_lat: float, target_lon: float):
+async def getPosition(drone: System, pylon):
     """Gets x and y distance between 2 sets of latitude and longitude points"""
 
     async for gps in drone.telemetry.position():
@@ -23,13 +25,24 @@ async def getPosition(drone: System, target_lat: float, target_lon: float):
         curr_lat = round(gps.latitude_deg, 8)
         curr_lon = round(gps.longitude_deg, 8)
 
-        x = ((target_lon - curr_lon)* 40000 * math.cos((target_lat + curr_lat) * math.pi / 360) / 360) * 1000
+        current = LatLon(curr_lat, curr_lon)
 
-        y = ((target_lat - curr_lat) * 40000 / 360) * 1000
+        deg_to_pylon = current.heading_initial(pylon)
+        offset_point = pylon.offset(deg_to_pylon + config.DEG_OFFSET, config.OFFSET)
+
+        dist = current.distance(offset_point)
+        deg = current.heading_initial(offset_point)
+
+        x = dist*math.sin(math.radians(deg))*1000
+        y = dist*math.cos(math.radians(deg))*1000
+
+        # x = ((target_lon - curr_lon)* 40000 * math.cos((target_lat + curr_lat) * math.pi / 360) / 360) * 1000
+
+        # y = ((target_lat - curr_lat) * 40000 / 360) * 1000
 
         return (x, y, altitude)
 
-async def getVelocity(drone: System, target_lat: float, target_lon: float):
+async def getVelocity(drone: System, pylon):
     """Returns the needed x-velocity dx, y-velocity \
        dy, altitude speed, and needed degree deg of \
        the drone to go to a given position."""
@@ -37,7 +50,7 @@ async def getVelocity(drone: System, target_lat: float, target_lon: float):
 
     # Get x and y distance from target lat and lon points, and
     # altitude
-    position = await getPosition(drone, target_lat, target_lon)
+    position = await getPosition(drone, pylon)
 
     x = position[0]
     y = position[1]
@@ -77,7 +90,7 @@ async def getVelocity(drone: System, target_lat: float, target_lon: float):
 
     return (dx, dy, alt, deg)
 
-async def takeoff(drone: System, target: tuple ) -> None:
+async def takeoff(drone: System, pylon ) -> None:
     """This function expects that the drone is already armed."""
     """Function creates initial set points, starts offboard, and starts the drone \
        in the direction of the specified lat lon coordinates"""
@@ -103,12 +116,10 @@ async def takeoff(drone: System, target: tuple ) -> None:
 
     # Get target lat and lon points from the target tuple, formatted
     # (latitude, longitude)
-    lat = target[0]
-    lon = target[1]
 
     # Get the x-velocity, y-velocity, and degree to send the drone towards
     # the first pylon
-    velocity = await getVelocity(drone, lat, lon)
+    velocity = await getVelocity(drone, pylon)
 
     # X-velocity
     dx = velocity[0]
