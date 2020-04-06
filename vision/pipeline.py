@@ -85,7 +85,6 @@ class Pipeline:
             bboxes = self.obstacle_finder.find(color_image, depth_image)
         elif state == 'module_detection':
             self.module_location.setImg(color_image, depth_image)
-            
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
             #orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
