@@ -74,10 +74,6 @@ async def get_velocity(drone: System, pylon):
 async def wait_pos(drone, pylon):
     """Goes to a position"""
 
-    distance = await get_distance(drone, pylon)
-    reference_x = abs(distance[0])
-    reference_y = abs(distance[1])
-
     # Get the x-velocity, y-velocity, and degree to send the drone towards
     # the first pylon
     velocity = await get_velocity(drone, pylon)
@@ -94,12 +90,20 @@ async def wait_pos(drone, pylon):
     # Start the drone towards the given position
     await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
 
+    asyncio.ensure_future(check_at_pos)
+
+async def check_at_pos(drone: System, pylon)
+
+    distance = await get_distance(drone, pylon)
+    reference_x = abs(distance[0])
+    reference_y = abs(distance[1])
+
     # Loop until the drone is close to the given position
     while True:
         try:
-            position = await get_distance(drone, pylon)
-            x = position[0]
-            y = position[1]
+            distance = await get_distance(drone, pylon)
+            x = distance[0]
+            y = distance[1]
 
             if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
                 return True
