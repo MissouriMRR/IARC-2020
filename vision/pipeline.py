@@ -22,7 +22,7 @@ from vision.common.import_params import import_params
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
-from vision.module.region_of_interest import region_of_interest
+#from vision.module.region_of_interest import region_of_interest
 #from vision.module.module_orientation import get_module_orientation
 from vision.module.module_bounding import getModuleBounds
 
@@ -89,7 +89,6 @@ class Pipeline:
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
             #orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
-            
             box = BoundingBox(getModuleBounds(color_image, center, depth), ObjectType.MODULE)
             box.module_depth = depth # float
             #box.orientation = orientation # tuple
