@@ -31,7 +31,7 @@ Information about files within each directory can be found in /<directory>/READM
 To run the competition code
 
 ```bash
-pipenv shell # Initialize the python environment
+poetry shell # Initialize the python environment
 ./run.py  # Run the code
 ```
 
@@ -41,7 +41,7 @@ To run our competition code, you will need:
 
 - A drone or drone [simulator](https://dev.px4.io/master/en/simulation/)
 - Python version 3.6 or higher
-- [pipenv](https://github.com/pypa/pipenv)
+- [poetry](https://python-poetry.org/)
 - [MAVSDK-Python](https://github.com/mavlink/MAVSDK-Python)
 
 ## Installation
@@ -53,7 +53,7 @@ To run our competition code, you will need:
        on MacOS and Linux. For Windows, get the executable from [the Python website](https://www.python.org/downloads/).
     - Make sure you follow the steps *very specifically* - else you will waste time.
 
-2. Install [pipenv](https://github.com/pypa/pipenv)
+2. Install [poetry](https://python-poetry.org/)
 
 3. Clone the PX4 Firmware repository. Tutorial [here](https://dev.px4.io/master/en/setup/building_px4.html#get_px4_code).
 
@@ -67,7 +67,7 @@ To run our competition code, you will need:
    environment and install our packages:
 
     ```bash
-    pipenv install
+    poetry install
     ```
 
 ## Contributing

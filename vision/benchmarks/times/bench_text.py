@@ -1,5 +1,5 @@
 """
-Boat related unit tests.
+Text related unit tests.
 
 Parameter Defaults
 ------------------
@@ -22,7 +22,7 @@ import cv2
 
 import common
 
-from boat.detect_words import detect_russian_word
+from text.detect_words import TextDetector
 
 
 class TimeDetectRussianWord:
@@ -80,4 +80,4 @@ class TimeDetectRussianWord:
         """
         Timing detectRussianWord.
         """
-        detect_russian_word(color_image, depth_image)
+        TextDetector().detect_russian_word(color_image, depth_image)
