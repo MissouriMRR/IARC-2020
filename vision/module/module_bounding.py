@@ -9,15 +9,15 @@ MODULE_WIDTH = 50.8  # mm
 VERTICAL_FOV = 57  # degrees
 HORIZONTAL_FOV = 86  # degrees
 
-PADDING_CONSTANT = .85
+PADDING_CONSTANT = 1.15
 
-def getModuleBounds(color, center, depth):
+def getModuleBounds(dimensions, center, depth):
     """
     getModuleBounds will find four coordinates within the module that will be used to create a BoundingBox.
 
     Parameters
     ----------
-    color - ndarray - the color image
+    dimensions - tuple<int> - the dimensions of the color image
     center - tuple<int> - (x, y)-coordinates of the center of the module
     depth - float - value of the depth of the center of the module from the camera
 
@@ -25,9 +25,8 @@ def getModuleBounds(color, center, depth):
     -------
     list - list of the four tuple vertices
     """
-    
     x, y = center
-    vert_res, horiz_res, _ = color.shape
+    vert_res, horiz_res, _ = dimensions
 
     vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
     horiz_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))

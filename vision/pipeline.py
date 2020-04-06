@@ -22,7 +22,7 @@ from vision.common.import_params import import_params
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
-#from vision.module.region_of_interest import region_of_interest
+from vision.module.region_of_interest import region_of_interest
 #from vision.module.module_orientation import get_module_orientation
 from vision.module.module_bounding import getModuleBounds
 
@@ -83,10 +83,7 @@ class Pipeline:
 
         if state == 'early_laps':
             bboxes = self.obstacle_finder.find(color_image, depth_image)
-        else:
-            pass  # raise AttributeError(f"Unrecognized state: {state}")
-
-        if state == 'module_detection':
+        elif state == 'module_detection':
             self.module_location.setImg(color_image, depth_image)
             
             center = self.module_location.getCenter()
@@ -96,7 +93,6 @@ class Pipeline:
             box = BoundingBox(getModuleBounds(color_image, center, depth), ObjectType.MODULE)
             box.module_depth = depth # float
             #box.orientation = orientation # tuple
-            
             bboxes.append(box)
         else:
             pass # raise AttributeError(f"Unrecognized state: {state}")
