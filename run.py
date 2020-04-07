@@ -37,8 +37,8 @@ def run_threads(sim: bool) -> None:
     comm_obj = manager.Communication()
 
     log_queue: Queue = Queue(-1)
-    logging_process = init_logger(log_queue)
-    logging_process.start()
+    #logging_process = init_logger(log_queue)
+    #logging_process.start()
 
     worker_configurer(log_queue)
 

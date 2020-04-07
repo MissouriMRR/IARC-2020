@@ -6,6 +6,7 @@ from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
+from .approach_lap import ApproachLap
 
 from flight import config
 
@@ -41,7 +42,7 @@ class Takeoff(State):
             await drone.action.land()
             return
 
-        return EarlyLaps()  # Return the next state, RunLaps
+        return eval(config.RUN_LAPS)()  # Return the next state, RunLaps
 
     async def wait_alt(self, drone: System):
         """Checks to see if the drone is near the target altitude"""
