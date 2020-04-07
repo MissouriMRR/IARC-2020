@@ -3,11 +3,9 @@ module_orientation will calculate the orientation of the module in degrees
 and return them as a tuple (x tilt, y tilt) using a derivative through the x- and y- axes
 """
 import numpy as np
-import argparse
-from region_of_interest import region_of_interest
 
 
-def get_module_orientation(roi, coordinates):
+def get_module_orientation(roi):
     """
     Finds the orientation of the module in degrees
 
@@ -15,35 +13,12 @@ def get_module_orientation(roi, coordinates):
     ----------
     roi: numpy array
         module region of interest calculated by region_of_interest
-    coordinates: tuple of integers
-        (x, y) coordinates of the center of the module in the frame
     """
-    x_pos, y_pos = coordinates
-
-    num_rows, num_cols = roi.shape
-    print("rows: " + str(num_rows))
-    print("cols: " + str(num_cols))
-
-    x_diffs = 0
-    for row in roi:
-        x_diffs = x_diffs + (row[num_cols-1] / 1000 - row[0] / 1000)
-        # x_diffs = x_diffs + np.mean(np.diff(row))
-
-    x_avg_diff = x_diffs / num_rows
-
+    x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
 
-    np.transpose(roi)
 
-    y_diffs = 0
-    for col in roi:
-        # "num_cols" being used again in the line below is not a mistake,
-        #   it is still used in place of num_rows because of the transposition
-        y_diffs = y_diffs + (col[num_cols - 1] / 1000 - col[0] / 1000)
-        # y_diffs = y_diffs + np.mean(np.diff(col))
-
-    y_avg_diff = y_diffs / num_cols
-
+    y_avg_diff = np.mean(roi.T[:, -1] / 1000 - roi.T[:, 0] / 1000)
     y_tilt = np.degrees(np.arctan(y_avg_diff))
 
     return x_tilt, y_tilt
@@ -54,10 +29,13 @@ if __name__ == "__main__":
     Driver main for module_orientation
     
     To test module_orientation, use
-    "python module_orientation.py -i 
+    "python module_orientation.py -i {depthimage.npy}"
     
     Also note that region_of_interest should be in the same folder as module_orientation
     """
+    import argparse
+    from region_of_interest import region_of_interest
+
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
                                             To read a .npy file, type \"python get_module_depth.py --i (image name).npy)\"")
@@ -77,4 +55,4 @@ if __name__ == "__main__":
     center = (650, 560)
     roi = region_of_interest(depthImage, depthImage[560][650], center)
 
-    get_module_orientation(roi, center)
+    get_module_orientation(roi)
