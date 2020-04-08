@@ -13,6 +13,11 @@ def get_module_orientation(roi):
     ----------
     roi: numpy array
         module region of interest calculated by region_of_interest
+
+    Returns
+    -----------
+    tuple of floating point values, degrees in coordinates of
+        the tilt on the x and y axes, respectively
     """
     x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
