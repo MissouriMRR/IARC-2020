@@ -21,8 +21,7 @@ class TextDetector:
 
     def detect_russian_word(self, color_image, depth_image):
         """
-        Function to detect words pulled from images
-        -------
+        Detect words in given image.
 
         Returns
         -------

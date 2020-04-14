@@ -1,5 +1,5 @@
 """
-This file contains getModuleBounds, which will get a list of four vertices in the module.
+Find the region of the image that the module lies within.
 """
 
 import numpy as np

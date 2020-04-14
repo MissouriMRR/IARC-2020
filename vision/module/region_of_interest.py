@@ -1,8 +1,5 @@
 """
-region_of_interest will
-given the depth value (float) in millimeters
-
-The __main__ of this file acts as a driver for testing region_of_interest
+Find region of interest for the orientation algorithm.
 """
 import numpy as np
 import argparse

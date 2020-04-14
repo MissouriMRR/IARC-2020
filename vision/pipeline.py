@@ -28,8 +28,8 @@ from vision.module.module_bounding import getModuleBounds
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs an obstacle detection algorithm,
-    and updates the blobs to the environment class.
+    Pipeline to carry information from the cameras through
+    the various vision algorithms out to flight.
 
     Parameters
     -------------

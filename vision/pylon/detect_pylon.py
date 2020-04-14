@@ -24,8 +24,7 @@ RED_THRESHOLD = 50
 
 def detect_red(color_image, depth_image):
     """
-    detect_red detects all pixels that fall in a certain range in an image
-    then outputs the original image and detected mask
+    Counts the number of red(ish) pixels in an image.
 
     Parameters
     ----------
@@ -36,7 +35,7 @@ def detect_red(color_image, depth_image):
 
     Returns
     -------
-    bool If pylon is in frame or not.
+    list[BoundingBox] List with or without a pylon bounding box.
     """
     if color_image is None:
         raise ValueError("Image cannot be None.")

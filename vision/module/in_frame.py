@@ -1,5 +1,5 @@
 """
-This file contains the ModuleInFrame function to detect if the module is in an image
+This file contains the ModuleInFrame function to detect if the module is in an image or not.
 
 The commented-out lines are used to visualize the algorithm and are unnecessary for processing.
 """
