@@ -65,7 +65,7 @@ The vision team is responsible for processing images in order to extract informa
             ...
             main.py
             README.md
-            
+
         vision_images/  # Downloaded from team drive(see below)
             obstacle/
             ...
