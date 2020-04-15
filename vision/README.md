@@ -78,11 +78,25 @@ The vision team is responsible for processing images in order to extract informa
         README.md  <- This file.
         requirements.txt  <- All necessary pip packages
 
-    unit_tests/
-        test_camera.py  <- Follows Unit Testing specs from below
-        test_obstacle.py
-        ...
-        runall.sh  <- Runs every unit test
+        benchmarks/
+            accuracy/
+                __init__.py
+                bench_module.py  <- Follows Benchmarking Guides
+                ...
+                runall.py
+            times/
+                __init__.py
+                bench_module.py  <- Follows Benchmarking Guides
+                ...
+                runall.py
+            common.py 
+            README.md  <- Instructions for Benchmarks
+
+        unit_tests/
+            test_camera.py  <- Follows Unit Testing specs from below
+            test_obstacle.py
+            ...
+            runall.sh  <- Runs every unit test
 ```
 
 ## Storing Images
