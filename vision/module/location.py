@@ -241,7 +241,7 @@ class ModuleLocation:
     def showDepth(self):
         """
         Shows the depth channel image.
-        
+
         Returns
         -------
         None

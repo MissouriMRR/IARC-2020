@@ -32,10 +32,10 @@ def get_module_orientation(roi):
 if __name__ == "__main__":
     """
     Driver main for module_orientation
-    
+
     To test module_orientation, use
     "python module_orientation.py -i {depthimage.npy}"
-    
+
     Also note that region_of_interest should be in the same folder as module_orientation
     """
     import argparse

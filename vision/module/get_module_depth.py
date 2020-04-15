@@ -40,7 +40,7 @@ if __name__ == "__main__":
     """
     To test get_module_depth, use
     "python get_module_depth.py -i (image name).npy"
-    
+
     Also note that in_frame, must be in the same file location,
     or a path must be specified
     """

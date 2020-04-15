@@ -29,7 +29,7 @@ def region_of_interest(depth_frame, depth_val, center):
         Measured value for the depth of the module from the camera.
     center: integer tuple
         Coordinates of the center of the module.
-    
+
     Returns
     -------
     ndarray: A region of the depth image.
