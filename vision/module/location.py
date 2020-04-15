@@ -38,6 +38,7 @@ class ModuleLocation:
     def getDistance(self):
         """
         Finds the distance to the module.
+
         Returns
         -------
         int - distance to the module.
@@ -51,6 +52,7 @@ class ModuleLocation:
     def getCenter(self):
         """
         Find the center of the front face of the module.
+
         Returns
         -------
         ndarray - coordinates of the center of the module.
@@ -123,6 +125,7 @@ class ModuleLocation:
     def _groupSlopes(self):
         """
         Bucket sort slopes to find parallels.
+
         Returns
         -------
         None
@@ -140,6 +143,7 @@ class ModuleLocation:
     def _getSlopes(self):
         """
         Finds slopes between detected circles
+
         Returns
         -------
         None
@@ -157,6 +161,8 @@ class ModuleLocation:
 
     def _circleDetection(self):
         """
+        Uses cv2 to detect circles in the color image.
+
         Returns
         -------
         ndarray - circles detected in image.
@@ -187,6 +193,11 @@ class ModuleLocation:
         """
         Increases the brightness of the image.
 
+        Parameters
+        ----------
+        increase: int
+            The increase in brightness of RGB values.
+
         Returns
         -------
         None
@@ -198,6 +209,13 @@ class ModuleLocation:
     def setImg(self, color, depth):
         """
         Sets the image detection is performed on.
+
+        Parameters
+        ----------
+        color: ndarray
+            The color image.
+        depth: ndarray
+            The depth image.
 
         Returns
         -------
@@ -238,6 +256,7 @@ class ModuleLocation:
 
         Returns
         -------
+        None
         """
 
         circleImg = np.copy(self.img)

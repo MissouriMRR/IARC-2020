@@ -24,9 +24,15 @@ def region_of_interest(depth_frame, depth_val, center):
     Parameters
     ----------
     depth_frame: np array
+        The depth image.
     depth_val: float
-        Measured value for the depth of the module from the camera
+        Measured value for the depth of the module from the camera.
     center: integer tuple
+        Coordinates of the center of the module.
+    
+    Returns
+    -------
+    ndarray: A region of the depth image.
     """
     x_pos, y_pos = center
 

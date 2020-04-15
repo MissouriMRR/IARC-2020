@@ -17,13 +17,16 @@ def getModuleBounds(dimensions, center, depth):
 
     Parameters
     ----------
-    dimensions - tuple<int> - the dimensions of the color image
-    center - tuple<int> - (x, y)-coordinates of the center of the module
-    depth - float - value of the depth of the center of the module from the camera
+    dimensions: tuple<int>
+        The dimensions of the color image.
+    center: tuple<int>
+        (x, y)-coordinates of the center of the module
+    depth: float
+        Value of the depth of the center of the module from the camera.
 
     Returns
     -------
-    list - list of the four tuple vertices
+    list - list of the four tuple vertices.
     """
     x, y = center
     vert_res, horiz_res, _ = dimensions

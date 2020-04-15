@@ -20,8 +20,8 @@ def ModuleInFrame(color_image, depth_image):
 
     Parameters
     ----------
-    img: numpy array
-        The image stored in a numpy array.
+    img: ndarray
+        The color image.
 
     Returns
     -------
