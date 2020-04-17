@@ -17,14 +17,14 @@ def get_module_depth(depth_image, coordinates):
 
     Parameters
     ----------
-    depth_image: numpy array
+    depth_image: ndarray
         The depth image.
     coordinates: tuple of numbers
         (x, y) coordinates of the center of the module in the frame.
 
     Returns
     -------
-    float: depth at the center
+    float: Depth at the center (in millimeters).
     """
     x_pos, y_pos = coordinates
 
