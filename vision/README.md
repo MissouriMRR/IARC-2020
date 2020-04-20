@@ -56,24 +56,48 @@ The vision team is responsible for processing images in order to extract informa
 
 ```
     vision/
-        obstacle/
+        module/  # Tasks relating to the module block
+            get_module_depth.py  <- Code, usable in IARC-2020/vision/pipeline.py
             ...
-            main.py  <- Code, runnable from IARC/
-            README.md  <- Feature goal, use instructions
-
-        camera/
-            ...
-            main.py
             README.md
 
-        vision_images/  # Downloaded from team drive(see below)
+        obstacle/  # Tasks relating to obstacle detection
+            ...
+            README.md  <- Feature goal, use instructions
+
+        pylon/  # Tasks relating to the pylon
+            ...
+            README.md
+
+        text/  # Tasks relating to text detection
+            ...
+            README.md
+
+        camera/  # Tasks relating to the camera
+            ...
+            README.md
+
+        common/  # Common vision tools
+            blob_plotter.py
+            ...
+
+        tools/  # Tools for use in vision testing
+            blob_annotator/
+                ...
+                main.py
+            record_video.py
+            view_depth.py
+
+        vision_images/  # Downloaded from team drive (see below)
             obstacle/
             ...
 
-        vision_videos/  # Downloaded from team drive(see below)
+        vision_videos/  # Downloaded from team drive (see below)
             obstacle/
             ...
 
+        bounding_box.py  <- Class for formatting vision output
+        interface.py  <- For modeling the environment around the drone
         pipeline.py  <- Will bootstrap all vision code
         README.md  <- This file.
         requirements.txt  <- All necessary pip packages
