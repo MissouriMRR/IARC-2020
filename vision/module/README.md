@@ -1,6 +1,7 @@
 # Module
 
-These are tools for helping the drone pick up and manipulate the module.
+The module team handles tasks related to the module. The main tasks are to find the location, distance to, and orientation of the module.
+The goal of the module tasks is to allow flight to identify and manipulate the module.
 
 ## ModuleInFrame  (in_frame.py)
 
