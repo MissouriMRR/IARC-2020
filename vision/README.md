@@ -328,4 +328,4 @@ When testing a class and its methods, it's important to know if failed tests are
 
 ## Benchmarking
 
-The folder *benchmarks/* contains tools to gauge the time and accuracy of vision algorithms per different image categories, i.e. poor lighting, noisey background, ... Information to configure and make use of these can be found in *benchmarks/README.md*.
+The folder *benchmarks/* contains tools to gauge the time and accuracy of vision algorithms per different image categories, i.e. poor lighting, noisey background, ... Information to configure and make use of these can be found in *[benchmarks/README.md](https://github.com/MissouriMRR/IARC-2020/blob/feature/vision_docs/vision/benchmarks/README.md)*.
