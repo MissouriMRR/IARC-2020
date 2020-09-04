@@ -1,5 +1,5 @@
 """
-The Environment class will manage the other objects in the environment
+A model of the environment around the drone.
 """
 
 

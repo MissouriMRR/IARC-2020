@@ -18,7 +18,7 @@ from vision.common.import_params import import_params
 
 class ObstacleFinder:
     """
-    Constructs an ObstacleFinder object with an image, logging, and params
+    Detect objects in an image.
 
     Parameters
     ----------

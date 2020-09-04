@@ -1,4 +1,8 @@
-"""Utility for logging blobs detected in an image"""
+"""
+Utility for logging blobs detected in an image
+
+(Specifically OpenCV blob detector keypoints)
+"""
 
 import cv2
 import numpy as np
@@ -6,7 +10,8 @@ import numpy as np
 
 def plot_blobs(keypoints, image):
     """
-    Shows the detected blobs in an image and print the bounding boxes
+    Show opencv blob detector keypoints on image.
+    - Use box_plotter instead.
 
     Parameters
     ----------

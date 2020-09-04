@@ -1,5 +1,5 @@
 """
-Utility for logging obstacles detected in an image
+Display BoundingBoxes on image.
 """
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ BBOX_THICKNESS = 2
 
 def plot_box(boxes, image, waittime=0):
     """
-    Shows the detected obstacles in an image and print the bounding boxes
+    Display BoundingBoxes on image.
 
     Parameters
     ----------

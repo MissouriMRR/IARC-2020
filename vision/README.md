@@ -14,6 +14,8 @@ The vision team is responsible for processing images in order to extract informa
 
 [Unit Testing](#unit-testing)
 
+[Benchmarking](#benchmarking)
+
 ## Getting Started
 
 1.  Clone this repository
@@ -56,33 +58,71 @@ The vision team is responsible for processing images in order to extract informa
 
 ```
     vision/
-        obstacle/
+        module/  # Tasks relating to the module block
+            get_module_depth.py  <- Code, usable in IARC-2020/vision/pipeline.py
             ...
-            main.py  <- Code, runnable from IARC/
+            README.md
+
+        obstacle/  # Tasks relating to obstacle detection
+            ...
             README.md  <- Feature goal, use instructions
 
-        camera/
+        pylon/  # Tasks relating to the pylon
             ...
-            main.py
             README.md
-            
-        vision_images/  # Downloaded from team drive(see below)
+
+        text/  # Tasks relating to text detection
+            ...
+            README.md
+
+        camera/  # Tasks relating to the camera
+            ...
+            README.md
+
+        common/  # Common vision tools
+            blob_plotter.py
+            ...
+
+        tools/  # Tools for use in vision testing
+            blob_annotator/
+                ...
+                main.py
+            record_video.py
+            view_depth.py
+
+        vision_images/  # Downloaded from team drive (see below)
             obstacle/
             ...
 
-        vision_videos/  # Downloaded from team drive(see below)
+        vision_videos/  # Downloaded from team drive (see below)
             obstacle/
             ...
 
+        bounding_box.py  <- Class for formatting vision output
+        interface.py  <- For modeling the environment around the drone
         pipeline.py  <- Will bootstrap all vision code
         README.md  <- This file.
         requirements.txt  <- All necessary pip packages
 
-    unit_tests/
-        test_camera.py  <- Follows Unit Testing specs from below
-        test_obstacle.py
-        ...
-        runall.sh  <- Runs every unit test
+        benchmarks/
+            accuracy/
+                __init__.py
+                bench_module.py  <- Follows Benchmarking Guides
+                ...
+                runall.py
+            times/
+                __init__.py
+                bench_module.py  <- Follows Benchmarking Guides
+                ...
+                runall.py
+            common.py 
+            README.md  <- Instructions for Benchmarks
+
+        unit_tests/
+            test_camera.py  <- Follows Unit Testing specs from below
+            test_obstacle.py
+            ...
+            runall.sh  <- Runs every unit test
 ```
 
 ## Storing Images
@@ -285,3 +325,7 @@ When testing a class and its methods, it's important to know if failed tests are
     if __name__ == '__main__:
         unittest.main()
 ```
+
+## Benchmarking
+
+The folder *benchmarks/* contains tools to gauge the time and accuracy of vision algorithms per different image categories, i.e. poor lighting, noisey background, ... Information to configure and make use of these can be found in *[benchmarks/README.md](https://github.com/MissouriMRR/IARC-2020/blob/feature/vision_docs/vision/benchmarks/README.md)*.
