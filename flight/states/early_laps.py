@@ -58,17 +58,19 @@ class EarlyLaps:
             lon = round(gps.longitude_deg, 8)
             current = LatLon(lat, lon)  # you are here
 
-            if count==0:
-                #offset pylon
+            if count == 0:
+                # offset pylon
                 deg_to_pylon = current.heading_initial(pylon)
-                offset_point = pylon.offset(deg_to_pylon+config.DEG_OFFSET, config.OFFSET)
-                logging.debug(offset_point.to_string('d% %m% %S% %H'))# you are here
+                offset_point = pylon.offset(
+                    deg_to_pylon + config.DEG_OFFSET, config.OFFSET
+                )
+                logging.debug(offset_point.to_string("d% %m% %S% %H"))  # you are here
 
             dist = current.distance(offset_point)
             deg = current.heading_initial(offset_point)
 
-            x=dist*math.sin(math.radians(deg))*1000 # from km to m
-            y=dist*math.cos(math.radians(deg))*1000 # from km to m
+            x = dist * math.sin(math.radians(deg)) * 1000  # from km to m
+            y = dist * math.cos(math.radians(deg)) * 1000  # from km to m
             if count == 0:
                 reference_x: float = abs(x)
                 reference_y: float = abs(y)
@@ -78,17 +80,26 @@ class EarlyLaps:
 
             except ZeroDivisionError:
                 dx = math.copysign(
-                    config.MAX_SPEED * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), x
+                    config.MAX_SPEED
+                    * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    x,
                 )
                 dy = math.copysign(
-                    config.MAX_SPEED * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))), y
+                    config.MAX_SPEED
+                    * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    y,
                 )
 
-            await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(dy, dx, alt, deg))
+            await drone.offboard.set_velocity_ned(
+                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg)
+            )
 
-            if abs(x) <= reference_x*config.POINT_PERCENT_ACCURACY and abs(y) <= reference_y*config.POINT_PERCENT_ACCURACY:
+            if (
+                abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
+                and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
+            ):
                 return True
-            count+=1
+            count += 1
 
     async def wait_turn(self, drone):
         """Completes a full turn"""
@@ -99,9 +110,9 @@ class EarlyLaps:
                 temp = (current + 180) % 360
 
             await drone.offboard.set_velocity_body(
-                sdk.VelocityBodyYawspeed(5, -3, -0.1, -60)
+                sdk.offboard.VelocityBodyYawspeed(5, -3, -0.1, -60)
             )
-            await asyncio.sleep(config.FAST_THINK_S)
+            # await asyncio.sleep(config.FAST_THINK_S)
             val = abs(current - temp)
             # TODO: Add case so that it can overshoot the point and still complete
             if val < 10:

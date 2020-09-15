@@ -87,7 +87,7 @@ To run our competition code, you will need:
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/MissouriMRR/IARC-2020
+    git clone --recursive https://github.com/MissouriMRR/IARC-2020
     ```
 
 2. Make sure you are on the up to date `develop` branch.

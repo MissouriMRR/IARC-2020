@@ -22,9 +22,11 @@ class Land(State):
         Stops the drone by setting all movements to 0, then move to land
         mode
         """
-        await drone.offboard.set_position_ned(sdk.PositionNedYaw(0, 0, 0, 0))
-        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
-        await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
+        await drone.offboard.set_position_ned(sdk.offboard.PositionNedYaw(0, 0, 0, 0))
+        await drone.offboard.set_velocity_ned(sdk.offboard.VelocityNedYaw(0, 0, 0, 0))
+        await drone.offboard.set_velocity_body(
+            sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
+        )
 
         await asyncio.sleep(config.THINK_FOR_S)
 

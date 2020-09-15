@@ -24,14 +24,18 @@ class Takeoff(State):
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
-        await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_position_ned(
+            sdk.offboard.PositionNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (NSm/s, EWm/s, DUm/s, Ydeg)
-        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (FBm/s, RLm/s, DUm/s, Yspdeg/s)
         await drone.offboard.set_velocity_body(
-            sdk.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+            sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
         )
 
         try:
