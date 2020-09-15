@@ -18,6 +18,7 @@ class DroneNotFoundError(Exception):
 
     pass
 
+
 class StateMachine:
     """
     Initializes the state machine and runs the states.
@@ -59,8 +60,8 @@ async def log_flight_mode(drone: System) -> None:
 
 
 async def observe_is_in_air(drone: System, comm) -> None:
-    """ Monitors whether the drone is flying or not and
-    returns after landing """
+    """Monitors whether the drone is flying or not and
+    returns after landing"""
 
     was_in_air: bool = False
 
@@ -113,7 +114,7 @@ async def init_drone(sim: bool) -> System:
         raise DroneNotFoundError()
 
     # Add lines to control takeoff height
-    # config drone param's
+    # config drone param'soffboard.
     await config.config_params(drone)
     return drone
 
@@ -132,9 +133,15 @@ async def start_flight(comm, drone: System):
     except Exception:
         logging.exception("Exception occurred in state machine")
         try:
-            await drone.offboard.set_position_ned(sdk.PositionNedYaw(0, 0, 0, 0))
-            await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
-            await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
+            await drone.offboard.set_position_ned(
+                sdk.offboard.PositionNedYaw(0, 0, 0, 0)
+            )
+            await drone.offboard.set_velocity_ned(
+                sdk.offboard.VelocityNedYaw(0, 0, 0, 0)
+            )
+            await drone.offboard.set_velocity_body(
+                sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
+            )
 
             await asyncio.sleep(config.THINK_FOR_S)
 
@@ -157,4 +164,3 @@ async def start_flight(comm, drone: System):
 
     await termination_task
     flight_mode_task.cancel()
-
