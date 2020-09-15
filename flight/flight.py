@@ -114,7 +114,7 @@ async def init_drone(sim: bool) -> System:
         raise DroneNotFoundError()
 
     # Add lines to control takeoff height
-    # config drone param'soffboard.
+    # config drone param's
     await config.config_params(drone)
     return drone
 
