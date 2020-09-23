@@ -25,8 +25,9 @@ Notes:
 Imports
 '''
 
-from lac import LAC
+from .lac import LAC
 import time
+import logging
 
 '''
 Constants
@@ -64,8 +65,12 @@ class sLAC:
     elif (ePosition >= eMechStop):
       raise Exception("Extend is set to the mechanical stop.")
     
-    self.piston = LAC(vendorID,productID)
-    self.setupLAC()
+    try:
+    	self.piston = LAC(vendorID,productID)
+    	self.setupLAC()
+    except Exception:
+    	logging.error("Failed to connect to the piston")
+    
     
   #Automatically sets up the LAC
   def setupLAC(self):
@@ -108,18 +113,22 @@ class sLAC:
   #Takes 5 seconds to fully extend
   def extendLAC(self):
     print("Extending...")
-    self.piston.set_position(eLimit)
+    if self.piston:
+    	self.piston.set_position(eLimit)
     time.sleep(sleepVal) #Wait 6.5 seconds during extension
     
   #Retracts the LAC to the max value without hitting mechanical stop
   #Takes 5 seconds to fully retract
   def retractLAC(self):
-    self.piston.set_position(rLimit)
+    if self.piston:
+    	self.piston.set_position(rLimit)
     time.sleep(sleepVal) #Wait 6.5 seconds during retraction
 
   #Returns the current location of the LAC from [rLimit, eLimit]
   #Prints the metric location (mm) of LAC
   def positionLAC(self):
+    if self.piston is None:
+    	return -1
     actualPos = int(self.piston.get_feedback()) #Actual 2-bit position
     distance = (actualPos * stroke)/eLimit #Calculate metric distance
     print(str(distance) + "mm")
@@ -130,6 +139,7 @@ class sLAC:
   def resetLAC(self):
     print("Resetting...")
     self.retractLAC()
-    self.piston.reset()
+    if self.piston:
+    	self.piston.reset()
 
 
