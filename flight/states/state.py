@@ -1,4 +1,5 @@
 """Base State class which all other states inherit"""
+import logging
 from mavsdk import System
 
 
@@ -9,6 +10,9 @@ class State:
     Attributes:
         drone (System): The drone object; used for flight.
     """
+
+    def __init__(self):
+        logging.info('State "%s" has begun', self.name)
 
     async def run(self, drone: System):
         """
@@ -42,8 +46,13 @@ class State:
         """
         async for is_armed in drone.telemetry.armed():
             if not is_armed:
-                print("Not armed -- Arming")
+                logging.debug("Not armed. Attempting to arm")
                 await drone.action.arm()
             else:
-                print("Armed -- Continuing")
+                logging.warning("Drone armed")
                 break
+
+    @property
+    def name(self):
+        """Returns the name of the class"""
+        return type(self).__name__

@@ -1,5 +1,5 @@
 """
-Boat related unit tests.
+Text related unit tests.
 
 Parameter Defaults
 ------------------
@@ -14,21 +14,22 @@ import os, sys
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
-sys.path += [parent_dir, gparent_dir, ggparent_dir]
+gggparent_dir = os.path.dirname(ggparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
 import numpy as np
 import cv2
 
 import common
 
-from boat.detect_words import detect_russian_word
+from text.detect_words import TextDetector
 
 
 class TimeDetectRussianWord:
     """
     Testing the text detector.
     """
-    DEFAULT_WORD = 'holye'  # pronounced hol.ee
+    DEFAULT_WORD = 'holye'
     DEFAULT_DIMS = (1280, 720)
     DEFAULT_SIZE = 3
 
@@ -79,4 +80,4 @@ class TimeDetectRussianWord:
         """
         Timing detectRussianWord.
         """
-        detect_russian_word(color_image, depth_image)
+        TextDetector().detect_russian_word(color_image, depth_image)

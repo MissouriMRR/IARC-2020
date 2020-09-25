@@ -1,5 +1,5 @@
 """
-This file contains the ModuleInFrame function to detect if the module is in an image
+This file contains the ModuleInFrame function to detect if the module is in an image or not.
 
 The commented-out lines are used to visualize the algorithm and are unnecessary for processing.
 """
@@ -20,8 +20,8 @@ def ModuleInFrame(color_image, depth_image):
 
     Parameters
     ----------
-    img: numpy array
-        The image stored in a numpy array.
+    img: ndarray
+        The color image.
 
     Returns
     -------

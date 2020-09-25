@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "iarc-2020"
+version = "0.1.0"
+description = ""
+authors = []
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+mavsdk = "^0.6.1"
+colorlog = "^4.1.0"
+pyproj = "^2.6.0"
+pyusb = "^1.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+pylint = "^2.4.4"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

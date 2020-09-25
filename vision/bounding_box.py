@@ -18,7 +18,8 @@ class ObjectType(Enum):
 
 class BoundingBox:
     """
-    The bounding box of an object.
+    The bounding box around an object, a method of conveying information
+    to flight code.
 
     Parameters
     ----------

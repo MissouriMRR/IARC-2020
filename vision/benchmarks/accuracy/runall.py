@@ -1,6 +1,8 @@
 """
 Run time benchmarks.
 
+Results: (found, missed, extra)
+
 Process
 -------
 files = [filename for filename in 'times/' if 'bench' in filename]
@@ -23,7 +25,13 @@ Resolution = (1280, 720)
 Noise SD = 0
 N Objects = 0
 """
+import os, sys
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+sys.path += [parent_dir, gparent_dir]
+
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
@@ -39,21 +47,24 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
     Parameters
     ----------
     data: color_image, depth_image
-    TODO
+
+    annotation: pascal voc annotation
+
+    method: function(instance, *data)
+
+    instance: instance of object
 
     Returns
     -------
-    float Mean squared error between annotation and given.
-    \"""
+    (int, int, int) boxes_found, boxes_missed, boxes_extra.
+    """
+    FOUND_THRESHOLD = 5  # pixels
+
+    ##
     bounding_boxes = method(instance, *data)
 
-    ## Calculate error
-    # what if output misses box?
-    # better accuracy mectric for this?
-    # what if gives extra box
-    THRESHOLD = 5
-
-    accuracy = 0
+    ##
+    boxes_found, boxes_missed, boxes_extra = 0, 0, 0
 
     for value in annotation.findall('object'):
         annotation_bounding_box = value.find('bndbox')
@@ -61,7 +72,6 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
         ax1, ay1, ax2, ay2 = [int(annotation_bounding_box.find(param).text) for param in ['xmin', 'ymin', 'xmax', 'ymax']]
 
         for bounding_box in bounding_boxes:
-            ## Get x's and y's from bounding box
             X, Y, Z = [], [], []
             for x, y in bounding_box.vertices:
                 X.append(x)
@@ -70,22 +80,19 @@ def accuracy_boundingbox(data, annotation, method, instance):  ## NOT IMPLEMENTE
             X, Y = np.unique(X), np.unique(Y)
             bx1, by1, bx2, by2 = min(X), min(Y), max(X), max(Y)
 
-            ## see if bx1, by1,... within +/- threshold of each ax1, ...
-
-            x1_close = bx1 - THRESHOLD <= ax1 <= bx1 + THRESHOLD
-            y1_close = by1 - THRESHOLD <= ay1 <= by1 + THRESHOLD
-            x2_close = bx2 - THRESHOLD <= ax2 <= bx2 + THRESHOLD
-            y2_close = by2 - THRESHOLD <= ay2 <= by2 + THRESHOLD
+            ##
+            x1_close = bx1 - FOUND_THRESHOLD <= ax1 <= bx1 + FOUND_THRESHOLD
+            y1_close = by1 - FOUND_THRESHOLD <= ay1 <= by1 + FOUND_THRESHOLD
+            x2_close = bx2 - FOUND_THRESHOLD <= ax2 <= bx2 + FOUND_THRESHOLD
+            y2_close = by2 - FOUND_THRESHOLD <= ay2 <= by2 + FOUND_THRESHOLD
 
             if all((x1_close, y1_close, x2_close, y2_close)):
-                accuracy += 1
+                boxes_found += 1
 
-        accuracy /= len(annotation.findall('object'))
+    boxes_missed = len(annotation.findall('object')) - boxes_found
+    boxes_extra = len(bounding_boxes) - boxes_found
 
-    error = accuracy
-
-    return error
-    """
+    return boxes_found, boxes_missed, boxes_extra
 
 
 def accuracy_boolean(data, annotation, method, instance):
@@ -101,7 +108,7 @@ def accuracy_boolean(data, annotation, method, instance):
 
     Returns
     -------
-    float Accuracy of model.
+    found, missed, extra
     """
     ## Prediction
     bounding_boxes = method(instance, *data)
@@ -112,9 +119,11 @@ def accuracy_boolean(data, annotation, method, instance):
     expected = bool(len(annotation.findall('object')))
 
     ## Calculate accuracy
-    accuracy = int(prediction == expected)
+    found = int(prediction == expected)
+    missed = 1 - found
+    extra = 0
 
-    return accuracy
+    return found, missed, extra
 
 
 classification_map = {
@@ -125,10 +134,13 @@ classification_map = {
 if __name__ == '__main__':
     benchmarks = {}
 
+    ## Command line args
+    keyword = sys.argv[1] if len(sys.argv) > 1 else ''
+
     ## Find time benchmarks in modules
     for module in modules:
         for key, value in module.__dict__.items():
-            if 'Accuracy' in key:
+            if 'Accuracy' in key and keyword.lower() in key.lower():
                 benchmarks.update({key: value})
 
         ## Read benchmark configuration
@@ -148,7 +160,7 @@ if __name__ == '__main__':
         annotations = common.read_annotations(path)
 
         ## Run benchmarks
-        output = pd.DataFrame(columns=['class', 'method', 'type', 'filename', 'result'])
+        output = pd.DataFrame(columns=['class', 'method', 'type', 'filename', 'found', 'missed', 'extra'])
 
         for b_name, benchmark in benchmarks.items():
             b_instance = benchmark()
@@ -165,7 +177,8 @@ if __name__ == '__main__':
                 for filename, p_type in parameters.items():
                     try:
                         images = common.read_image(os.path.join(path, filename), encoding)
-                        annotation = annotations[filename.split('.')[0]]
+
+                        annotation = annotations[filename.split('.')[0].split('\\')[-1].split('/')[-1]]
 
                         result = classification_method(images, annotation, method, b_instance)
 
@@ -174,9 +187,9 @@ if __name__ == '__main__':
 
                         output.loc[len(output)] = [b_name, m_name, p_type, filename, np.nan]
                     else:
-                        print(f"{b_name}.{m_name}: {filename} {result:.5f}")
+                        print(f"{b_name}.{m_name}: {filename} {result}")
 
-                        output.loc[len(output)] = [b_name, m_name, p_type, filename, result]
+                        output.loc[len(output)] = [b_name, m_name, p_type, filename, *result]
 
     # print(output.head(15))
     # output.to_csv('', index=False)

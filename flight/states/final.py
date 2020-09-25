@@ -9,4 +9,3 @@ class Final(State):
 
     async def run(self, drone: System) -> None:
         """Does nothing"""
-        print("Final")

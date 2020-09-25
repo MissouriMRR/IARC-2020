@@ -1,10 +1,13 @@
 """The takeoff state"""
 import asyncio
+import logging
 import mavsdk as sdk
 from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
+
+from flight import config
 
 
 class Takeoff(State):
@@ -13,24 +16,26 @@ class Takeoff(State):
     async def run(self, drone: System) -> None:
         """Arms and takes off the drone"""
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
-        print("-- Taking off")
+        logging.info("Taking off")
         # Takeoff command, goes to altitude specified in params
         await drone.action.takeoff()
         # waits for altitude to be close to the specified level
-        alt_wait: asyncio.coroutine = asyncio.ensure_future(self.wait_alt(drone))
-        await alt_wait
-        alt_wait.cancel()
+        await self.wait_alt(drone)
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
-        await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_position_ned(
+            sdk.offboard.PositionNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (NSm/s, EWm/s, DUm/s, Ydeg)
-        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (FBm/s, RLm/s, DUm/s, Yspdeg/s)
         await drone.offboard.set_velocity_body(
-            sdk.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+            sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
         )
 
         try:
@@ -46,5 +51,5 @@ class Takeoff(State):
         """Checks to see if the drone is near the target altitude"""
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= 2:
+            if altitude >= config.ALT_RANGE_MIN:
                 return True
