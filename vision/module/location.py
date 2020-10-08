@@ -21,7 +21,7 @@ class ModuleLocation:
         self.circles = np.array(0) # Array of circles detected in color image
 
         self.center = np.arange(2) # x, y coordinates of center
-        self.holes = np.arange(8) # Set of (x, y) coordinates, location of the holes
+        self.holes = np.zeros((4, 3)) # Set of (x, y, r) coordinates, location of the holes
 
         self.slopes = np.array(0) # Slopes between detected circles
         self.slope_heights = np.array(0) # Histogram of slopes
@@ -41,8 +41,7 @@ class ModuleLocation:
         -------
         int - distance to the module.
         """
-        self.getCenter()
-        self.distance = self.depth[self.center[0], self.center[1], 0]
+        self.distance = self.depth[self.center[1], self.center[0]]
         return self.distance
 
     ## Finding the Center
@@ -56,15 +55,16 @@ class ModuleLocation:
         tuple - (x, y) coordinates of the center of the module.
         """
         MAX_CIRCLES = 100 # slope calculations are not performed if there are more than MAX_CIRCLES circles
+        MIN_CIRCLES = 4 # minimum number of circles to perform more calculations
 
         # Circle detection
         self._circleDetection()
 
         # Filter out far away circles
-        self._filterCircleDepth()
+        #self._filterCircleDepth()
 
         # Only perform more calculations if there are few circles
-        if np.shape(self.circles)[0] <= MAX_CIRCLES:
+        if np.shape(self.circles)[0] <= MAX_CIRCLES and np.shape(self.circles)[0] > MIN_CIRCLES:
             # Get Slopes and Parallels
             self._getSlopes()
             self._groupSlopes()
@@ -344,10 +344,23 @@ if __name__ == "__main__":
     import os
 
     prefix = 'vision' if os.path.isdir('vision') else ''
-    filename = os.path.join(prefix, "vision_images", "module", "blocks1.jpg")
+    filename = os.path.join(prefix, "vision_images", "module", "Feb29", "2020-02-29_15.36.15.079345-colorImage.jpg")
+    depthname = os.path.join(prefix, "vision_images", "module", "Feb29", "2020-02-29_15.36.15.079345-depthImage.npy")
     image = cv2.imread(filename)
+    depth = np.load(depthname)
+
     if image is None:
         print(f'Failed to read image: {filename}')
         exit()
+    if depth is None:
+        print(f'Failed to load depth image: {depthname}')
+        exit()
     
     loc = ModuleLocation()
+
+    loc.setImg(image, depth)
+
+    print(loc.getCenter())
+    print(loc.getDistance())
+
+    loc.showCenter()
