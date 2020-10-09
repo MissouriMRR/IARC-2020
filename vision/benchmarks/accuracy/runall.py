@@ -5,7 +5,7 @@ Results: (found, missed, extra)
 
 Process
 -------
-files = [filename for filename in 'times/' if 'bench' in filename]
+filenames = [filename for filename in 'times/' if 'bench' in filename]
 benchmarks = [class for class in filenames if 'Accuracy' in class_name]
 
 for benchmark in benchmarks:
