@@ -192,7 +192,7 @@ class TestModuleOrientation(unittest.TestCase):
         IMAGE_SIZE = [1920, 1080]
 
         # testing with ndarray of all zeroes
-        image = np.zeros(IMAGE_SIZE)
+        image = np.zeros(IMAGE_SIZE, dtype=int)
         result = get_module_orientation(image)
 
         self.assertIs(type(image), np.ndarray)
@@ -214,28 +214,19 @@ class TestModuleOrientation(unittest.TestCase):
             # NOTE: The center tuples are estimated because center function does not work at the moment
             # TODO: Find more head-on shots of the module
         }
-
-        counter = 0
-        for current_file in files:
-            counter += 1  # started one ahead to get next (depth) file
-            stripped_filename = current_file[:26]
-
-            # Get files two at a time, color w/ depth
-            if (
-                counter - 1
-            ) % 2 == 0 and stripped_filename in estimates:  # counts every other file and checks if current is in estimates
-
+        
+        for current_file in estimates.keys():
                 # grabs and loadspair of color and depth files (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-                current_color_file = os.path.join(img_dir, current_file)  # current file
+                current_color_file = os.path.join(img_dir, current_file, "-colorImage.jpg")  # current file
                 current_color = cv2.imread(current_color_file)
-                current_depth_file = files[counter]  # next file over (after color img)
-                current_depth = np.load(os.path.join(img_dir, current_depth_file))
+                current_depth_file = os.path.join(img_dir, current_file, "-depthImage.npy")  # next file over (after color img)
+                current_depth = np.load(current_depth_file)
 
-                # get center and get and show region of interest as image
-                current_center = estimates[stripped_filename][0]
-                loc = ModuleLocation()
-                loc.setImg(current_color, current_depth)
-                # current_center = loc.getCenter(); #BROKEN
+                # get center
+                #loc = ModuleLocation()
+                #loc.setImg(current_color, current_depth)
+                #current_center = loc.getCenter(); #BROKEN
+                current_center = estimates[current_file][0]
 
                 # get region of interest
                 roi = region_of_interest(
@@ -246,8 +237,8 @@ class TestModuleOrientation(unittest.TestCase):
 
                 orientation = get_module_orientation(roi)
 
-                estimated_pitch = estimates[stripped_filename][1][0]
-                estimated_yaw = estimates[stripped_filename][1][1]
+                estimated_pitch = estimates[current_file][1][0]
+                estimated_yaw = estimates[current_file][1][1]
                 calculated_pitch = orientation[0]
                 calculated_yaw = orientation[1]
 
@@ -269,7 +260,7 @@ class TestModuleOrientation(unittest.TestCase):
         IMAGE_SIZE = [1920, 1080]
 
         # testing with ndarray of all zeroes
-        image = np.zeros(IMAGE_SIZE)
+        image = np.zeros(IMAGE_SIZE, dtype=int)
         result = get_module_orientation(image)
 
         self.assertIs(type(result), tuple)
