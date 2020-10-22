@@ -17,10 +17,6 @@ class Takeoff(State):
         """Arms and takes off the drone"""
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
-        # Takeoff command, goes to altitude specified in params
-        await drone.action.takeoff()
-        # waits for altitude to be close to the specified level
-        await self.wait_alt(drone)
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
@@ -45,11 +41,26 @@ class Takeoff(State):
             await drone.action.land()
             return
 
+        await self.takeoff(drone, 1.0)
+        #Takes off vertically until a desired altitude
+        #Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
         return EarlyLaps()  # Return the next state, RunLaps
 
-    async def wait_alt(self, drone: System):
+    async def takeoff(self, drone: (System), alt):
+        """Takes off vertically to a height defined by alt"""
+
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, -1.0, 0.0)
+            #Sets the velocity of the drone to be straight up
+        )
+        await self.wait_alt(drone, alt)
+        #Waits until a desired altitude is reached, before moving on to EarlyLaps
+
+        return
+
+    async def wait_alt(self, drone: System, alt):
         """Checks to see if the drone is near the target altitude"""
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= config.ALT_RANGE_MIN:
+            if altitude >= alt:
                 return True
