@@ -31,14 +31,13 @@ pylon2: LatLon = LatLon(lat2, lon2)
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
-NUM_LAPS: int = 1
+NUM_LAPS: int = 2
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
 
 
 async def config_params(drone: System):
-    return
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
     await drone.param.set_param_float("MPC_XY_VEL_MAX", MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_CRUISE", MAX_SPEED)
