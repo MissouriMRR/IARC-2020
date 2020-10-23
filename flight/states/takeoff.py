@@ -44,9 +44,9 @@ class Takeoff(State):
         await self.takeoff(drone)
         #Takes off vertically until a desired altitude constant TAKEOFF_ALT
         #Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
-        return EarlyLaps()  # Return the next state, RunLaps
+        return EarlyLaps()  # Return the next state, EarlyLaps
 
-    async def takeoff(self, drone: (System)):
+    async def takeoff(self, drone: System):
         """Takes off vertically to a height defined by alt"""
 
         await drone.offboard.set_velocity_ned(
