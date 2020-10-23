@@ -31,7 +31,7 @@ pylon2: LatLon = LatLon(lat2, lon2)
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
-NUM_LAPS: int = 2
+NUM_LAPS: int = 1
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
