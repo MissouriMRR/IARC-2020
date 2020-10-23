@@ -6,11 +6,12 @@ from mavsdk import System
 MAX_SPEED: float = 6.352  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
-TAKEOFF_ALT: float = 6.0  # m
+TAKEOFF_ALT: float = 1.0  # m
+FLYING_ALT: float = 6.0 # m
 # What percentage of the hight can we loos/gain before unsafe
 ALT_PERCENT_ACCURACY: float = 0.15
-ALT_RANGE_MAX: float = TAKEOFF_ALT + (TAKEOFF_ALT * ALT_PERCENT_ACCURACY)  # m
-ALT_RANGE_MIN: float = TAKEOFF_ALT - (TAKEOFF_ALT * ALT_PERCENT_ACCURACY)  # m
+ALT_RANGE_MAX: float = FLYING_ALT + (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
+ALT_RANGE_MIN: float = FLYING_ALT - (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
 
 POINT_PERCENT_ACCURACY: float = 0.2
 
