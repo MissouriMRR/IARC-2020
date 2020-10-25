@@ -6,10 +6,11 @@ from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
-from flight.utils.Wrapped_Movement import D_Move
+from flight.utils.movement_controller import MovementController
 
 from flight import config
 
+mover: MovementController = MovementController()
 
 class Takeoff(State):
     """The state that takes off the drone"""
@@ -21,7 +22,7 @@ class Takeoff(State):
         # Takeoff command, goes to altitude specified in params
         await drone.action.takeoff()
         # waits for altitude to be close to the specified level
-        await D_Move.checkAlt(self, drone)
+        await mover.check_altitude(drone)
         logging.debug("after hold")
 
         # Setting set points for the next 3 lines (used to basically set drone center)

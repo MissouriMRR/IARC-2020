@@ -41,8 +41,7 @@ FAST_THINK_S: float = 1.0
 
 
 async def config_params(drone: System):
-    return
-    #await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
+    await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
     await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_VEL_MAX", MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_CRUISE", MAX_SPEED)
