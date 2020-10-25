@@ -1,17 +1,15 @@
-from flight import config  
-"""import config used to obtain set constant values"""
+from flight import config"""import config used to obtain set constant values"""
 from flight.utils.latlon import LatLon
 from mavsdk import System
 import mavsdk as sdk
 import logging
-import asyncio
 import math
 
 class MovementController:
     """
     Params: Drone, Pylon
     Return: Boolean or None
-    Calculates and uses gps coordinates of the drone to move to the location of the target pylon 
+    Calculates and uses gps coordinates of the drone to move to the location of the target pylon
     """
     async def move_to(self, drone: System, pylon: LatLon) -> bool:
         """
@@ -93,7 +91,7 @@ class MovementController:
             ):
                 return True
             count += 1
-            
+
     async def turn(self, drone: System) -> bool:
         """
         Turns the drone around the pylon it is currently at
@@ -117,13 +115,12 @@ class MovementController:
                 return True
             count += 1
 
-    
+
     async def check_altitude(self, drone: System) -> bool:
         """
         Checks the altitude of the drone to make sure that we are at our target
-        Parameters: 
+        Parameters:
             Drone(System): Our drone object
-        
         """
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
