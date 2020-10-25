@@ -53,7 +53,7 @@ async def config_params(drone: System):
     await drone.param.set_param_int("NAV_RCL_ACT", 1)
 
     await drone.param.set_param_float("LNDMC_XY_VEL_MAX", 0.5)
-    await drone.param.set_param_float("LNDMC_FFALL_THR", 3)
-    await drone.param.set_param_float("LNDMC_FFALL_TTRI", 0.15)
+    # await drone.param.set_param_float("LNDMC_FFALL_THR", 3)
+    # await drone.param.set_param_float("LNDMC_FFALL_TTRI", 0.15)
     await drone.param.set_param_float("LNDMC_ALT_MAX", MAX_ALT)
-    await drone.param.set_param_float("LNDMC_LOW_T_THR", 0.2)
+    # await drone.param.set_param_float("LNDMC_LOW_T_THR", 0.2)
