@@ -5,7 +5,7 @@ import math
 import mavsdk as sdk
 
 from flight import config
-from flight.utils.latlon import LatLon
+from flight.utils.latlon import LatLon, Latitude, Longitude
 
 from flight.utils.movement_controller import MovementController
 from .land import Land
@@ -16,7 +16,9 @@ async def arange(count):
     for i in range(count):
         yield i
 
+
 mover: MovementController = MovementController()
+
 
 class EarlyLaps:
     """Handles getting the drone around the two pylons 8 times"""
@@ -30,7 +32,7 @@ class EarlyLaps:
         async for i in arange(config.NUM_LAPS):
             logging.info("Starting lap: %d", i)
             logging.debug("Lap %d: Straight one", i)
-            await mover.move_to( drone, config.pylon2)  # move to pylon 2
+            await mover.move_to(drone, config.pylon2)  # move to pylon 2
 
             logging.debug("Lap %d: Turn one", i)
             await mover.turn(drone)  # turn around pylon 2
