@@ -46,7 +46,7 @@ class TestModuleInFrame(unittest.TestCase):
         with self.subTest(i="3 Channel {0..255} Image"):
             color_image = np.ones(shape=(*IMAGE_SIZE, 3), dtype="uint8")
 
-            result = mif(color_image, None)
+            result = mif(color_image)
 
             self.assertIn(result, [True, False])
 
@@ -79,7 +79,7 @@ class TestModuleInFrame(unittest.TestCase):
             color_image = 255 * np.ones((i * 100, i * 100, 3), dtype="uint8")
             color_image = cv2.circle(color_image, (i * 50, i * 50), 20, (0, 0, 0), 4)
 
-            result = mif(color_image, None)
+            result = mif(color_image)
 
             self.assertIn(result, [True, False])
 
@@ -89,7 +89,7 @@ class TestModuleInFrame(unittest.TestCase):
 
         color_parameter = np.copy(color_image)
 
-        mif(color_parameter, None)
+        mif(color_parameter)
 
         np.testing.assert_array_equal(color_image, color_parameter)
 
@@ -208,24 +208,24 @@ class TestModuleOrientation(unittest.TestCase):
 
         # hand-picked images for unit test, assumes color-depth pair for each of the files
         estimates = {
-            # FORMAT: "name_of_file_without_color-depth_tail" : [estimated_center, estimated_orientation]
-            "2020-02-29_15.35.31.313411": [(906, 807), (-25, -1)],
-            "2020-02-29_15.35.40.045632": [(641, 866), (-70, -25)],
-            "2020-02-29_15.35.57.551331": [(1228, 653), (0, 5)],
-            "2020-02-29_15.35.56.436446": [(1170, 644), (10, 10)],
-            "2020-02-29_15.40.42.462549": [(948, 620), (20, 5)]
+            # FORMAT: "name_of_file_without_color-depth_tail" : [estimated_center (x, y), estimated_orientation (yaw, pitch)]
+            "2020-02-29_15.35.31.313411": [(906, 807), (1, -25)],
+            "2020-02-29_15.35.40.045632": [(641, 866), (15, -45)],
+            "2020-02-29_15.35.57.551331": [(1228, 653), (-15, -1)],
+            "2020-02-29_15.35.56.436446": [(1170, 644), (-10, 0)],
+            "2020-02-29_15.40.42.462549": [(948, 620), (-20, -3)]
             # NOTE: The center tuples are estimated because center function does not work at the moment
             # TODO: Find more head-on shots of the module
         }
 
         for current_file in estimates.keys():
             # grabs and loadspair of color and depth files (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-            current_color_file = os.path.join(
-                img_dir, current_file, "-colorImage.jpg"
+            current_color_file = (
+                os.path.join(img_dir, current_file) + "-colorImage.jpg"
             )  # current file
             current_color = cv2.imread(current_color_file)
-            current_depth_file = os.path.join(
-                img_dir, current_file, "-depthImage.npy"
+            current_depth_file = (
+                os.path.join(img_dir, current_file) + "-depthImage.npy"
             )  # next file over (after color img)
             current_depth = np.load(current_depth_file)
 
