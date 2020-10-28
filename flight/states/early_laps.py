@@ -17,14 +17,12 @@ async def arange(count):
         yield i
 
 
-mover: MovementController = MovementController()
-
-
 class EarlyLaps:
     """Handles getting the drone around the two pylons 8 times"""
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
+        mover: MovementController = MovementController()
         # Go to pylon 1
         logging.info("Moving to pylon 1")
         await mover.move_to(drone, config.pylon1)

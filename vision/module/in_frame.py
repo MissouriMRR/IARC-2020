@@ -8,19 +8,19 @@ import numpy as np
 import argparse
 
 # Constants
-BLUR_SIZE = 5 # Blur kernel size
-BUCKET_MODIFIER = 1 # Changes how many buckets are in the range
-MIN_SLOPES_IN_BUCKET = 15 # Minimum number of slopes in a single bucket to identify the module
-MAX_CIRCLES = 100 # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
+BLUR_SIZE = 5  # Blur kernel size
+BUCKET_MODIFIER = 1  # Changes how many buckets are in the range
+MIN_SLOPES_IN_BUCKET = 15  # Minimum number of slopes in a single bucket to identify the module
+MAX_CIRCLES = 100  # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
 
 
-def ModuleInFrame(color_image, depth_image):
+def ModuleInFrame(color_image: np.ndarray) -> bool:
     """
     Determines if the Module is in frame
 
     Parameters
     ----------
-    img: ndarray
+    color_image: ndarray
         The color image.
 
     Returns
@@ -50,7 +50,7 @@ def ModuleInFrame(color_image, depth_image):
     laplacian = np.uint8(laplacian)
 
     # Hough Circle Detection
-    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=50, param2=28, minRadius=0, maxRadius=50)
+    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=75, param2=24, minRadius=0, maxRadius=50)
     if circles is None:  # no circles found
         return False
     elif circles.shape[1] > MAX_CIRCLES:  # too many circles found
@@ -121,4 +121,4 @@ if __name__ == '__main__':
     image = cv2.imread(inputImageFile)
     npImage = np.asarray(image)
 
-    print("Module in frame: " + str(ModuleInFrame(npImage, None)))
+    print("Module in frame: " + str(ModuleInFrame(npImage)))

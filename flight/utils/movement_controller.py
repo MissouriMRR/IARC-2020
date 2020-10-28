@@ -1,4 +1,4 @@
-"""import config used to obtain set constant values"""
+"""Holds all of the movement functions for our drone device"""
 from flight import config
 from flight.utils.latlon import LatLon
 from mavsdk import System
@@ -124,6 +124,17 @@ class MovementController:
         """
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= config.ALT_RANGE_MIN:
+            if altitude >= config.TAKEOFF_ALT:
                 return True
                 
+    async def takeoff(self, drone: System):
+        """Takes off vertically to a height defined by alt"""
+
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, -1.0, 0.0)
+            # Sets the velocity of the drone to be straight up
+        )
+        await self.check_altitude(drone)
+        # Waits until altitude TAKEOFF_ALT is reached, before moving on to EarlyLaps
+
+        return

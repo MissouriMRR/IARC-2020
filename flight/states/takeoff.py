@@ -11,21 +11,14 @@ from flight.utils.movement_controller import MovementController
 from flight import config
 
 
-mover: MovementController = MovementController()
-
-
 class Takeoff(State):
     """The state that takes off the drone"""
 
     async def run(self, drone: System) -> None:
         """Arms and takes off the drone"""
+        mover: MovementController = MovementController()
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
-        # Takeoff command, goes to altitude specified in params
-        await drone.action.takeoff()
-        # waits for altitude to be close to the specified level
-        await mover.check_altitude(drone)
-        logging.debug("after hold")
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
@@ -50,4 +43,7 @@ class Takeoff(State):
             await drone.action.land()
             return
 
-        return EarlyLaps()  # Return the next state, RunLaps
+        await mover.takeoff(drone)
+        # Takes off vertically until a desired altitude constant TAKEOFF_ALT
+        # Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
+        return EarlyLaps()  # Return the next state, EarlyLaps
