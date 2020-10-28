@@ -8,7 +8,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 gggparent_dir = os.path.dirname(ggparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
-from boat.detect_words import detect_russian_word
+from text.detect_words import TextDetector
 
 
 IMG_FOLDER = 'boat'
@@ -28,6 +28,6 @@ class AccuracyRussianWord:
         -------
         List[BoundingBox]
         """
-        bounding_boxes = detect_russian_word(color_image, depth_image)
+        bounding_boxes = TextDetector().detect_russian_word(color_image, depth_image)
 
         return bounding_boxes

@@ -4,7 +4,7 @@ Common functions for benchmarks to make use of.
 NOTE: Do no edit, only append!
 """
 import os
-import lxml
+import lxml.etree
 import numpy as np
 import cv2
 

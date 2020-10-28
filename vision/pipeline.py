@@ -10,6 +10,9 @@ gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
+from vision.bounding_box import BoundingBox, ObjectType
+
+import datetime
 import json
 from multiprocessing import Queue
 from queue import Empty
@@ -17,6 +20,11 @@ from queue import Empty
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.common.import_params import import_params
 
+from vision.module.location import ModuleLocation
+from vision.module.get_module_depth import get_module_depth
+#from vision.module.region_of_interest import region_of_interest
+#from vision.module.module_orientation import get_module_orientation
+from vision.module.module_bounding import getModuleBounds
 
 CAMERA_IDS = {
     'obstacle': '',
@@ -26,14 +34,14 @@ CAMERA_IDS = {
 
 class Pipeline:
     """
-    This is a pipeline class that takes in a video, runs an obstacle detection algorithm,
-    and updates the blobs to the environment class.
+    Pipeline to carry information from the cameras through
+    the various vision algorithms out to flight.
 
     Parameters
     -------------
-    vision_communication: multiprocessing queue
+    vision_communication: multiprocessing Queue
         Interface to share vision information with flight.
-    flight_communication: multiprocessing queue
+    flight_communication: multiprocessing Queue
         Interface to recieve flight state information from flight.
     camera: Camera
         Camera to pull image from.
@@ -58,6 +66,12 @@ class Pipeline:
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
 
+        self.module_location = ModuleLocation()
+
+    @property
+    def picture(self):
+        return next(self.camera)
+
     def run(self, prev_state):
         """
         Process current camera frame.
@@ -79,12 +93,20 @@ class Pipeline:
 
         if state == 'early_laps':
             bboxes = self.obstacle_finder.find(color_image, depth_image)
+        elif state == 'module_detection':
+            self.module_location.setImg(color_image, depth_image)
+            center = self.module_location.getCenter()
+            depth = get_module_depth(depth_image, center)
+            #orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
+            box = BoundingBox(getModuleBounds(color_image, center, depth), ObjectType.MODULE)
+            box.module_depth = depth # float
+            #box.orientation = orientation # tuple
+            bboxes.append(box)
         else:
-            pass  # raise AttributeError(f"Unrecognized state: {state}")
+            pass # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
-        for bbox in bboxes:
-            self.vision_communication.put(bbox, self.PUT_TIMEOUT)
+        self.vision_communication.put((datetime.datetime.now(), bboxes), self.PUT_TIMEOUT)
 
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)

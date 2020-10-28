@@ -17,9 +17,14 @@ def get_module_depth(depth_image, coordinates):
 
     Parameters
     ----------
-    depth_image: numpy array
+    depth_image: ndarray
+        The depth image.
     coordinates: tuple of numbers
-        (x, y) coordinates of the center of the module in the frame
+        (x, y) coordinates of the center of the module in the frame.
+
+    Returns
+    -------
+    float: Depth at the center (in millimeters).
     """
     x_pos, y_pos = coordinates
 
@@ -35,7 +40,7 @@ if __name__ == "__main__":
     """
     To test get_module_depth, use
     "python get_module_depth.py -i (image name).npy"
-    
+
     Also note that in_frame, must be in the same file location,
     or a path must be specified
     """

@@ -25,7 +25,7 @@ if __name__ == '__main__':
     config = rs.config()
 
     config.enable_stream(rs.stream.depth, 0, 0, rs.format.z16, 0)
-    config.enable_stream(rs.stream.color, 0, 0, rs.format.bgr8, 0)
+    config.enable_stream(rs.stream.color, 0, 0, rs.format.rgb8, 0)
 
     config.enable_record_to_file(FILENAME)
 

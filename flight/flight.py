@@ -5,7 +5,9 @@ import logging
 from mavsdk import System
 import mavsdk as sdk
 
-from flight.states import STATES, State
+from .states import STATES, State
+from . import config
+
 
 SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
 CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
@@ -58,8 +60,8 @@ async def log_flight_mode(drone: System) -> None:
 
 
 async def observe_is_in_air(drone: System, comm) -> None:
-    """ Monitors whether the drone is flying or not and
-    returns after landing """
+    """Monitors whether the drone is flying or not and
+    returns after landing"""
 
     was_in_air: bool = False
 
@@ -112,6 +114,8 @@ async def init_drone(sim: bool) -> System:
         raise DroneNotFoundError()
 
     # Add lines to control takeoff height
+    # config drone param's
+    await config.config_params(drone)
     return drone
 
 
@@ -129,20 +133,26 @@ async def start_flight(comm, drone: System):
     except Exception:
         logging.exception("Exception occurred in state machine")
         try:
-            await drone.offboard.set_position_ned(sdk.PositionNedYaw(0, 0, 0, 0))
-            await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0, 0, 0, 0))
-            await drone.offboard.set_velocity_body(sdk.VelocityBodyYawspeed(0, 0, 0, 0))
+            await drone.offboard.set_position_ned(
+                sdk.offboard.PositionNedYaw(0, 0, 0, 0)
+            )
+            await drone.offboard.set_velocity_ned(
+                sdk.offboard.VelocityNedYaw(0, 0, 0, 0)
+            )
+            await drone.offboard.set_velocity_body(
+                sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
+            )
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(config.THINK_FOR_S)
 
             try:
                 await drone.offboard.stop()
-            except sdk.OffboardError as error:
+            except sdk.offboard.OffboardError as error:
                 logging.exception(
                     "Stopping offboard mode failed with error code: %s", str(error)
                 )
                 # Worried about what happens here
-            await asyncio.sleep(1)
+            await asyncio.sleep(config.THINK_FOR_S)
             logging.info("Landing the drone")
             await drone.action.land()
         except:
@@ -154,4 +164,3 @@ async def start_flight(comm, drone: System):
 
     await termination_task
     flight_mode_task.cancel()
-

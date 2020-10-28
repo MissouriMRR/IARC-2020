@@ -7,6 +7,8 @@ from mavsdk import System
 from .state import State
 from .early_laps import EarlyLaps
 
+from flight import config
+
 
 class Takeoff(State):
     """The state that takes off the drone"""
@@ -15,35 +17,50 @@ class Takeoff(State):
         """Arms and takes off the drone"""
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
-        # Takeoff command, goes to altitude specified in params
-        await drone.action.takeoff()
-        # waits for altitude to be close to the specified level
-        await self.wait_alt(drone)
 
         # Setting set points for the next 3 lines (used to basically set drone center)
         # (NSm, EWm, DUm, Ydeg)
-        await drone.offboard.set_position_ned(sdk.PositionNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_position_ned(
+            sdk.offboard.PositionNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (NSm/s, EWm/s, DUm/s, Ydeg)
-        await drone.offboard.set_velocity_ned(sdk.VelocityNedYaw(0.0, 0.0, 0.0, 0.0))
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
+        )
 
         # (FBm/s, RLm/s, DUm/s, Yspdeg/s)
         await drone.offboard.set_velocity_body(
-            sdk.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+            sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
         )
 
         try:
             # Enable offboard mode, allowing for computer to control the drone
             await drone.offboard.start()
-        except sdk.OffboardError:
+        except sdk.offboard.OffboardError:
             await drone.action.land()
             return
 
-        return EarlyLaps()  # Return the next state, RunLaps
+        await self.takeoff(drone)
+        #Takes off vertically until a desired altitude constant TAKEOFF_ALT
+        #Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
+        return EarlyLaps()  # Return the next state, EarlyLaps
+
+    async def takeoff(self, drone: System):
+        """Takes off vertically to a height defined by alt"""
+
+        await drone.offboard.set_velocity_ned(
+            sdk.offboard.VelocityNedYaw(0.0, 0.0, -1.0, 0.0)
+            #Sets the velocity of the drone to be straight up
+        )
+        await self.wait_alt(drone)
+        #Waits until altitude TAKEOFF_ALT is reached, before moving on to EarlyLaps
+
+        return
 
     async def wait_alt(self, drone: System):
         """Checks to see if the drone is near the target altitude"""
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= 2:
+            if altitude >= config.TAKEOFF_ALT:
                 return True
