@@ -11,6 +11,7 @@ Colors = White text on black bg
 Size = 3
 """
 import os, sys
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -29,7 +30,8 @@ class TimeDetectRussianWord:
     """
     Testing the text detector.
     """
-    DEFAULT_WORD = 'holye'
+
+    DEFAULT_WORD = "holye"
     DEFAULT_DIMS = (1280, 720)
     DEFAULT_SIZE = 3
 
@@ -48,33 +50,75 @@ class TimeDetectRussianWord:
         for size in [1, 3, 6, 10]:
             color_image, depth_image = np.copy(base_color), np.copy(base_depth)
 
-            cv2.putText(color_image, self.DEFAULT_WORD, (640, 360), cv2.FONT_HERSHEY_SIMPLEX,
-                        size, (255, 255, 255), 3)
-            cv2.putText(depth_image, self.DEFAULT_WORD, (640, 360), cv2.FONT_HERSHEY_SIMPLEX,
-                        size, (255), 3)
+            cv2.putText(
+                color_image,
+                self.DEFAULT_WORD,
+                (640, 360),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                size,
+                (255, 255, 255),
+                3,
+            )
+            cv2.putText(
+                depth_image,
+                self.DEFAULT_WORD,
+                (640, 360),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                size,
+                (255),
+                3,
+            )
 
-            self.PARAMETERS.update({f'size={size}': (color_image, depth_image)})
+            self.PARAMETERS.update({f"size={size}": (color_image, depth_image)})
 
         # One to each corner
         for n_text in range(4):
             color_image, depth_image = np.copy(base_color), np.copy(base_depth)
 
             for location in [(320, 180), (320, 540), (960, 180), (960, 540)][:n_text]:
-                cv2.putText(color_image, self.DEFAULT_WORD, location, cv2.FONT_HERSHEY_SIMPLEX,
-                            self.DEFAULT_SIZE, (255, 255, 255), 3)
-                cv2.putText(depth_image, self.DEFAULT_WORD, location, cv2.FONT_HERSHEY_SIMPLEX,
-                            self.DEFAULT_SIZE, (255), 3)
+                cv2.putText(
+                    color_image,
+                    self.DEFAULT_WORD,
+                    location,
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    self.DEFAULT_SIZE,
+                    (255, 255, 255),
+                    3,
+                )
+                cv2.putText(
+                    depth_image,
+                    self.DEFAULT_WORD,
+                    location,
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    self.DEFAULT_SIZE,
+                    (255),
+                    3,
+                )
 
-            self.PARAMETERS.update({f'n_text={n_text}': (color_image, depth_image)})
+            self.PARAMETERS.update({f"n_text={n_text}": (color_image, depth_image)})
 
         # On default noise specturm
         for title, (color_image, depth_image) in common.noise().items():
-            cv2.putText(color_image, self.DEFAULT_WORD, (640, 360), cv2.FONT_HERSHEY_SIMPLEX,
-                        self.DEFAULT_SIZE, (255, 255, 255), 3)
-            cv2.putText(depth_image, self.DEFAULT_WORD, (640, 360), cv2.FONT_HERSHEY_SIMPLEX,
-                        self.DEFAULT_SIZE, (255), 3)
+            cv2.putText(
+                color_image,
+                self.DEFAULT_WORD,
+                (640, 360),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                self.DEFAULT_SIZE,
+                (255, 255, 255),
+                3,
+            )
+            cv2.putText(
+                depth_image,
+                self.DEFAULT_WORD,
+                (640, 360),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                self.DEFAULT_SIZE,
+                (255),
+                3,
+            )
 
-            self.PARAMETERS.update({f'{title} single': (color_image, depth_image)})
+            self.PARAMETERS.update({f"{title} single": (color_image, depth_image)})
 
     def time_detector(self, color_image, depth_image):
         """

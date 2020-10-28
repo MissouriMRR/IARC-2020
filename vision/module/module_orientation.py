@@ -22,7 +22,6 @@ def get_module_orientation(roi):
     x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
 
-
     y_avg_diff = np.mean(roi.T[:, -1] / 1000 - roi.T[:, 0] / 1000)
     y_tilt = np.degrees(np.arctan(y_avg_diff))
 
@@ -42,8 +41,10 @@ if __name__ == "__main__":
     from region_of_interest import region_of_interest
 
     # # Create object for parsing command-line options
-    parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
-                                            To read a .npy file, type \"python get_module_depth.py --i (image name).npy)\"")
+    parser = argparse.ArgumentParser(
+        description='Read .npy file and test for get_module_depth.\
+                                            To read a .npy file, type "python get_module_depth.py --i (image name).npy)"'
+    )
     # # Add argument which takes path to a bag file as an input
     parser.add_argument("-i", "--input", type=str, help="Path to the .npy file")
     # # Parse the command line arguments to an object
@@ -52,7 +53,9 @@ if __name__ == "__main__":
     if args.input:
         depthNpy = args.input
     else:
-        raise FileNotFoundError("No input parameter has been given. For help type --help")
+        raise FileNotFoundError(
+            "No input parameter has been given. For help type --help"
+        )
 
     depthImage = np.load(depthNpy)
 

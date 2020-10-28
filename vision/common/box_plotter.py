@@ -25,7 +25,9 @@ def plot_box(boxes, image, waittime=0):
     if not isinstance(boxes, list):
         raise ValueError(f"Expected list of BoundingBox, got {type(boxes)} instead")
     if not isinstance(image, np.ndarray):
-        raise ValueError(f"Expected argument of type ObstacleFinder, got {type(image)} instead")
+        raise ValueError(
+            f"Expected argument of type ObstacleFinder, got {type(image)} instead"
+        )
 
     output = np.copy(image)  # Important so dont have to copy before passing here
     for bbox in boxes:
@@ -41,10 +43,12 @@ def plot_box(boxes, image, waittime=0):
             X.append(x)
             Y.append(y)
 
-        cv2.rectangle(output, (min(X), min(Y)), (max(X), max(Y)), BBOX_COLOR, BBOX_THICKNESS)
-        #print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+        cv2.rectangle(
+            output, (min(X), min(Y)), (max(X), max(Y)), BBOX_COLOR, BBOX_THICKNESS
+        )
+        # print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
 
-        #output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        # output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     cv2.imshow("Obstacles", output)
     cv2.waitKey(waittime)

@@ -25,18 +25,26 @@ def plot_blobs(keypoints, image):
     if not isinstance(keypoints, list):
         raise ValueError(f"Expected list of Keypoints, got {type(keypoints)} instead")
     if not isinstance(image, np.ndarray):
-        raise ValueError(f"Expected argument of type BlobFinder, got {type(image)} instead")
+        raise ValueError(
+            f"Expected argument of type BlobFinder, got {type(image)} instead"
+        )
 
-    im_with_keypoints = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    im_with_keypoints = cv2.drawKeypoints(
+        image,
+        keypoints,
+        outImage=np.array([]),
+        color=(255, 0, 255),
+        flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+    )
 
     # print formatted list of bouding boxes
     if len(keypoints) == 0:
-        print('[]')
+        print("[]")
     else:
-        print('[')
+        print("[")
         for bbox in keypoints:
-            print('\tKeypoint:', round(bbox.pt[0], 2), round(bbox.pt[1], 2))
-        print(']')
+            print("\tKeypoint:", round(bbox.pt[0], 2), round(bbox.pt[1], 2))
+        print("]")
 
     # show image with circles indicating where blobs were detected
     cv2.imshow("Blobs", im_with_keypoints)

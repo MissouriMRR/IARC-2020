@@ -22,15 +22,17 @@ from vision.common.import_params import import_params
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
-#from vision.module.region_of_interest import region_of_interest
-#from vision.module.module_orientation import get_module_orientation
+
+# from vision.module.region_of_interest import region_of_interest
+# from vision.module.module_orientation import get_module_orientation
 from vision.module.module_bounding import getModuleBounds
 
 CAMERA_IDS = {
-    'obstacle': '',
-    'module': '',
-    'peg': '',
+    "obstacle": "",
+    "module": "",
+    "peg": "",
 }
+
 
 class Pipeline:
     """
@@ -46,6 +48,7 @@ class Pipeline:
     camera: Camera
         Camera to pull image from.
     """
+
     PUT_TIMEOUT = 1  # Expected time for results to be irrelevant.
 
     def __init__(self, vision_communication, flight_communication, camera):
@@ -56,12 +59,12 @@ class Pipeline:
         self.camera = camera.__iter__()
 
         ##
-        prefix = 'vision' if os.path.isdir("vision") else ''
+        prefix = "vision" if os.path.isdir("vision") else ""
 
         #
-        config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+        config_filename = os.path.join(prefix, "obstacle", "config.json")
 
-        with open(config_filename, 'r') as config_file:
+        with open(config_filename, "r") as config_file:
             config = json.load(config_file)
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
@@ -91,27 +94,32 @@ class Pipeline:
         ##
         bboxes = []
 
-        if state == 'early_laps':
+        if state == "early_laps":
             bboxes = self.obstacle_finder.find(color_image, depth_image)
-        elif state == 'module_detection':
+        elif state == "module_detection":
             self.module_location.setImg(color_image, depth_image)
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
-            #orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
-            box = BoundingBox(getModuleBounds(color_image, center, depth), ObjectType.MODULE)
-            box.module_depth = depth # float
-            #box.orientation = orientation # tuple
+            # orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
+            box = BoundingBox(
+                getModuleBounds(color_image, center, depth), ObjectType.MODULE
+            )
+            box.module_depth = depth  # float
+            # box.orientation = orientation # tuple
             bboxes.append(box)
         else:
-            pass # raise AttributeError(f"Unrecognized state: {state}")
+            pass  # raise AttributeError(f"Unrecognized state: {state}")
 
         ##
-        self.vision_communication.put((datetime.datetime.now(), bboxes), self.PUT_TIMEOUT)
+        self.vision_communication.put(
+            (datetime.datetime.now(), bboxes), self.PUT_TIMEOUT
+        )
 
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
 
         return state
+
 
 def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
@@ -119,19 +127,21 @@ def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
     pipeline = Pipeline(vision_comm, flight_comm, video)
 
-    prev_state = 'start'
+    prev_state = "start"
 
     for _ in range(runtime):
         prev_state = pipeline.run(prev_state)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
 
     vision_comm = Queue(100000)
 
-    flight_comm = Queue()  # type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
-    flight_comm.put('early_laps')
+    flight_comm = (
+        Queue()
+    )  # type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
+    flight_comm.put("early_laps")
 
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
@@ -139,6 +149,7 @@ if __name__ == '__main__':
     init_vision(vision_comm, flight_comm, video)
 
     from time import sleep
+
     sleep(1)
 
     vision_comm.close()

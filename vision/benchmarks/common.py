@@ -24,26 +24,26 @@ def read_image(path, encoding):
     -------
     [color_image, depth_image]
     """
-    if encoding == 'color':
+    if encoding == "color":
         color_image = cv2.imread(path)
         depth_image = None
 
-    elif encoding == 'depth':
+    elif encoding == "depth":
         color_image = None
         depth_image = cv2.imread(path)
 
-    elif encoding == 'both':
-        if 'colorImage' in path:
+    elif encoding == "both":
+        if "colorImage" in path:
             color_image = cv2.imread(path)
-            depth_image = cv2.imread(path.replace('colorImage', 'depthImage'))
+            depth_image = cv2.imread(path.replace("colorImage", "depthImage"))
 
-        elif 'depthImage' in path:
-            color_image = cv2.imread(path.replace('depthImage', 'colorImage'))
+        elif "depthImage" in path:
+            color_image = cv2.imread(path.replace("depthImage", "colorImage"))
             depth_image = cv2.imread(path)
 
-    if color_image is None and encoding in ['color', 'both']:
+    if color_image is None and encoding in ["color", "both"]:
         raise ValueError(f"Failed to read {path}!")
-    if depth_image is None and encoding in ['depth', 'both']:
+    if depth_image is None and encoding in ["depth", "both"]:
         raise ValueError(f"Failed to read {path}!")
 
     return [color_image, depth_image]
@@ -62,18 +62,20 @@ def read_annotations(path):
     -------
     {filename: annotation}
     """
-    annotation_folder = os.path.join(path, 'Annotations')
+    annotation_folder = os.path.join(path, "Annotations")
 
     annotations = {}
     for filename in os.listdir(annotation_folder):
-        annotation = lxml.etree.parse(os.path.join(annotation_folder, filename)).getroot()
+        annotation = lxml.etree.parse(
+            os.path.join(annotation_folder, filename)
+        ).getroot()
 
-        annotations.update({filename.split('.')[0]: annotation})
+        annotations.update({filename.split(".")[0]: annotation})
 
     return annotations
 
 
-def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
+def blank_dimensions(dimensions=None, generator=np.zeros, dtype="uint8"):
     """
     Generate series of blank images with set dimensions.
 
@@ -92,10 +94,10 @@ def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
     """
     if dimensions is None:
         dimensions = {
-            '480p blank': (640, 480),
-            '720p blank': (1280, 720),
-            '1080p blank': (1920, 1080),
-            '4k blank': (4096, 2160),
+            "480p blank": (640, 480),
+            "720p blank": (1280, 720),
+            "1080p blank": (1920, 1080),
+            "4k blank": (4096, 2160),
         }
 
     if isinstance(dimensions, tuple):
@@ -116,7 +118,9 @@ def blank_dimensions(dimensions=None, generator=np.zeros, dtype='uint8'):
     return output
 
 
-def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, dtype='uint8'):
+def noise(
+    amounts=None, dimensions=(1280, 720), generator=np.random.poisson, dtype="uint8"
+):
     """
     Generate series of images w/ varying amounts of noise.
 
@@ -139,12 +143,12 @@ def noise(amounts=None, dimensions=(1280, 720), generator=np.random.poisson, dty
 
     if amounts is None:
         amounts = {
-            'sd=0': 0,
-            'sd=1': 1,
-            'sd=3': 8,
-            'sd=6': 40,
-            'sd=10': 100,
-            'sd=14': 200,
+            "sd=0": 0,
+            "sd=1": 1,
+            "sd=3": 8,
+            "sd=6": 40,
+            "sd=10": 100,
+            "sd=14": 200,
         }
 
     if isinstance(amounts, (int, float)):

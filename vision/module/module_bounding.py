@@ -11,6 +11,7 @@ HORIZONTAL_FOV = 86  # degrees
 
 PADDING_CONSTANT = 1.15
 
+
 def getModuleBounds(dimensions, center, depth):
     """
     getModuleBounds will find four coordinates within the module that will be used to create a BoundingBox.

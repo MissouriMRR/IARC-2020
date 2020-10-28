@@ -2,6 +2,7 @@
 Boat related unit tests.
 """
 import os, sys
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -11,12 +12,14 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 from text.detect_words import TextDetector
 
 
-IMG_FOLDER = 'boat'
+IMG_FOLDER = "boat"
+
 
 class AccuracyRussianWord:
     """
     Testing the text detector.
     """
+
     def setup(self):
         pass
 
