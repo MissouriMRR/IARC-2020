@@ -220,13 +220,13 @@ class TestModuleOrientation(unittest.TestCase):
 
         for current_file in estimates.keys():
             # grabs and loadspair of color and depth files (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-            current_color_file = os.path.join(
-                img_dir, current_file
-            ) + "-colorImage.jpg"  # current file
+            current_color_file = (
+                os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            )  # current file
             current_color = cv2.imread(current_color_file)
-            current_depth_file = os.path.join(
-                img_dir, current_file
-            ) + "-depthImage.npy"  # next file over (after color img)
+            current_depth_file = (
+                os.path.join(img_dir, current_file) + "-depthImage.npy"
+            )  # next file over (after color img)
             current_depth = np.load(current_depth_file)
 
             # get center
