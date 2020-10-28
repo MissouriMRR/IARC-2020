@@ -10,7 +10,9 @@ from flight.utils.movement_controller import MovementController
 
 from flight import config
 
+
 mover: MovementController = MovementController()
+
 
 class Takeoff(State):
     """The state that takes off the drone"""

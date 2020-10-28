@@ -1,4 +1,5 @@
-from flight import config"""import config used to obtain set constant values"""
+"""import config used to obtain set constant values"""
+from flight import config
 from flight.utils.latlon import LatLon
 from mavsdk import System
 import mavsdk as sdk
@@ -80,12 +81,11 @@ class MovementController:
             # continuously update information on the drone's location
             # and update the velocity of the drone
             await drone.offboard.set_velocity_ned(
-                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg)
-            )
+                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg))
             # if the x and y values are close enough (2m) to the original position * precision
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
-            if (
+            if(
                 abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
                 and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
             ):
