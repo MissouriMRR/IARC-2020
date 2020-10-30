@@ -39,17 +39,17 @@ FAST_THINK_S: float = 1.0
 
 
 async def config_params(drone: System):
+    return
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
+    await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_VEL_MAX", MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_CRUISE", MAX_SPEED)
-    await drone.action.set_maximum_speed(MAX_SPEED)
     # Set data link loss failsafe mode HOLD
     await drone.param.set_param_int("NAV_DLL_ACT", 1)
     # Set offboard loss failsafe mode HOLD
     await drone.param.set_param_int("COM_OBL_ACT", 1)
     # Set offboard loss failsafe mode when RC is available HOLD
     await drone.param.set_param_int("COM_OBL_RC_ACT", 5)
-
     # Set RC loss failsafe mode HOLD
     await drone.param.set_param_int("NAV_RCL_ACT", 1)
     await drone.param.set_param_float("LNDMC_XY_VEL_MAX", 0.5)
