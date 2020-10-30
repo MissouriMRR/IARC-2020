@@ -1,3 +1,4 @@
+"""Sets parameters for the drone and holds constant values needed for configuration"""
 from flight.utils.latlon import LatLon, Latitude, Longitude
 
 from mavsdk import System
@@ -16,6 +17,8 @@ ALT_RANGE_MIN: float = FLYING_ALT - (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
 POINT_PERCENT_ACCURACY: float = 0.2
 
 # Position for pylon 1
+# lat1: Latitude = Latitude(37.9497800)
+# lon1: Longitude = Longitude(-92.7854470)
 lat1: Latitude = Latitude(degree=37, minute=56, second=55.6)
 lon1: Longitude = Longitude(degree=-91, minute=-47, second=-3.3)
 pylon1: LatLon = LatLon(lat1, lon1)
@@ -23,8 +26,9 @@ pylon1: LatLon = LatLon(lat1, lon1)
 # Position for pylon 2
 # lat2: float = 37.9486433
 # lon2: float = -91.7839372
-# lat2: float = 37.9481946
-# lon2: float = -91.7834122
+# lat2: float = Latitude(37.9504260)
+# lon2: float = Longitude(-91.7848542)
+
 lat2: Latitude = Latitude(degree=37, minute=56, second=53.3)
 lon2: Longitude = Longitude(degree=-91, minute=-47, second=0)
 pylon2: LatLon = LatLon(lat2, lon2)
@@ -40,9 +44,10 @@ FAST_THINK_S: float = 1.0
 
 async def config_params(drone: System):
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
+    await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_VEL_MAX", MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_CRUISE", MAX_SPEED)
-    await drone.action.set_maximum_speed(MAX_SPEED)
+
     # Set data link loss failsafe mode HOLD
     await drone.param.set_param_int("NAV_DLL_ACT", 1)
     # Set offboard loss failsafe mode HOLD
