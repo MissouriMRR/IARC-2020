@@ -6,6 +6,7 @@ from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
+from flight.utils.movement_controller import MovementController
 
 from flight import config
 
@@ -15,6 +16,7 @@ class Takeoff(State):
 
     async def run(self, drone: System) -> None:
         """Arms and takes off the drone"""
+        mover: MovementController = MovementController()
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
 
@@ -41,26 +43,7 @@ class Takeoff(State):
             await drone.action.land()
             return
 
-        await self.takeoff(drone)
-        #Takes off vertically until a desired altitude constant TAKEOFF_ALT
-        #Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
+        await mover.takeoff(drone)
+        # Takes off vertically until a desired altitude constant TAKEOFF_ALT
+        # Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
         return EarlyLaps()  # Return the next state, EarlyLaps
-
-    async def takeoff(self, drone: System):
-        """Takes off vertically to a height defined by alt"""
-
-        await drone.offboard.set_velocity_ned(
-            sdk.offboard.VelocityNedYaw(0.0, 0.0, -1.0, 0.0)
-            #Sets the velocity of the drone to be straight up
-        )
-        await self.wait_alt(drone)
-        #Waits until altitude TAKEOFF_ALT is reached, before moving on to EarlyLaps
-
-        return
-
-    async def wait_alt(self, drone: System):
-        """Checks to see if the drone is near the target altitude"""
-        async for position in drone.telemetry.position():
-            altitude: float = round(position.relative_altitude_m, 2)
-            if altitude >= config.TAKEOFF_ALT:
-                return True
