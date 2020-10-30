@@ -126,7 +126,7 @@ class MovementController:
             altitude: float = round(position.relative_altitude_m, 2)
             if altitude >= config.TAKEOFF_ALT:
                 return True
-                
+
     async def takeoff(self, drone: System):
         """Takes off vertically to a height defined by alt"""
 
