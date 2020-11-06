@@ -39,23 +39,27 @@ class ModuleLocation:
     def isInFrame(self) -> bool:
         """
         Determines if the Module is in the frame
-        
+
         Returns
         -------
         bool - true if module is in the frame and false if module is not in the frame
         """
-        MIN_SLOPES_IN_BUCKET = 15  # Minimum number of slopes per bucket to identify the module
-        MAX_CIRCLES = 100 # maximum number of circles that are allowed to be detected before in_frame fails
-        
+        MIN_SLOPES_IN_BUCKET = (
+            15  # Minimum number of slopes per bucket to identify the module
+        )
+        MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
+
         # Circle Detection
         self._circleDetection()
-        if self.circles is None or self.circles.shape[0] > MAX_CIRCLES:  # no circles found or too many circles found
+        if (
+            self.circles is None or self.circles.shape[0] > MAX_CIRCLES
+        ):  # no circles found or too many circles found
             return False
-        
+
         # Get slopes and group parallel slopes
         self._getSlopes()
         self._groupSlopes()
-        
+
         return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
 
     ## Finding Distance to Module
