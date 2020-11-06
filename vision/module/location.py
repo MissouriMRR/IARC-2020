@@ -34,9 +34,33 @@ class ModuleLocation:
         self.lower_bound = np.array(0)  # lower bound of slopes
         self.num_buckets = np.array(0)  # number of buckets applied to slopes
 
+    ## Determining if Module is in frame
+
+    def isInFrame(self) -> bool:
+        """
+        Determines if the Module is in the frame
+        
+        Returns
+        -------
+        bool - true if module is in the frame and false if module is not in the frame
+        """
+        MIN_SLOPES_IN_BUCKET = 15  # Minimum number of slopes per bucket to identify the module
+        MAX_CIRCLES = 100 # maximum number of circles that are allowed to be detected before in_frame fails
+        
+        # Circle Detection
+        self._circleDetection()
+        if self.circles is None or self.circles.shape[0] > MAX_CIRCLES:  # no circles found or too many circles found
+            return False
+        
+        # Get slopes and group parallel slopes
+        self._getSlopes()
+        self._groupSlopes()
+        
+        return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
+
     ## Finding Distance to Module
 
-    def getDistance(self):
+    def getDistance(self) -> int:
         """
         Finds the distance to the module.
 
@@ -49,7 +73,7 @@ class ModuleLocation:
 
     ## Finding the Center
 
-    def getCenter(self):
+    def getCenter(self) -> tuple:
         """
         Find the center of the front face of the module.
 
@@ -97,7 +121,7 @@ class ModuleLocation:
         # or the previous center if no slope calculations were performed
         return tuple(self.center)
 
-    def _filterCircleDepth(self):
+    def _filterCircleDepth(self) -> np.ndarray:
         """
         Filters out circles based on the depth at the circles' centers.
 
@@ -127,7 +151,7 @@ class ModuleLocation:
             nCir = nCir.reshape((-1, 3))
             self.circles = nCir
 
-    def _getHoleLocations(self):
+    def _getHoleLocations(self) -> np.ndarray:
         """
         Finds the locations of the 4 holes on the front face of the module.
 
@@ -169,7 +193,7 @@ class ModuleLocation:
         self.holes = self.holes.reshape((-1, 3))
         return self.holes
 
-    def _groupSlopes(self):
+    def _groupSlopes(self) -> None:
         """
         Bucket sort slopes to find parallels.
 
@@ -191,7 +215,7 @@ class ModuleLocation:
             self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound)
         )
 
-    def _getSlopes(self):
+    def _getSlopes(self) -> None:
         """
         Finds slopes between detected circles
 
@@ -210,7 +234,7 @@ class ModuleLocation:
         # Convert slopes to degrees
         self.slopes = np.degrees(np.arctan(self.slopes))
 
-    def _circleDetection(self):
+    def _circleDetection(self) -> np.ndarray:
         """
         Uses cv2 to detect circles in the color image.
 
@@ -219,7 +243,7 @@ class ModuleLocation:
         ndarray - circles detected in image.
         """
         # Size of the blur kernel
-        BLUR_SIZE = 9
+        BLUR_SIZE = 5
 
         # Grayscale
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
@@ -236,9 +260,9 @@ class ModuleLocation:
             image=laplacian,
             method=cv2.HOUGH_GRADIENT,
             dp=1,
-            minDist=14,
-            param1=63,
-            param2=30,
+            minDist=8,
+            param1=75,
+            param2=24,
             minRadius=0,
             maxRadius=50,
         )
@@ -251,7 +275,7 @@ class ModuleLocation:
 
     ## Image Processing
 
-    def _filterDepth(self):
+    def _filterDepth(self) -> None:
         """
         Uses the depth channel to eliminate far away parts of the color image
 
@@ -266,7 +290,7 @@ class ModuleLocation:
         tempDepth = np.dstack((self.depth, self.depth, self.depth))
         self.img = np.where(tempDepth < DEPTH_THRESH, self.img, 0)
 
-    def _increaseBrightness(self, increase):
+    def _increaseBrightness(self, increase) -> None:
         """
         Increases the brightness of the image.
 
@@ -285,7 +309,7 @@ class ModuleLocation:
 
     ## Input Functions
 
-    def setImg(self, color, depth):
+    def setImg(self, color, depth) -> None:
         """
         Sets the image detection is performed on.
 
@@ -305,7 +329,7 @@ class ModuleLocation:
 
     ## Visualization Functions
 
-    def showImg(self):
+    def showImg(self) -> None:
         """
         Shows the initial input image.
 
@@ -317,7 +341,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showDepth(self):
+    def showDepth(self) -> None:
         """
         Shows the depth channel image.
 
@@ -329,7 +353,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showCircles(self):
+    def showCircles(self) -> None:
         """
         Shows an image of detected circles.
 
@@ -348,7 +372,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showCenter(self):
+    def showCenter(self) -> None:
         """
         Shows the image with detected holes and center.
 

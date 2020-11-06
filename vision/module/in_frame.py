@@ -33,12 +33,6 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
-    # Remove depth channel
-    color_image = color_image[:, :, :3]
-
-    # Create output image
-    # output = img.copy()
-
     # Grayscale
     gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
 
@@ -51,10 +45,8 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
 
     # Hough Circle Detection
     circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=75, param2=24, minRadius=0, maxRadius=50)
-    if circles is None:  # no circles found
+    if circles is None or circles.shape[1] > MAX_CIRCLES:  # no circles found or too many circles found
         return False
-    elif circles.shape[1] > MAX_CIRCLES:  # too many circles found
-        raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
 
     circles = np.uint16(circles)
 
