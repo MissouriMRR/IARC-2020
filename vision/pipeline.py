@@ -22,8 +22,8 @@ from vision.common.import_params import import_params
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
-#from vision.module.region_of_interest import region_of_interest
-#from vision.module.module_orientation import get_module_orientation
+from vision.module.region_of_interest import region_of_interest
+from vision.module.module_orientation import get_module_orientation
 from vision.module.module_bounding import getModuleBounds
 
 class Pipeline:
@@ -87,10 +87,10 @@ class Pipeline:
             self.module_location.setImg(color_image, depth_image)
             center = self.module_location.getCenter()
             depth = get_module_depth(depth_image, center)
-            #orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
+            orientation = get_module_orientation(region_of_interest(depth_image, depth, center), center)
             box = BoundingBox(getModuleBounds(color_image, center, depth), ObjectType.MODULE)
             box.module_depth = depth # float
-            #box.orientation = orientation # tuple
+            box.orientation = orientation # tuple
             bboxes.append(box)
         else:
             pass # raise AttributeError(f"Unrecognized state: {state}")
@@ -98,6 +98,7 @@ class Pipeline:
         ##
         self.vision_communication.put((datetime.datetime.now(), bboxes), self.PUT_TIMEOUT)
 
+        # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
 
@@ -109,10 +110,10 @@ def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
     pipeline = Pipeline(vision_comm, flight_comm, video)
 
-    prev_state = 'start'
+    state = 'start'
 
     for _ in range(runtime):
-        prev_state = pipeline.run(prev_state)
+        state = pipeline.run(state)
 
 
 if __name__ == '__main__':
@@ -129,7 +130,7 @@ if __name__ == '__main__':
     init_vision(vision_comm, flight_comm, video)
 
     from time import sleep
-    sleep(1)
+    sleep(2) # allow queue to close
 
     vision_comm.close()
     flight_comm.close()
