@@ -11,6 +11,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 from vision.bounding_box import BoundingBox, ObjectType
+from vision.camera import realsense
 
 import datetime
 import json
