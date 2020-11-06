@@ -147,7 +147,7 @@ async def start_flight(comm, drone: System):
 
             try:
                 await drone.offboard.stop()
-            except sdk.OffboardError as error:
+            except sdk.offboard.OffboardError as error:
                 logging.exception(
                     "Stopping offboard mode failed with error code: %s", str(error)
                 )
