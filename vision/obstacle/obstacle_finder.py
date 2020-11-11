@@ -3,18 +3,17 @@ Detects obstacles in images using OpenCV's SimpleBlobDetector
 """
 import os
 import sys
+import cv2
+import numpy as np
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
-import cv2
-import numpy as np
 from vision.bounding_box import BoundingBox, ObjectType
 import json
 from vision.common.import_params import import_params
-
 
 class ObstacleFinder:
     """
@@ -28,6 +27,8 @@ class ObstacleFinder:
     def __init__(self, params=None):
         self.keypoints = []
         self.params = params
+        print(self.params.minConvexity)
+        print(self.params.maxConvexity)
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
     @property
