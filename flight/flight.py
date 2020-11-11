@@ -8,6 +8,8 @@ import mavsdk as sdk
 from .states import STATES, State
 from . import config
 
+from ..vision.camera.realsense import Realsense
+
 
 SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
 CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
@@ -39,11 +41,14 @@ class StateMachine:
         self.current_state: State = initial_state
         self.drone: System = drone
 
+        camera: Realsense = Realsense(600, 800, 60)
+
     async def run(self) -> None:
         """
         Runs the state machine by infinitely replacing current_state until a
         state return None.
         """
+	camera.display_in_window()
         while self.current_state:
             self.current_state: State = await self.current_state.run(self.drone)
 
@@ -147,7 +152,7 @@ async def start_flight(comm, drone: System):
 
             try:
                 await drone.offboard.stop()
-            except sdk.OffboardError as error:
+            except sdk.offboard.OffboardError as error:
                 logging.exception(
                     "Stopping offboard mode failed with error code: %s", str(error)
                 )
