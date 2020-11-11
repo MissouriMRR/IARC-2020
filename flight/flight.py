@@ -12,7 +12,7 @@ from ..vision.camera.realsense import Realsense
 
 
 SIM_ADDR = "udp://:14540"  # Address to connect to the simulator
-CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
+CONTROLLER_ADDR = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
 
 
 class DroneNotFoundError(Exception):
