@@ -34,6 +34,8 @@ class ModuleLocation:
         self.lower_bound = np.array(0)  # lower bound of slopes
         self.num_buckets = np.array(0)  # number of buckets applied to slopes
 
+        self.needsRecalc = True # Prevents recalculation of circles, slopes, and slope grouping
+
     ## Determining if Module is in frame
 
     def isInFrame(self) -> bool:
@@ -49,31 +51,22 @@ class ModuleLocation:
         )
         MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
 
-        # Circle Detection
-        self._circleDetection()
+        if(self.needsRecalc):
+            # Circle Detection
+            self._circleDetection()
+
         if (
             self.circles is None or self.circles.shape[0] > MAX_CIRCLES
         ):  # no circles found or too many circles found
             return False
 
-        # Get slopes and group parallel slopes
-        self._getSlopes()
-        self._groupSlopes()
-
+        if(self.needsRecalc):
+            # Get slopes and group parallel slopes
+            self._getSlopes()
+            self._groupSlopes()
+            self.needsRecalc = False
+        
         return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
-
-    ## Finding Distance to Module
-
-    def getDistance(self) -> int:
-        """
-        Finds the distance to the module.
-
-        Returns
-        -------
-        int - distance to the module.
-        """
-        self.distance = self.depth[self.center[1], self.center[0]]
-        return self.distance
 
     ## Finding the Center
 
@@ -88,8 +81,9 @@ class ModuleLocation:
         MAX_CIRCLES = 100  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
 
-        # Circle detection
-        self._circleDetection()
+        if(self.needsRecalc):
+            # Circle detection
+            self._circleDetection()
 
         # Filter out far away circles
         # self._filterCircleDepth()
@@ -99,9 +93,11 @@ class ModuleLocation:
             np.shape(self.circles)[0] <= MAX_CIRCLES
             and np.shape(self.circles)[0] > MIN_CIRCLES
         ):
-            # Get Slopes and Parallels
-            self._getSlopes()
-            self._groupSlopes()
+            if(self.needsRecalc):
+                # Get Slopes and Parallels
+                self._getSlopes()
+                self._groupSlopes()
+                self.needsRecalc = False
 
             # Find the Holes
             self._getHoleLocations()
@@ -294,7 +290,7 @@ class ModuleLocation:
         tempDepth = np.dstack((self.depth, self.depth, self.depth))
         self.img = np.where(tempDepth < DEPTH_THRESH, self.img, 0)
 
-    def _increaseBrightness(self, increase) -> None:
+    def _increaseBrightness(self, increase: int) -> None:
         """
         Increases the brightness of the image.
 
@@ -313,7 +309,7 @@ class ModuleLocation:
 
     ## Input Functions
 
-    def setImg(self, color, depth) -> None:
+    def setImg(self, color: np.ndarray, depth: np.ndarray) -> None:
         """
         Sets the image detection is performed on.
 
@@ -330,6 +326,7 @@ class ModuleLocation:
         """
         self.depth = depth
         self.img = color
+        self.needsRecalc = True
 
     ## Visualization Functions
 
