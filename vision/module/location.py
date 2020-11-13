@@ -34,7 +34,9 @@ class ModuleLocation:
         self.lower_bound = np.array(0)  # lower bound of slopes
         self.num_buckets = np.array(0)  # number of buckets applied to slopes
 
-        self.needsRecalc = True # Prevents recalculation of circles, slopes, and slope grouping
+        self.needsRecalc = (
+            True  # Prevents recalculation of circles, slopes, and slope grouping
+        )
 
     ## Determining if Module is in frame
 
@@ -51,7 +53,7 @@ class ModuleLocation:
         )
         MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
 
-        if(self.needsRecalc):
+        if self.needsRecalc:
             # Circle Detection
             self._circleDetection()
 
@@ -60,12 +62,12 @@ class ModuleLocation:
         ):  # no circles found or too many circles found
             return False
 
-        if(self.needsRecalc):
+        if self.needsRecalc:
             # Get slopes and group parallel slopes
             self._getSlopes()
             self._groupSlopes()
             self.needsRecalc = False
-        
+
         return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
 
     ## Finding the Center
@@ -81,7 +83,7 @@ class ModuleLocation:
         MAX_CIRCLES = 100  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
 
-        if(self.needsRecalc):
+        if self.needsRecalc:
             # Circle detection
             self._circleDetection()
 
@@ -93,7 +95,7 @@ class ModuleLocation:
             np.shape(self.circles)[0] <= MAX_CIRCLES
             and np.shape(self.circles)[0] > MIN_CIRCLES
         ):
-            if(self.needsRecalc):
+            if self.needsRecalc:
                 # Get Slopes and Parallels
                 self._getSlopes()
                 self._groupSlopes()
