@@ -52,14 +52,15 @@ class ModuleLocation:
             15  # Minimum number of slopes per bucket to identify the module
         )
         MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
+        MIN_CIRCLES = 4 # minimum number of circles needed to perform calculations
 
         if self.needsRecalc:
             # Circle Detection
             self._circleDetection()
 
         if (
-            self.circles is None or self.circles.shape[0] > MAX_CIRCLES
-        ):  # no circles found or too many circles found
+            np.shape(self.circles) < MIN_CIRCLES or np.shape(self.circles) > MAX_CIRCLES
+        ):  # too little or too many circles found
             return False
 
         if self.needsRecalc:
