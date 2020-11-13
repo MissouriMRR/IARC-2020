@@ -14,6 +14,7 @@ MIN_SLOPES_IN_BUCKET = (
     15  # Minimum number of slopes in a single bucket to identify the module
 )
 MAX_CIRCLES = 100  # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
+MIN_CIRCLES = 4 # Minimum number of circles needed to perform calculations
 
 
 def ModuleInFrame(color_image: np.ndarray) -> bool:
@@ -57,8 +58,8 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
         maxRadius=50,
     )
     if (
-        circles is None or circles.shape[1] > MAX_CIRCLES
-    ):  # no circles found or too many circles found
+        np.shape(self.circles) < MIN_CIRCLES or np.shape(self.circles) > MAX_CIRCLES
+    ):  # too little or too many circles found
         return False
 
     circles = np.uint16(circles)
