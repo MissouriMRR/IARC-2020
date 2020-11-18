@@ -58,7 +58,7 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
         maxRadius=50,
     )
     if (
-        np.shape(self.circles) < MIN_CIRCLES or np.shape(self.circles) > MAX_CIRCLES
+        np.shape(circles)[0] < MIN_CIRCLES or np.shape(circles)[0] > MAX_CIRCLES
     ):  # too little or too many circles found
         return False
 
