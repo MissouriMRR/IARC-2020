@@ -85,8 +85,8 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     # if the angle is absurd, it won't be taken
     #   if the module is truly rolled at over 45 degrees, minAreaRect
     #   should simply choose a different rectangle or axis
-    np.where(abs(angles) < 45, angles, angles)
-    roll = np.mean(angles)
+    mask = np.where(abs(angles) < 45)
+    roll = np.mean(angles[mask])
 
     return roll
 
