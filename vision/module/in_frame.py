@@ -10,8 +10,11 @@ import argparse
 # Constants
 BLUR_SIZE = 5  # Blur kernel size
 BUCKET_MODIFIER = 1  # Changes how many buckets are in the range
-MIN_SLOPES_IN_BUCKET = 15  # Minimum number of slopes in a single bucket to identify the module
+MIN_SLOPES_IN_BUCKET = (
+    15  # Minimum number of slopes in a single bucket to identify the module
+)
 MAX_CIRCLES = 100  # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
+MIN_CIRCLES = 4  # Minimum number of circles needed to perform calculations
 
 
 def ModuleInFrame(color_image: np.ndarray) -> bool:
@@ -33,12 +36,6 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
     # Ignore numpy warnings
     np.seterr(all="ignore")
 
-    # Remove depth channel
-    color_image = color_image[:, :, :3]
-
-    # Create output image
-    # output = img.copy()
-
     # Grayscale
     gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
 
@@ -50,11 +47,20 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
     laplacian = np.uint8(laplacian)
 
     # Hough Circle Detection
-    circles = cv2.HoughCircles(image=laplacian, method=cv2.HOUGH_GRADIENT, dp=1, minDist=8, param1=75, param2=24, minRadius=0, maxRadius=50)
-    if circles is None:  # no circles found
+    circles = cv2.HoughCircles(
+        image=laplacian,
+        method=cv2.HOUGH_GRADIENT,
+        dp=1,
+        minDist=8,
+        param1=75,
+        param2=24,
+        minRadius=0,
+        maxRadius=50,
+    )
+    if (
+        np.shape(circles)[0] < MIN_CIRCLES or np.shape(circles)[0] > MAX_CIRCLES
+    ):  # too little or too many circles found
         return False
-    elif circles.shape[1] > MAX_CIRCLES:  # too many circles found
-        raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
 
     circles = np.uint16(circles)
 
@@ -96,7 +102,7 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
     return any(buckets > MIN_SLOPES_IN_BUCKET)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """
     To test in_frame, use
     "python in_frame.py -i (image name).(image file extension)"
@@ -105,8 +111,10 @@ if __name__ == '__main__':
     or a path must be specified
     """
     # # Create object for parsing command-line options
-    parser = argparse.ArgumentParser(description="Read image file and display depth and test for ModuleInFrame.\
-                                     To read an image file, type \"python in_frame_driver.py --i (image name).(image extension)\"")
+    parser = argparse.ArgumentParser(
+        description='Read image file and display depth and test for ModuleInFrame.\
+                                     To read an image file, type "python in_frame_driver.py --i (image name).(image extension)"'
+    )
     # # Add argument which takes path to a bag file as an input
     parser.add_argument("-i", "--input", type=str, help="Path to the image file")
     # # Parse the command line arguments to an object
@@ -115,7 +123,7 @@ if __name__ == '__main__':
     if args.input:
         inputImageFile = args.input
     else:
-        inputImageFile = '../vision_images/module/Block2.jpg'
+        inputImageFile = "../vision_images/module/Block2.jpg"
         # raise FileNotFoundError("No input parameter has been given. For help type --help"
 
     image = cv2.imread(inputImageFile)
