@@ -1,6 +1,8 @@
 """
-module_orientation will calculate the orientation of the module in degrees
+get_module_orientation will calculate the orientation of the module in degrees
 and return them as a tuple (x tilt, y tilt) using a derivative through the x- and y- axes
+
+get_module_roll will calculate the roll of the module in degrees with respect to the y axis
 """
 import numpy as np
 import cv2
@@ -29,7 +31,21 @@ def get_module_orientation(roi):
     return x_tilt, y_tilt
 
 
-def get_module_roll(enclosing_region):
+def get_module_roll(enclosing_region: np.ndarray) -> float:
+    """
+    Finds the roll of the module in degrees
+
+    Parameters
+    ----------
+    enclosing_region: numpy array
+        region of the image with the module, calculated by module_bounding
+        image is supposed to be padded enough to include the entire
+
+    Returns
+    -----------
+    roll
+        module roll with respect to the positive y axis in degrees
+    """
     # contours only work on grey images
     enclosing_region = cv2.cvtColor(enclosing_region, cv2.COLOR_BGR2GRAY)
 
@@ -45,7 +61,9 @@ def get_module_roll(enclosing_region):
         approx = cv2.approxPolyDP(c, 0.01 * cv2.arcLength(c, True), True)
         if len(approx) < 8:
             simple_contours.append(c)
-            enclosing_region = cv2.drawContours(enclosing_region, c, -1, (0, 255, 0), 3)
+
+            # more visualization stuff
+            # enclosing_region = cv2.drawContours(enclosing_region, c, -1, (0, 255, 0), 3)
 
     # draws minimum area rectangles to enclose the contours
     # presumably, since thee module contours (or module edge contours) will rectangles at some angle,
@@ -55,25 +73,20 @@ def get_module_roll(enclosing_region):
     # for visualization, if desired
     # enclosing_region = cv2.cvtColor(enclosing_region, cv2.COLOR_GRAY2BGR)
 
-    # sums the angles of the min area rectangles
-    sum_angle = 0
-    divisor = 0
-    for rect in rectangles:
-        box = cv2.boxPoints(rect)
-        box = np.int0(box)
+    # to visualize min area rectangles
+    # for rect in rectangles:
+    #     box = cv2.boxPoints(rect)
+    #     box = np.int0(box)
+    #     cv2.drawContours(colorImage, [box], 0, (0, 0, 255), 2)
 
-        # visualization
-        # cv2.drawContours(colorImage, [box], 0, (0, 0, 255), 2)
+    np_rectangles = np.asarray(rectangles)
+    angles = np_rectangles[:, 2]
 
-        # if the angle is absurd, it won't be taken
-        #   if the module is truly rolled at over 45 degrees, minAreaRect
-        #   should simply choose a different rectangle or axis
-        if abs(rect[2]) < 45:
-            sum_angle += rect[2]
-            divisor += 1
-
-    # averages the angles of the enclosing min area rectangles around the contours
-    roll = sum_angle / divisor
+    # if the angle is absurd, it won't be taken
+    #   if the module is truly rolled at over 45 degrees, minAreaRect
+    #   should simply choose a different rectangle or axis
+    np.where(abs(angles) < 45, angles, angles)
+    roll = np.mean(angles)
 
     return roll
 
