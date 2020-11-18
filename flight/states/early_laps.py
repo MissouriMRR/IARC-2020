@@ -8,6 +8,7 @@ from flight import config
 
 from flight.utils.movement_controller import MovementController
 from .land import Land
+from .mast import Mast
 
 
 async def arange(count):
@@ -39,4 +40,5 @@ class EarlyLaps:
 
             logging.debug("Lap %d: Turn two", i)
             await mover.turn(drone)  # turn around pylon 1
-        return Land()
+        #return Land()
+        return Mast()
