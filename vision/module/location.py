@@ -59,7 +59,8 @@ class ModuleLocation:
             self._circleDetection()
 
         if (
-            np.shape(self.circles)[0] < MIN_CIRCLES or np.shape(self.circles)[0] > MAX_CIRCLES
+            np.shape(self.circles)[0] < MIN_CIRCLES
+            or np.shape(self.circles)[0] > MAX_CIRCLES
         ):  # too little or too many circles found
             return False
 
