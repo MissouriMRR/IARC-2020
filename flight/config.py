@@ -36,6 +36,11 @@ pylon2: LatLon = LatLon(lat2, lon2)
 # Takeoff Position set in takeoff.py
 takeoff_pos = LatLon
 
+# Position for the mast
+MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder postion
+MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)
+MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
+
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
@@ -46,6 +51,7 @@ FAST_THINK_S: float = 1.0
 
 
 async def config_params(drone: System):
+    await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
     await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MPC_XY_VEL_MAX", MAX_SPEED)
