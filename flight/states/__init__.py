@@ -13,5 +13,5 @@ STATES = {
     "early_laps": EarlyLaps,
     "land": Land,
     "final": Final,
-    "mast": ToMast,
+    "to_mast": ToMast,
 }
