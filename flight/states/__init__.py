@@ -5,7 +5,7 @@ from flight.states.takeoff import Takeoff
 from flight.states.land import Land
 from flight.states.final import Final
 from flight.states.early_laps import EarlyLaps
-from flight.states.mast import Mast
+from flight.states.to_mast import ToMast
 
 STATES = {
     "start": Start,
@@ -13,5 +13,5 @@ STATES = {
     "early_laps": EarlyLaps,
     "land": Land,
     "final": Final,
-    "mast": Mast,
+    "mast": ToMast,
 }
