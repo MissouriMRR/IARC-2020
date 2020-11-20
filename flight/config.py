@@ -33,6 +33,9 @@ lat2: Latitude = Latitude(degree=37, minute=56, second=53.3)
 lon2: Longitude = Longitude(degree=-91, minute=-47, second=0)
 pylon2: LatLon = LatLon(lat2, lon2)
 
+# Takeoff Position set in takeoff.py
+takeoff_pos = LatLon
+
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
