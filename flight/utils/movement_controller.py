@@ -171,21 +171,10 @@ class MovementController:
             lon: float = round(gps.longitude_deg, 8)
             current: float = LatLon(lat, lon)  # you are here
 
-            # Only for first run through loop
-            if count == 0:
-                # How many degrees we need to turn in order to look at the pylon
-                # Think of a unit circle
-                deg_to_pylon: float = current.heading_initial(takeoff_location)
-                # Creating a new position we need to go to
-                # Distance to the offset point from the pylon
-                offset_point: float = takeoff_location.offset(
-                    deg_to_pylon + config.DEG_OFFSET, config.OFFSET
-                )
-                logging.debug(offset_point.to_string("d% %m% %S% %H"))  # you are here
             # distance we have to go in order to get to the offset point
-            dist: float = current.distance(offset_point)
+            dist: float = current.distance(takeoff_location)
             # degrees needed to change to get to offset position
-            deg: float = current.heading_initial(offset_point)
+            deg: float = current.heading_initial(takeoff_location)
 
             # East, West
             x: float = dist * math.sin(math.radians(deg)) * 1000  # from km to m
@@ -219,7 +208,6 @@ class MovementController:
                 and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
             ):
                 return True
-            count += 1
 
     async def manual_land(self, drone: System) -> None:
         """
