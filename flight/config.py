@@ -34,7 +34,7 @@ lon2: Longitude = Longitude(degree=-91, minute=-47, second=0)
 pylon2: LatLon = LatLon(lat2, lon2)
 
 # Position for the mast
-MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0) # placeholder postion
+MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder postion
 MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)
 MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 

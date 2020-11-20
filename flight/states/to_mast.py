@@ -12,6 +12,7 @@ from .state import State
 
 class ToMast(State):
     """ Sends the drone from the first pylon to the mast """
+
     async def run(self, drone):
         """Sends the drone from the first pylon to the mast"""
         mover: MovementController = MovementController()
