@@ -30,6 +30,7 @@ from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import getModuleBounds
 
+
 class Pipeline:
     """
     Pipeline to carry information from the cameras through
@@ -64,7 +65,7 @@ class Pipeline:
             config = json.load(config_file)
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
-        
+
         self.text_detector = TextDetector()
 
         self.module_location = ModuleLocation()
@@ -88,30 +89,42 @@ class Pipeline:
         ##
         bboxes = []
 
-        if state == "early_laps": # navigation around the pylons
+        if state == "early_laps":  # navigation around the pylons
             bboxes = self.obstacle_finder.find(color_image, depth_image)
 
-        elif state == "text_detection": # approaching mast
+        elif state == "text_detection":  # approaching mast
             bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
 
-        elif state == "module_detection": # locating module
+        elif state == "module_detection":  # locating module
             self.module_location.setImg(color_image, depth_image)
 
             # only do more calculation if module is in the image
             if self.module_location.isInFrame():
-                center = self.module_location.getCenter() # center of module in image
-                depth = get_module_depth(depth_image, center) # depth of center of module
-                
-                region = region_of_interest(depth_image, depth, center) # depth image sliced on underestimate bounds
-                orientation = get_module_orientation(region, center) # x and y tilt of module
+                center = self.module_location.getCenter()  # center of module in image
+                depth = get_module_depth(
+                    depth_image, center
+                )  # depth of center of module
 
-                bounds = getModuleBounds(color_image, center, depth) # overestimate of bounds
-                roll = get_module_roll(color_image[bounds[0][1]:bounds[3][1], bounds[0][0]:bounds[3][0], :]) # roll of module
-                
+                region = region_of_interest(
+                    depth_image, depth, center
+                )  # depth image sliced on underestimate bounds
+                orientation = get_module_orientation(
+                    region, center
+                )  # x and y tilt of module
+
+                bounds = getModuleBounds(
+                    color_image, center, depth
+                )  # overestimate of bounds
+                roll = get_module_roll(
+                    color_image[
+                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                    ]
+                )  # roll of module
+
                 # construct boundingbox for the module
                 box = BoundingBox(bounds, ObjectType.MODULE)
                 box.module_depth = depth  # float
-                box.orientation = (orientation + (roll,))  # x, y, z tilt
+                box.orientation = orientation + (roll,)  # x, y, z tilt
                 bboxes.append(box)
 
         else:

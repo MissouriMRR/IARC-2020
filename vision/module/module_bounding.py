@@ -56,8 +56,10 @@ if __name__ == "__main__":
     Driver for testing module_bounding
     """
     # # Create object for parsing command-line options
-    parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
-                                            To read a .npy file, type \"python module_bounding.py --i (image number))\"")
+    parser = argparse.ArgumentParser(
+        description='Read .npy file and test for get_module_depth.\
+                                            To read a .npy file, type "python module_bounding.py --i (image number))"'
+    )
     # # Add argument which takes path to a bag file as an input
     parser.add_argument("-i", "--input", type=str, help="Path to the .npy file")
     # # Parse the command line arguments to an object
@@ -67,13 +69,17 @@ if __name__ == "__main__":
         colorImage = cv2.imread(args.input + "-colorImage.jpg")
         depthImage = np.load(args.input + "-depthImage.npy")
     else:
-        raise FileNotFoundError("No input parameter has been given. For help type --help")
+        raise FileNotFoundError(
+            "No input parameter has been given. For help type --help"
+        )
 
     # gets rid of outliers, should be done before the arguments are calculated at all
-    depthImage = np.clip(depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90))
+    depthImage = np.clip(
+        depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90)
+    )
 
     tl, tr, br, bl = getModuleBounds((1080, 1920), (995, 600), depthImage[600][995])
-    colorImage = colorImage[tl[1]:bl[1], bl[0]:br[0]]
+    colorImage = colorImage[tl[1] : bl[1], bl[0] : br[0]]
 
     cv2.imshow("Module Bounding", colorImage)
     cv2.waitKey(0)
