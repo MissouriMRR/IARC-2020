@@ -15,14 +15,17 @@ class ToMast(State):
 
     async def run(self, drone):
         """Sends the drone from the first pylon to the mast"""
-        mover: MovementController = MovementController()
-        # Go to the mast
-        logging.info("Moving to mast")
-        await mover.move_to(drone, config.MAST_LOCATION)
-        logging.info("Arrived at mast")
-        # (NSm/s, EWm/s, DUm/s, Ydeg) Stop moving
-        await drone.offboard.set_velocity_ned(
-            sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
-        )
-        await asyncio.sleep(20)
-        return Land()
+        if config.run_states["to_mast"]:
+            mover: MovementController = MovementController()
+            # Go to the mast
+            logging.info("Moving to mast")
+            await mover.move_to(drone, config.MAST_LOCATION)
+            logging.info("Arrived at mast")
+            # (NSm/s, EWm/s, DUm/s, Ydeg) Stop moving
+            await drone.offboard.set_velocity_ned(
+                sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
+            )
+            await asyncio.sleep(20)
+            return Land()
+        else:
+            return Land()

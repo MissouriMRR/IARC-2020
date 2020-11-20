@@ -8,7 +8,7 @@ import mavsdk as sdk
 from .states import STATES, State
 from . import config
 
-#from ..vision.camera.realsense import Realsense
+# from vision.camera.realsense import Realsense
 
 
 SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
@@ -41,14 +41,14 @@ class StateMachine:
         self.current_state: State = initial_state
         self.drone: System = drone
 
-        #camera: Realsense = Realsense(600, 800, 60)
+        # camera: Realsense = Realsense(600, 800, 60)
 
     async def run(self) -> None:
         """
         Runs the state machine by infinitely replacing current_state until a
         state return None.
         """
-        #camera.display_in_window()
+        # camera.display_in_window()
         while self.current_state:
             self.current_state: State = await self.current_state.run(self.drone)
 
