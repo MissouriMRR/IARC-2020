@@ -7,6 +7,7 @@ import mavsdk as sdk
 from flight import config
 
 from flight.utils.movement_controller import MovementController
+from .state import State
 from .land import Land
 
 
@@ -16,27 +17,30 @@ async def arange(count):
         yield i
 
 
-class EarlyLaps:
+class EarlyLaps(State):
     """Handles getting the drone around the two pylons 8 times"""
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        mover: MovementController = MovementController()
-        # Go to pylon 1
-        logging.info("Moving to pylon 1")
-        await mover.move_to(drone, config.pylon1)
-        logging.info("Arrived at pylon 1")
-        async for i in arange(config.NUM_LAPS):
-            logging.info("Starting lap: %d", i)
-            logging.debug("Lap %d: Straight one", i)
-            await mover.move_to(drone, config.pylon2)  # move to pylon 2
+        if config.run_states["early_laps"]:
+            mover: MovementController = MovementController()
+            # Go to pylon 1
+            logging.info("Moving to pylon 1")
+            await mover.move_to(drone, config.pylon1)
+            logging.info("Arrived at pylon 1")
+            async for i in arange(config.NUM_LAPS):
+                logging.info("Starting lap: %d", i)
+                logging.debug("Lap %d: Straight one", i)
+                await mover.move_to(drone, config.pylon2)  # move to pylon 2
 
-            logging.debug("Lap %d: Turn one", i)
-            await mover.turn(drone)  # turn around pylon 2
+                logging.debug("Lap %d: Turn one", i)
+                await mover.turn(drone)  # turn around pylon 2
 
-            logging.debug("Lap %d: Straight two", i)
-            await mover.move_to(drone, config.pylon1)  # move to pylon 1
+                logging.debug("Lap %d: Straight two", i)
+                await mover.move_to(drone, config.pylon1)  # move to pylon 1
 
-            logging.debug("Lap %d: Turn two", i)
-            await mover.turn(drone)  # turn around pylon 1
-        return Land()
+                logging.debug("Lap %d: Turn two", i)
+                await mover.turn(drone)  # turn around pylon 1
+            return Land()
+        else:
+            return Land()

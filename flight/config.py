@@ -41,6 +41,8 @@ NUM_LAPS: int = 2
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
 
+run_states = {"early_laps": False}
+
 
 async def config_params(drone: System):
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
