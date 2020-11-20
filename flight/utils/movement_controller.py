@@ -6,12 +6,14 @@ import mavsdk as sdk
 import logging
 import math
 
+
 class MovementController:
     """
     Params: Drone, Pylon
     Return: Boolean or None
     Calculates and uses gps coordinates of the drone to move to the location of the target pylon
     """
+
     async def move_to(self, drone: System, pylon: LatLon) -> bool:
         """
         Function to calculate movement velocity:
@@ -27,9 +29,9 @@ class MovementController:
 
         async for gps in drone.telemetry.position():
             altitude: float = round(gps.relative_altitude_m, 2)
-            #not allowed to go past 15m
-            #at or above, go down (positive)
-            #below tolerance, go up (negative)
+            # not allowed to go past 15m
+            # at or above, go down (positive)
+            # below tolerance, go up (negative)
 
             if altitude >= config.ALT_RANGE_MAX:
                 alt = config.ALT_CORRECTION_SPEED  # go down m/s
@@ -38,12 +40,12 @@ class MovementController:
             else:
                 alt = -0.15  # don't move
 
-            #Configure current position and store it
+            # Configure current position and store it
             lat: float = round(gps.latitude_deg, 8)
             lon: float = round(gps.longitude_deg, 8)
             current: float = LatLon(lat, lon)  # you are here
 
-            #Only for first run through loop
+            # Only for first run through loop
             if count == 0:
                 # How many degrees we need to turn in order to look at the pylon
                 # Think of a unit circle
@@ -59,7 +61,7 @@ class MovementController:
             # degrees needed to change to get to offset position
             deg: float = current.heading_initial(offset_point)
 
-            #East, West
+            # East, West
             x: float = dist * math.sin(math.radians(deg)) * 1000  # from km to m
             # North, South
             y: float = dist * math.cos(math.radians(deg)) * 1000  # from km to m
@@ -71,21 +73,22 @@ class MovementController:
                 dx: float = math.copysign(
                     config.MAX_SPEED
                     * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                    x
+                    x,
                 )
                 dy: float = math.copysign(
                     config.MAX_SPEED
                     * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                    y
+                    y,
                 )
             # continuously update information on the drone's location
             # and update the velocity of the drone
             await drone.offboard.set_velocity_ned(
-                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg))
+                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg)
+            )
             # if the x and y values are close enough (2m) to the original position * precision
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
-            if(
+            if (
                 abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
                 and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
             ):
@@ -115,7 +118,6 @@ class MovementController:
                 return True
             count += 1
 
-
     async def check_altitude(self, drone: System) -> bool:
         """
         Checks the altitude of the drone to make sure that we are at our target
@@ -138,3 +140,100 @@ class MovementController:
         # Waits until altitude TAKEOFF_ALT is reached, before moving on to EarlyLaps
 
         return
+
+    async def move_to_takeoff(self, drone: System, takeoff_location: LatLon) -> None:
+        """
+        Similar to move_to function, but heights are changed so drone only descends when moving
+        Parameters:
+                drone(System): our drone object
+                takeoff_location(LatLon): gives lat & lon of takeoff location
+        Return:
+            None
+        """
+        # Moves drone to initial takeoff location
+        logging.info("Moving to Takeoff location")
+        count: int = 0
+        async for gps in drone.telemetry.position():
+            altitude: float = round(gps.relative_altitude_m, 2)
+            # not allowed to go past 15m
+            # at or above, go down (positive)
+            # below tolerance, go up (negative)
+
+            if altitude > 2:
+                alt = config.ALT_CORRECTION_SPEED  # go down m/s
+            elif altitude < 2:
+                alt = -config.ALT_CORRECTION_SPEED  # go up m/s
+            else:
+                alt = -0.15  # don't move
+
+            # Configure current position and store it
+            lat: float = round(gps.latitude_deg, 8)
+            lon: float = round(gps.longitude_deg, 8)
+            current: float = LatLon(lat, lon)  # you are here
+
+            # distance we have to go in order to get to the offset point
+            dist: float = current.distance(takeoff_location)
+            # degrees needed to change to get to offset position
+            deg: float = current.heading_initial(takeoff_location)
+
+            # East, West
+            x: float = dist * math.sin(math.radians(deg)) * 1000  # from km to m
+            # North, South
+            y: float = dist * math.cos(math.radians(deg)) * 1000  # from km to m
+
+            if count == 0:
+                reference_x: float = abs(x)
+                reference_y: float = abs(y)
+
+                dx: float = math.copysign(
+                    config.MAX_SPEED
+                    * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    x,
+                )
+                dy: float = math.copysign(
+                    config.MAX_SPEED
+                    * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    y,
+                )
+            # continuously update information on the drone's location
+            # and update the velocity of the drone
+            await drone.offboard.set_velocity_ned(
+                sdk.offboard.VelocityNedYaw(dy, dx, alt, deg)
+            )
+            # if the x and y values are close enough (2m) to the original position * precision
+            # if inside the circle, move on to the next
+            # if outside of the circle, keep running to you get inside
+            if (
+                abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
+                and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
+            ):
+                return True
+
+    async def manual_land(self, drone: System) -> None:
+        """
+        Function to slowly land the drone vertically
+        Parameters:
+                drone(System): our drone object
+        Return:
+            None
+        """
+        # Lands the drone using manual velocity values
+        logging.info("Landing the drone")
+        async for position in drone.telemetry.position():
+            current_altitude: float = round(position.relative_altitude_m, 3)
+            if current_altitude > 1.0:
+                # Descends at 0.7 m/s at altitudes > 1 m
+                await drone.offboard.set_velocity_body(
+                    sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.7, 0.0)
+                )
+            elif 1.0 > current_altitude > 0.3:
+                # Descends at 0.35 m/s at altitudes < 1 m && > 0.3 m
+                await drone.offboard.set_velocity_body(
+                    sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.35, 0.0)
+                )
+            else:
+                # Sets downward velocity to 0 otherwise
+                await drone.offboard.set_velocity_body(
+                    sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+                )
+                return
