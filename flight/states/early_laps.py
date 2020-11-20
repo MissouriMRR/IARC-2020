@@ -1,14 +1,12 @@
 """Runs the 8 laps to get to the mast"""
 import logging
 import asyncio
-import math
 import mavsdk as sdk
 
 from flight import config
 
 from flight.utils.movement_controller import MovementController
-from .state import State
-from .land import Land
+from .to_mast import ToMast
 
 
 async def arange(count):
@@ -22,7 +20,7 @@ class EarlyLaps(State):
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        if config.run_states["early_laps"]:
+        if config.run_states["earrly_laps"]:
             mover: MovementController = MovementController()
             # Go to pylon 1
             logging.info("Moving to pylon 1")
@@ -41,6 +39,6 @@ class EarlyLaps(State):
 
                 logging.debug("Lap %d: Turn two", i)
                 await mover.turn(drone)  # turn around pylon 1
-            return Land()
+            return ToMast()
         else:
-            return Land()
+            return ToMast()

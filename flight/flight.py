@@ -41,7 +41,7 @@ class StateMachine:
         self.current_state: State = initial_state
         self.drone: System = drone
 
-        camera: Realsense = Realsense(600, 800, 60)
+        # camera: Realsense = Realsense(600, 800, 60)
 
     async def run(self) -> None:
         """
