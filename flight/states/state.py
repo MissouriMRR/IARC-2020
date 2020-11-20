@@ -2,6 +2,8 @@
 import logging
 from mavsdk import System
 
+from vision.pipeline import Pipeline
+
 
 class State:
     """
@@ -14,7 +16,7 @@ class State:
     def __init__(self):
         logging.info('State "%s" has begun', self.name)
 
-    async def run(self, drone: System):
+    async def run(self, drone: System, pipeline: Pipeline = None):
         """
         Does all of the operations for the state
 
@@ -22,6 +24,8 @@ class State:
         ----------
         drone : System
             The drone system; used for flight operations.
+        pipeline : Pipeline
+            The flight-vision pipeline used for communication of data
 
         Returns
         -------

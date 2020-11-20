@@ -3,7 +3,9 @@ import logging
 import asyncio
 import mavsdk as sdk
 
+from mavsdk import System
 from flight import config
+from vision.pipeline import Pipeline
 
 from flight.utils.movement_controller import MovementController
 from .to_mast import ToMast
@@ -18,8 +20,10 @@ async def arange(count):
 class EarlyLaps:
     """Handles getting the drone around the two pylons 8 times"""
 
-    async def run(self, drone):
+    async def run(self, drone: System, pipeline: Pipeline = None):
         """Moves the drone to the first pylon, then begins the 8 laps"""
+        if config.USE_VISION:
+            pipeline.flight_communication.put_nowait("early_laps")
         mover: MovementController = MovementController()
         # Go to pylon 1
         logging.info("Moving to pylon 1")
@@ -27,6 +31,8 @@ class EarlyLaps:
         logging.info("Arrived at pylon 1")
         async for i in arange(config.NUM_LAPS):
             logging.info("Starting lap: %d", i)
+            if config.USE_VISION:
+                logging.info(pipeline.vision_communication)
             logging.debug("Lap %d: Straight one", i)
             await mover.move_to(drone, config.pylon2)  # move to pylon 2
 

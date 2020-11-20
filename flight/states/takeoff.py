@@ -8,6 +8,7 @@ from .state import State
 from .early_laps import EarlyLaps
 from flight.utils.latlon import LatLon
 from flight.utils.movement_controller import MovementController
+from vision.pipeline import Pipeline
 
 from flight import config
 
@@ -15,8 +16,10 @@ from flight import config
 class Takeoff(State):
     """The state that takes off the drone"""
 
-    async def run(self, drone: System) -> None:
+    async def run(self, drone: System, pipeline: Pipeline = None) -> None:
         """Sets takeoff location"""
+        if config.USE_VISION:
+            pipeline.flight_communication.put_nowait("takeoff")
         async for gps in drone.telemetry.position():
             config.takeoff_pos = LatLon(
                 round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)

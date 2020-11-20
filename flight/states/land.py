@@ -10,6 +10,7 @@ from mavsdk import System
 from .state import State
 from flight.utils.movement_controller import MovementController
 from .final import Final
+from vision.pipeline import Pipeline
 
 
 class Land(State):
@@ -18,11 +19,13 @@ class Land(State):
     offboard
     """
 
-    async def run(self, drone: System) -> State:
+    async def run(self, drone: System, pipeline: Pipeline = None) -> State:
         """
         Stops the drone by setting all movements to 0, then move to land
         mode
         """
+        if config.USE_VISION:
+            pipeline.flight_communication.put_nowait("land")
         mover: MovementController = MovementController()
         await drone.offboard.set_position_ned(sdk.offboard.PositionNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_ned(sdk.offboard.VelocityNedYaw(0, 0, 0, 0))

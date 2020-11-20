@@ -49,6 +49,11 @@ NUM_LAPS: int = 2
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
 
+USE_VISION: bool = True
+REALSENSE_SCREEN_WIDTH: int = 800
+REALSENSE_SCREEN_HEIGHT: int = 600
+REALSENSE_FRAMERATE: int = 60
+
 
 async def config_params(drone: System):
     await drone.action.set_maximum_speed(MAX_SPEED)

@@ -8,8 +8,10 @@ import mavsdk as sdk
 from .states import STATES, State
 from . import config
 
-#from ..vision.camera.realsense import Realsense
+from vision.camera.realsense import Realsense
+from vision.pipeline import Pipeline
 
+from multiprocessing import Queue
 
 SIM_ADDR: str = "udp://:14540"  # Address to connect to the simulator
 CONTROLLER_ADDR: str = "serial:///dev/ttyUSB0"  # Address to connect to a pixhawk board
@@ -40,17 +42,21 @@ class StateMachine:
         """
         self.current_state: State = initial_state
         self.drone: System = drone
-
-        #camera: Realsense = Realsense(600, 800, 60)
+        if config.USE_VISION:
+            self.camera: Realsense = Realsense(config.REALSENSE_SCREEN_WIDTH, config.REALSENSE_SCREEN_HEIGHT, config.REALSENSE_FRAMERATE)
+            self.vision_comm: Queue = Queue()
+            self.flight_comm: Queue = Queue()
+            self.pipeline = Pipeline(self.vision_comm, self.flight_comm, self.camera)
 
     async def run(self) -> None:
         """
         Runs the state machine by infinitely replacing current_state until a
         state return None.
         """
-        #camera.display_in_window()
+        if config.USE_VISION:
+            self.camera.display_in_window()
         while self.current_state:
-            self.current_state: State = await self.current_state.run(self.drone)
+            self.current_state: State = await self.current_state.run(self.drone, self.pipeline)
 
 
 async def log_flight_mode(drone: System) -> None:
