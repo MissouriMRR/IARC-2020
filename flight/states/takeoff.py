@@ -18,10 +18,7 @@ class Takeoff(State):
     async def run(self, drone: System) -> None:
         """Sets takeoff location"""
         async for gps in drone.telemetry.position():
-            takeoff_lat: float = round(gps.latitude_deg, 8)
-            takeoff_lon: float = round(gps.longitude_deg, 8)
-            takeoff_position = LatLon(takeoff_lat, takeoff_lon)
-            config.takeoff_pos = takeoff_position
+            config.takeoff_pos = LatLon(round(gps.latitude_deg, 8), round(gps.longitude_deg, 8))
             break
         """Arms and takes off the drone"""
         mover: MovementController = MovementController()
