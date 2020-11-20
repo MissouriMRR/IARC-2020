@@ -43,7 +43,11 @@ class StateMachine:
         self.current_state: State = initial_state
         self.drone: System = drone
         if config.USE_VISION:
-            self.camera: Realsense = Realsense(config.REALSENSE_SCREEN_WIDTH, config.REALSENSE_SCREEN_HEIGHT, config.REALSENSE_FRAMERATE)
+            self.camera: Realsense = Realsense(
+                config.REALSENSE_SCREEN_WIDTH,
+                config.REALSENSE_SCREEN_HEIGHT,
+                config.REALSENSE_FRAMERATE,
+            )
             self.vision_comm: Queue = Queue()
             self.flight_comm: Queue = Queue()
             self.pipeline = Pipeline(self.vision_comm, self.flight_comm, self.camera)
@@ -56,7 +60,9 @@ class StateMachine:
         if config.USE_VISION:
             self.camera.display_in_window()
         while self.current_state:
-            self.current_state: State = await self.current_state.run(self.drone, self.pipeline)
+            self.current_state: State = await self.current_state.run(
+                self.drone, self.pipeline
+            )
 
 
 async def log_flight_mode(drone: System) -> None:
