@@ -20,7 +20,7 @@ class EarlyLaps(State):
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        if config.run_states["earrly_laps"]:
+        if config.run_states["early_laps"]:
             mover: MovementController = MovementController()
             # Go to pylon 1
             logging.info("Moving to pylon 1")
