@@ -19,6 +19,12 @@ def main() -> None:
     )
     args = parser.parse_args()
     logging.debug("Simulation flag %s", "enabled" if args.simulation else "disabled")
+    confirm = "no"
+    while(confirm != "yes"):
+        if(not args.simulation):
+            confirm = input("Enter 'yes' to initiate takeoff: ")
+        else:
+            confirm = "yes"
     run_threads(args.simulation)
 
 
