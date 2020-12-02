@@ -362,7 +362,8 @@ class TestRegionOfInterest(unittest.TestCase):
         # testing with ndarray of all zeroes, arbitrary depth value,
         #   and arbitrary center value
         depth_image = np.zeros(IMAGE_SIZE, dtype=int)
-        roi = region_of_interest(depth_image, 300, (300, 300))
+        arbitrary_value = 300
+        roi = region_of_interest(depth_image, arbitrary_value, (arbitrary_value, arbitrary_value))
 
         self.assertIs(type(roi), np.ndarray)
 
