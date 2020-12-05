@@ -2,6 +2,7 @@
 The Realsense class is a child class of the camera, designed to be used for realsense depth cameras
 """
 import sys, os
+from datetime import datetime
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -45,6 +46,7 @@ class Realsense(Camera):
 
         # Create a config object
         self.config = rs.config()
+        self.config.enable_record_to_file(f"/vision_logs/{datetime.now()}.bag")
 
         # a unique serial number for a camera, enables config to get data from a specific camera
         if self.serialNumber:

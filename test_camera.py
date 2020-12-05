@@ -36,9 +36,12 @@ def run_threads(sim: bool) -> None:
     logging.info("Spawning Processes")
 
     camera = Realsense(config.REALSENSE_SCREEN_WIDTH, config.REALSENSE_SCREEN_HEIGHT, config.REALSENSE_FRAMERATE)
-    camera.display_in_window()
 
-    time.sleep(10)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
 
     logging.info("All processes ended, Goodbye!")
     logging_process.stop()
