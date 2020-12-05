@@ -45,3 +45,6 @@ class EarlyLaps:
             logging.debug("Lap %d: Turn two", i)
             await mover.turn(drone)  # turn around pylon 1
         return ToMast()
+
+if __name__ == '__main__':
+    print('done')
