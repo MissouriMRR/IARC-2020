@@ -4,7 +4,7 @@ from flight.utils.latlon import LatLon, Latitude, Longitude
 from mavsdk import System
 
 
-MAX_SPEED: float = 6.352  # m/s
+MAX_SPEED: float = 10  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
 TAKEOFF_ALT: float = 1.0  # m
@@ -37,19 +37,19 @@ pylon2: LatLon = LatLon(lat2, lon2)
 takeoff_pos = LatLon
 
 # Position for the mast
-MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder postion
-MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)
+MAST_LAT: Latitude = Latitude(37.9486054)  # placeholder postion
+MAST_LON: Longitude = Longitude(-91.7843514)
 MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
-NUM_LAPS: int = 2
+NUM_LAPS: int = 1
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
 
-run_states = {"early_laps": True, "to_mast": True}
+run_states = {"early_laps": True, "to_mast": False}
 
 
 async def config_params(drone: System):
