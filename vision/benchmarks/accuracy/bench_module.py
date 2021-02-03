@@ -86,7 +86,7 @@ def bench_module_accuracy(folder: str) -> None:
                 except:
                     print("Failed to read image:", depthname)
                     return
-                
+
                 if image is None:
                     print("Failed to read image:", filename)
                     return
