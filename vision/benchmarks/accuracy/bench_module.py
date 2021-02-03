@@ -10,6 +10,7 @@ gggparent_dir = os.path.dirname(ggparent_dir)
 sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
 import numpy as np
+import cv2
 
 from vision.bounding_box import BoundingBox, ObjectType
 
@@ -27,10 +28,7 @@ class AccuracyModule:
     """
 
     def __init__(self):
-        self.setup()
-
-    def setup(self):
-        self.location = ModuleLocation
+        self.location = ModuleLocation()
 
     def accuracy_isInFrame(
         self, color_image: np.ndarray, depth_image: np.ndarray
@@ -67,13 +65,50 @@ def bench_module_accuracy(folder: str) -> None:
     -------
     None
     """
-    pass
+    tester = AccuracyModule()
+    for root, _, files in os.walk(folder):
+        for file in files:
+            if file.endswith(".jpg"):
+                # Attempt to read the file
+                filename = os.path.join(root, file)
+                depthname = filename[:-14] + "depthImage.npy"
+
+                image = np.array([])
+                depth = np.array([])
+
+                try:
+                    image = cv2.imread(filename)
+                except:
+                    print("Failed to read image:", filename)
+                    return
+                try:
+                    depth = np.load(depthname)
+                except:
+                    print("Failed to read image:", depthname)
+                    return
+                
+                if image is None:
+                    print("Failed to read image:", filename)
+                    return
+                if depth is None:
+                    print("Failed to read image:", depthname)
+                    return
+
+                # Run tests on the image
+                print(filename)
+                result = tester.accuracy_isInFrame(image, depth)
+                print("isInFrame:", result)
+                result = tester.accuracy_getCenter(image, depth)
+                print("getCenter:", result)
+
+    return
 
 
 if __name__ == "__main__":
     """
     Runs bench_module_accuracy() to test all module accuracy benchmarks.
     Defaults to IMG_FOLDER if no folder is specified.
+    Will only run on images that have an .npy extension associated depth image.
 
     Command Line Arguments
     -f {foldername}
