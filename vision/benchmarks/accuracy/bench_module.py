@@ -15,8 +15,11 @@ import cv2
 from vision.bounding_box import BoundingBox, ObjectType
 
 from vision.module.location import ModuleLocation
-from vision.module.region_of_interest import region_of_interest as roi
+from vision.module.get_module_depth import get_module_depth
+from vision.module.region_of_interest import region_of_interest
+from vision.module.module_bounding import getModuleBounds
 from vision.module.module_orientation import get_module_orientation
+from vision.module.module_orientation import get_module_roll
 
 
 IMG_FOLDER = "module"  # default folder to read images from
@@ -36,9 +39,16 @@ class AccuracyModule:
         """
         Measuring accuracy of isInFrame() from ModuleLocation class.
 
+        Parameters
+        ----------
+        color_image: ndarray
+            The color image.
+        depth_image: ndarray
+            The depth image.
+
         Returns
         -------
-        bool - whether the module was detected in color_image
+        bool - whether the module was detected in color_image.
         """
         self.location.setImg(color_image, depth_image)
         return self.location.isInFrame()
@@ -49,17 +59,113 @@ class AccuracyModule:
         """
         Measuring accuracy of isInFrame() from ModuleLocation class.
 
+        Parameters
+        ----------
+        color_image: ndarray
+            The color image.
+        depth_image: ndarray
+            The depth image.
+
         Returns
         -------
         tuple - (x, y) coordinates of the center of the module in color_image.
         """
         self.location.setImg(color_image, depth_image)
         return self.location.getCenter()
+    
+    def accuracy_get_module_depth(self, depth_image: np.ndarray, center: tuple) -> float:
+        """
+        Measuring accuracy of get_module_depth().
 
+        Parameters
+        ----------
+        depth_image: ndarray
+            The depth image.
+        center: tuple
+            (x, y) coordinates of the center of the module.
+        
+        Returns
+        -------
+        float: Depth value at the center of the module in millimeters.
+        """
+        return get_module_depth(depth_image, center)
+
+    def accuracy_region_of_interest(self, depth_image: np.ndarray, depth_val: np.ndarray, center: tuple) -> np.ndarray:
+        """
+        Measuring accuracy of region_of_interest().
+
+        Parameters
+        ----------
+        depth_image: ndarray
+            The depth image.
+        depth_val: float
+            Measured value of the depth of the module.
+        center: tuple
+            (x, y) coordinates of the center of the module.
+        
+        Returns
+        -------
+        ndarray - Region of depth image.
+        """
+        return region_of_interest(depth_image, depth_val, center)
+
+    def accuracy_get_module_orientation(self, roi: np.ndarray) -> tuple:
+        """
+        Measuring accuracy of get_module_orientation().
+
+        Parameters
+        ----------
+        roi: ndarray
+            The module region of interest calculated by region_of_interest().
+
+        Returns
+        -------
+        tuple - (x_tilt, y_tilt) orientation of module
+        """
+        return get_module_orientation(roi)
+
+    def accuracy_getModuleBounds(self, dimensions: tuple, center: tuple, depth: float) -> list:
+        """
+        Measuring accuracy of getModuleBounds.
+
+        Parameters
+        ----------
+        dimensions: tuple
+            The dimensions of the color image.
+        center: tuple
+            (x, y) coordinates of center of module.
+        depth: float
+            Depth value at center of module.
+
+        Returns
+        -------
+        list<tuple> - list of four (x, y) vertices around padded module.
+        """
+        return getModuleBounds(dimensions, center, depth)
+    
+    def accuracy_get_module_roll(self, region: np.ndarray) -> float:
+        """
+        Measuring accuracy of get_module_roll().
+
+        Parameters
+        ----------
+        region: ndarray
+            Padded region of image with module.
+
+        Returns
+        -------
+        float - module roll with respect to positive y-axis.
+        """
+        return get_module_roll(region)
 
 def bench_module_accuracy(folder: str) -> None:
     """
-    Runs all module accuracy benchmarks for a specified folder.
+    Runs all module accuracy benchmarks on all images in a specified folder.
+
+    Parameters
+    ----------
+    folder: str
+        The folder of images to test.
 
     Returns
     -------
