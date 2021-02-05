@@ -72,8 +72,10 @@ class AccuracyModule:
         """
         self.location.setImg(color_image, depth_image)
         return self.location.getCenter()
-    
-    def accuracy_get_module_depth(self, depth_image: np.ndarray, center: tuple) -> float:
+
+    def accuracy_get_module_depth(
+        self, depth_image: np.ndarray, center: tuple
+    ) -> float:
         """
         Measuring accuracy of get_module_depth().
 
@@ -83,14 +85,16 @@ class AccuracyModule:
             The depth image.
         center: tuple
             (x, y) coordinates of the center of the module.
-        
+
         Returns
         -------
         float: Depth value at the center of the module in millimeters.
         """
         return get_module_depth(depth_image, center)
 
-    def accuracy_region_of_interest(self, depth_image: np.ndarray, depth_val: np.ndarray, center: tuple) -> np.ndarray:
+    def accuracy_region_of_interest(
+        self, depth_image: np.ndarray, depth_val: np.ndarray, center: tuple
+    ) -> np.ndarray:
         """
         Measuring accuracy of region_of_interest().
 
@@ -102,7 +106,7 @@ class AccuracyModule:
             Measured value of the depth of the module.
         center: tuple
             (x, y) coordinates of the center of the module.
-        
+
         Returns
         -------
         ndarray - Region of depth image.
@@ -124,7 +128,9 @@ class AccuracyModule:
         """
         return get_module_orientation(roi)
 
-    def accuracy_getModuleBounds(self, dimensions: tuple, center: tuple, depth: float) -> list:
+    def accuracy_getModuleBounds(
+        self, dimensions: tuple, center: tuple, depth: float
+    ) -> list:
         """
         Measuring accuracy of getModuleBounds.
 
@@ -142,7 +148,7 @@ class AccuracyModule:
         list<tuple> - list of four (x, y) vertices around padded module.
         """
         return getModuleBounds(dimensions, center, depth)
-    
+
     def accuracy_get_module_roll(self, region: np.ndarray) -> float:
         """
         Measuring accuracy of get_module_roll().
@@ -157,6 +163,7 @@ class AccuracyModule:
         float - module roll with respect to positive y-axis.
         """
         return get_module_roll(region)
+
 
 def bench_module_accuracy(folder: str) -> None:
     """
@@ -173,14 +180,18 @@ def bench_module_accuracy(folder: str) -> None:
     None
     """
     OUTPUT_FILE = "results.csv"
-    f = open(OUTPUT_FILE, "w") # will overwrite existing file, backup previous results if needed
-    f.write("image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll()\n")
+    f = open(
+        OUTPUT_FILE, "w"
+    )  # will overwrite existing file, backup previous results if needed
+    f.write(
+        "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll()\n"
+    )
 
     tester = AccuracyModule()
     for root, _, files in os.walk(folder):
         for file in files:
             if file.endswith(".jpg"):
-                crash = False # whether the current image crashed at some point
+                crash = False  # whether the current image crashed at some point
                 # Attempt to read the file
                 filename = os.path.join(root, file)
                 depthname = filename[:-14] + "depthImage.npy"
@@ -188,103 +199,111 @@ def bench_module_accuracy(folder: str) -> None:
                 image = np.array([])
                 depth = np.array([])
 
-                f.write(filename + ',')
+                f.write(filename + ",")
 
                 try:
                     image = cv2.imread(filename)
                 except:
-                    f.write('False')
+                    f.write("False")
                     crash = True
                 if image is None:
-                    f.write('False')
+                    f.write("False")
                     crash = True
-                f.write('True,')
+                f.write("True,")
 
                 try:
                     depth = np.load(depthname)
                 except:
-                    f.write('False')
+                    f.write("False")
                     crash = True
                 if depth is None:
-                    f.write('False')
+                    f.write("False")
                     crash = True
-                f.write('True,')
+                f.write("True,")
 
                 in_frame = False
 
                 # Run tests on the image
-                
+
                 # isInFrame
                 if not crash:
                     try:
                         in_frame = tester.accuracy_isInFrame(image, depth)
-                        f.write(str(in_frame) + ',')
+                        f.write(str(in_frame) + ",")
                     except:
-                        f.write('Crash,')
+                        f.write("Crash,")
                         crash = True
 
                 # getCenter
                 center = (0, 1)
-                if in_frame and not crash: # only runs further tests if in frame
+                if in_frame and not crash:  # only runs further tests if in frame
                     try:
                         center = tester.accuracy_getCenter(image, depth)
-                        f.write(str(center[0]) + ' . ' + str(center[1]) + ',')
+                        f.write(str(center[0]) + " . " + str(center[1]) + ",")
                     except:
-                        f.write('Crash,')
+                        f.write("Crash,")
                         crash = True
-                
+
                 # get_module_depth
                 depth_val = 0.0
-                if center != (0, 1) and not crash: # only runs further tests if center found
+                if (
+                    center != (0, 1) and not crash
+                ):  # only runs further tests if center found
                     try:
                         depth_val = tester.accuracy_get_module_depth(depth, center)
-                        f.write(str(depth_val) + ',')
+                        f.write(str(depth_val) + ",")
                     except:
-                        f.write('Crash,')
+                        f.write("Crash,")
                         crash = True
-                
+
                 # region_of_interest
                 roi = np.ndarray([])
                 if depth_val != 0 and not crash:
                     try:
-                        roi = tester.accuracy_region_of_interest(depth, depth_val, center)
+                        roi = tester.accuracy_region_of_interest(
+                            depth, depth_val, center
+                        )
                         f.write("Found,")
                     except:
                         f.write("Crash,Dependency Crash,")
                         crash = True
-                
+
                 # get_module_orientation
                 orientation = (0, 0)
                 if depth_val != 0 and not crash:
                     try:
                         orientation = tester.accuracy_get_module_orientation(roi)
-                        f.write(str(orientation[0]) + ' . ' + str(orientation[1]) + ',')
+                        f.write(str(orientation[0]) + " . " + str(orientation[1]) + ",")
                     except:
-                        f.write('Crash,')
+                        f.write("Crash,")
                         crash = True
-                
+
                 # getModuleBounds
                 bounds = np.ndarray([])
                 if depth_val != 0 and not crash:
                     try:
-                        bounds = tester.accuracy_getModuleBounds((1920, 1080), center, depth_val)
+                        bounds = tester.accuracy_getModuleBounds(
+                            (1920, 1080), center, depth_val
+                        )
                         f.write("Found,")
                     except:
                         f.write("Crash,Dependency Crash,")
                         crash = True
-                
+
                 # get_module_roll
                 roll = 0.0
                 if depth_val != 0 and not crash:
                     try:
-                        bound_region = image[bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :]
+                        bound_region = image[
+                            bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                        ]
                         roll = tester.accuracy_get_module_roll(bound_region)
                         f.write(str(roll) + ",")
                     except:
-                        f.write('Crash,')
+                        f.write("Crash,")
                         crash = True
 
-                f.write('\n')
+                f.write("\n")
     f.close()
     return
 
