@@ -18,7 +18,7 @@ class Obstacle:
     """
     def __init__(self, bbox: BoundingBox):
         self.bounding_box = bbox
-        self.center = np.mean(bbox)
+        self.center = np.mean(bbox.vertices, axis=0)
         self.frames_persisted = 0
 
 
@@ -27,7 +27,7 @@ class ObstacleTracker:
     Track obstacles between frames.
     """
     def __init__(self):
-        self.MVMT_TOLERANCE = 0.10 # bounding box displacement tolerance per frame
+        self.MVMT_TOLERANCE = 30 # bounding box displacement tolerance per frame (in pixels)
         self.PERSISTENCE_THRESHOLD = 5 # number of frames for an obstacle to be considered consequential
         
         self.obstacles = np.array([]) # buffer that stores current Obstacles in view
@@ -42,8 +42,29 @@ class ObstacleTracker:
             The obstacle of reference
         obj2: Obstacle
             The obstacle in question
+        
+        Returns
+        -------
+        bool
+            The result of whether or not obj1 and obj2 are the same object
         """
-        return obj1.center >= (1-self.MVMT_TOLERANCE)*obj2.center and obj1.center <= (1+self.MVMT_TOLERANCE)*obj2.center
+        isSame = True # presume they're the same obstacle
+
+        # horizontal check
+        if(
+            obj1.center[0] >= (obj2.center[0]+MVMT_TOLERANCE) or # outside of upper bound
+            obj1.center[0] <= (obj2.center[0]-MVMT_TOLERANCE) # less than lower bound
+        ):
+            isSame = False
+
+        # vertical check
+        if(
+            obj1.center[1] >= (obj2.center[1]+MVMT_TOLERANCE) or # outside of upper bound
+            obj1.center[1] <= (obj2.center[1]-MVMT_TOLERANCE) # less than lower bound
+        ):
+            isSame = False
+
+        return isSame
 
     def update(self, new_obstacle_boxes: list) -> None:
         """
@@ -61,7 +82,7 @@ class ObstacleTracker:
         new_obstacles = np.array([])
         
         # transform the list of bounding boxes into an array of Obstacles
-        for i in np.arange(new_obstacle_boxes.size()):
+        for i in np.arange(new_obstacle_boxes.size):
             new_obstacles[i] = Obstacle(new_obstacle_boxes[i])
         
         if(not self.obstacles):
@@ -69,8 +90,8 @@ class ObstacleTracker:
             return
 
         # create an array of obstacles that existed in the previous (buffer) frame and replace the buffer with it
-        for i in np.arange(new_obstacles.size()):
-            if(_isSameObstacle(new_obstacles[i], self.obstacles[i])):
+        for i in np.arange(new_obstacles.size):
+            if(self._isSameObstacle(new_obstacles[i], self.obstacles[i])): # if new obj is within MVMT_TOLERANCE of old obj
                 new_obstacles[i].frame_persisted = self.obstacles[i].frames_persisted + 1
         
         # update buffer
@@ -85,10 +106,10 @@ class ObstacleTracker:
         list[BoundingBox]
             a list of the persistent obstacle BoundingBoxes
         """
-        persistent_obstacles = np.array([])
+        persistent_obstacles = []
 
         # append only obstacles persistent for PERSISTENCE_THRESHOLD frames
-        for i in np.arange(self.obstacles.size()):
+        for i in np.arange(self.obstacles.size):
             if(self.obstacles[i].frames_persisted == self.PERSISTENCE_THRESHOLD):
                 persistent_obstacles.append(self.obstacles[i].bounding_box)
         
