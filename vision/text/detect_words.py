@@ -15,12 +15,11 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 from bounding_box import BoundingBox, ObjectType
 
-
 class TextDetector:
     def __init__(self):
         self.text = "модулииртибот"
 
-    def detect_russian_word(self, color_image, depth_image):
+    def detect_russian_word(self, color_image, depth_image = None):
         """
         Detect words in given image.
 
@@ -94,21 +93,52 @@ class TextDetector:
         # the rectangle has an inside and outside boundary, and we can use that fact to eliminate noise
         # that is, any contours that don't have child contours aren't our rectangle
         contours, hierarchy = cv2.findContours(
-            edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE
+            edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE
         )
 
-        print(hierarchy.shape)
-        print(len(contours))
+        if hierarchy is None:
+            return None, None
 
-        (hierarchy[0][:][2] >= 0)
+        largestArea = 0
+        largestContour = 0
+        for c in contours:
+            if cv2.contourArea(c) > largestArea:
+                largestContour = c
 
-        print(contours[0].shape)
+        x,y,w,h = cv2.boundingRect(largestContour)
+
+        rect = cv2.minAreaRect(largestContour)
+
+        # stuff for viewing the min area rect, if desired
+        # box = cv2.boxPoints(rect)
+        # box = np.int0(box)
+        # color_image = cv2.drawContours(color_image,[box],0,(0,0,255),2)
+
+        center, size, theta = rect
+        
+        # adjust angle so the image isn't corrected to a 90 degree angle
+        if abs(theta) > 45:
+            if theta < 0:
+                theta = 90 + theta
+            else:
+                theta = 90 - theta
+
+        # rotates/slices image to min area rect of largest contour
+        center, size = tuple(map(int, center)), tuple(map(int, size))
+        rot_matrix = cv2.getRotationMatrix2D(center, theta, 1)
+        dst = cv2.warpAffine(color_image, rot_matrix, color_image.shape[:2])
+        sliced_rotated_image = cv2.getRectSubPix(dst, size, center)
+
+        cv2.imshow("Image", sliced_rotated_image)
+        cv2.waitKey(0)
+
+        # -------- lines for viewing contours ---------------
 
         lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 250, 600, 20)
-        # lines = np.where(lines[:,1] < np.pi/4
 
         # make it a color image again so we can draw colored lines on it
         mask_image = np.stack((mask_image,) * 3, axis=2)
+
 
         if lines is not None:
             for i in range(lines.shape[0]):
@@ -116,9 +146,11 @@ class TextDetector:
                     mask_image = cv2.line(
                         mask_image, (x1, y1), (x2, y2), (0, 255, 0), thickness=2
                     )
+    
+        # cv2.imshow("img", mask_image)
+        # cv2.waitKey(0)
 
-        cv2.imshow("img", mask_image)
-        cv2.waitKey(0)
+        # ----------------------------------------------------
 
         # not only does tesseract basically require uint8, but apparently it has to be
         # thresholded as uint8 or tesseract will throw a fit
@@ -136,13 +168,12 @@ class TextDetector:
         ## eg. find a way to check if boxes are repetitive or do not contain text
 
         tessdata = pytesseract.image_to_data(
-            color_image, output_type=pytesseract.Output.DICT, lang="uzb_cyrl"
+            sliced_rotated_image, output_type=pytesseract.Output.DICT, lang="uzb_cyrl"
         )
 
         n_boxes = len(tessdata["level"])
         box_obs = []
         contents = tessdata["text"]
-        # print(contents)
         for i in range(n_boxes):
             if not contents[i]:
                 continue
@@ -169,35 +200,65 @@ class TextDetector:
 if __name__ == "__main__":
     import time
     import os
+    import argparse
     from common import box_plotter
 
-    sample_dir = os.path.join("vision_images", "text", "Feb29")
-    sample_ims = []
+    # # sample_dir = os.path.join("vision_images", "text", "Feb29")
+    # sample_dir = "../vision_images/text/Feb29"
+    # sample_ims = []
 
-    for filename in os.listdir(sample_dir):
-        if filename.endswith(".jpg") or filename.endswith(".png"):
-            sample_ims.append(os.path.join(sample_dir, filename))
-        else:
-            continue
+    # for filename in os.listdir(sample_dir):
+    #     if filename.endswith(".jpg") or filename.endswith(".png"):
+    #         sample_ims.append(os.path.join(sample_dir, filename))
+    #     else:
+    #         continue
 
-    times = []
+    # times = []
 
-    for i in sample_ims:
+    # for i in sample_ims:
 
-        color_image = cv2.imread(i)
-        depth_image = np.load(i.split("colorImage")[0] + "depthImage.npy")
+    #     color_image = cv2.imread(i)
+    #     depth_image = np.load(i.split("colorImage")[0] + "depthImage.npy")
 
-        if color_image is None:
-            raise FileNotFoundError("Could not read image!")
+    #     if color_image is None:
+    #         raise FileNotFoundError("Could not read image!")
 
-        start = time.time()
+    #     start = time.time()
 
-        detector = TextDetector()
-        result, mask_image = detector.detect_russian_word(color_image, depth_image)
+    #     detector = TextDetector()
+    #     result, mask_image = detector.detect_russian_word(color_image, depth_image)
 
-        times.append(time.time() - start)
-        # box_plotter.plot_box(result, mask_image)
+    #     times.append(time.time() - start)
+    #     # box_plotter.plot_box(result, mask_image)
 
-    print("Max: ", np.max(times))
-    print("Min: ", np.min(times))
-    print("Mean: ", np.mean(times))
+    # print("Max: ", np.max(times))
+    # print("Min: ", np.min(times))
+    # print("Mean: ", np.mean(times))
+
+    # --------------------------------------------------------------
+
+    # # Create object for parsing command-line options
+    parser = argparse.ArgumentParser(
+        description='Read image file and display depth and test for ModuleInFrame.\
+                                     To read an image file, type "python in_frame_driver.py --i (image name).(image extension)"'
+    )
+    # # Add argument which takes path to a bag file as an input
+    parser.add_argument("-i", "--input", type=str, help="Path to the image file")
+    # # Parse the command line arguments to an object
+    args = parser.parse_args()
+
+    if args.input:
+        inputImageFile = args.input
+    else:
+        inputImageFile = "../vision_images/module/Block2.jpg"
+        # raise FileNotFoundError("No input parameter has been given. For help type --help"
+
+    color_image = cv2.imread(inputImageFile + "-colorImage.jpg")
+
+    if color_image is None:
+        raise FileNotFoundError("Could not read image!")
+
+    detector = TextDetector()
+    result, mask_image = detector.detect_russian_word(color_image)
+
+    # box_plotter.plot_box(result, mask_image)
