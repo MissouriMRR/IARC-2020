@@ -165,7 +165,7 @@ class AccuracyModule:
         return get_module_roll(region)
 
 
-def bench_module_accuracy(folder: str, quiet_output=True, draw_centers=False) -> None:
+def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -269,7 +269,7 @@ def bench_module_accuracy(folder: str, quiet_output=True, draw_centers=False) ->
                 ):  # only runs further tests if center found
                     try:
                         depth_val = tester.accuracy_get_module_depth(depth, center)
-                        f.write(str(depth_val) + "")
+                        f.write(str(depth_val))
                     except:
                         f.write("Crash")
                         crash = True
@@ -370,7 +370,7 @@ def bench_module_accuracy(folder: str, quiet_output=True, draw_centers=False) ->
                         2
                     )
 
-                    cv2.imwrite(os.path.join("marked_centers",file), image_copy)
+                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR,file), image_copy)
 
 
         avg_time = total_time / total_imgs
