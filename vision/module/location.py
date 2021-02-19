@@ -2,6 +2,7 @@
 This file contains the ModuleLocation class to find the location of the center of the module in an image.
 """
 
+import os
 import cv2
 import numpy as np
 
@@ -252,11 +253,12 @@ class ModuleLocation:
         # Grayscale
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
 
-        # Guassian Blur
-        blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
+        # Guassian Blur / Median Blur
+        #blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
+        blur = cv2.medianBlur(gray, 13)
 
-        # Laplacian Transform
-        laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=3)
+        # Laplacian Transform / ksize = 3 for Guassian
+        laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=1)
         laplacian = np.uint8(laplacian)
 
         # Hough Circle Detection
@@ -270,6 +272,12 @@ class ModuleLocation:
             minRadius=0,
             maxRadius=50,
         )
+
+        # Prevents TypeError if no circles detected
+        if self.circles is None:
+            self.circles = np.array([])
+            return self.circles
+
         self.circles = np.uint16(self.circles)
 
         # Resize circles into 2d array
@@ -377,6 +385,29 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+    def saveCircleImage(self, filename) -> None:
+        """
+        Saves image with circles in folder Circle_Images.
+
+        Returns
+        -------
+        None
+        """
+
+        circleImg = np.copy(self.img)
+
+        for x, y, r in self.circles:
+            cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
+            cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+
+        OUTPUT_FILE = "Circle_Images"
+        try:
+            os.mkdir(OUTPUT_FILE)
+        except FileExistsError:
+            pass
+
+        cv2.imwrite(os.path.join(OUTPUT_FILE, filename), circleImg)
+
     def showCenter(self) -> None:
         """
         Shows the image with detected holes and center.
@@ -389,7 +420,7 @@ class ModuleLocation:
         centerImg = np.copy(self.img)
         for x, y, r in self.holes:
             cv2.circle(
-                img=centerImg, center=(x, y), radius=r, color=(0, 0, 255), thickness=-1
+                img=centerImg, center=(int(x), int(y)), radius=int(r), color=(0, 0, 255), thickness=-1
             )
 
         cv2.circle(
@@ -439,5 +470,6 @@ if __name__ == "__main__":
 
     print(loc.getCenter())
     print(loc.getDistance())
+
 
     loc.showCenter()

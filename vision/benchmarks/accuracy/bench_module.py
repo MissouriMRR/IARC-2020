@@ -164,6 +164,27 @@ class AccuracyModule:
         """
         return get_module_roll(region)
 
+    def accuracy_saveCircleImage(self, filename, color_image: np.ndarray, depth_image: np.ndarray) -> None:
+        """
+        Saves copy of image with circles detected.
+
+        Parameters
+        ----------
+        color_image: ndarray
+            The color image.
+        depth_image: ndarray
+            The depth image.
+        filename
+            The file name.
+
+        Returns
+        -------
+        None
+        """
+        self.location.setImg(color_image, depth_image)
+        self.location.getCenter()
+        self.location.saveCircleImage(filename)
+        return None
 
 def bench_module_accuracy(folder: str) -> None:
     """
@@ -302,6 +323,10 @@ def bench_module_accuracy(folder: str) -> None:
                     except:
                         f.write("Crash,")
                         crash = True
+
+                # Saves image with circles and the module in frame
+                if in_frame:
+                    tester.accuracy_saveCircleImage(filename[-41:], image, depth)
 
                 f.write("\n")
     f.close()
