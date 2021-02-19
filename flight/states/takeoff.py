@@ -6,6 +6,7 @@ from mavsdk import System
 
 from .state import State
 from .early_laps import EarlyLaps
+from flight.utils.latlon import LatLon
 from flight.utils.movement_controller import MovementController
 
 from flight import config
@@ -15,6 +16,12 @@ class Takeoff(State):
     """The state that takes off the drone"""
 
     async def run(self, drone: System) -> None:
+        """Sets takeoff location"""
+        async for gps in drone.telemetry.position():
+            config.takeoff_pos = LatLon(
+                round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)
+            )
+            break
         """Arms and takes off the drone"""
         mover: MovementController = MovementController()
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed

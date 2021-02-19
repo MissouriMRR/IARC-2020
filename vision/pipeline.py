@@ -19,14 +19,17 @@ from multiprocessing import Queue
 from queue import Empty
 
 from vision.obstacle.obstacle_finder import ObstacleFinder
+from vision.obstacle.obstacle_tracker import ObstacleTracker
 from vision.common.import_params import import_params
+
+from vision.text.detect_words import TextDetector
 
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
 from vision.module.module_orientation import get_module_orientation
+from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import getModuleBounds
-
 
 class Pipeline:
     """
@@ -63,6 +66,10 @@ class Pipeline:
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
 
+        self.obstacle_tracker = ObstacleTracker()
+
+        self.text_detector = TextDetector()
+
         self.module_location = ModuleLocation()
 
     @property
@@ -84,21 +91,47 @@ class Pipeline:
         ##
         bboxes = []
 
-        if state == "early_laps":
+        if state == "early_laps":  # navigation around the pylons
             bboxes = self.obstacle_finder.find(color_image, depth_image)
-        elif state == "module_detection":
+            
+            obstacle_tracker.update(bboxes)
+            bboxes = obstacle_tracker.getPersistentObstacles()
+
+        elif state == "text_detection":  # approaching mast
+            bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
+
+        elif state == "module_detection":  # locating module
             self.module_location.setImg(color_image, depth_image)
-            center = self.module_location.getCenter()
-            depth = get_module_depth(depth_image, center)
-            orientation = get_module_orientation(
-                region_of_interest(depth_image, depth, center), center
-            )
-            box = BoundingBox(
-                getModuleBounds(color_image, center, depth), ObjectType.MODULE
-            )
-            box.module_depth = depth  # float
-            box.orientation = orientation  # tuple
-            bboxes.append(box)
+
+            # only do more calculation if module is in the image
+            if self.module_location.isInFrame():
+                center = self.module_location.getCenter()  # center of module in image
+                depth = get_module_depth(
+                    depth_image, center
+                )  # depth of center of module
+
+                region = region_of_interest(
+                    depth_image, depth, center
+                )  # depth image sliced on underestimate bounds
+                orientation = get_module_orientation(
+                    region, center
+                )  # x and y tilt of module
+
+                bounds = getModuleBounds(
+                    color_image, center, depth
+                )  # overestimate of bounds
+                roll = get_module_roll(
+                    color_image[
+                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                    ]
+                )  # roll of module
+
+                # construct boundingbox for the module
+                box = BoundingBox(bounds, ObjectType.MODULE)
+                box.module_depth = depth  # float
+                box.orientation = orientation + (roll,)  # x, y, z tilt
+                bboxes.append(box)
+
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
