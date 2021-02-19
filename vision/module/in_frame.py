@@ -14,6 +14,7 @@ MIN_SLOPES_IN_BUCKET = (
     15  # Minimum number of slopes in a single bucket to identify the module
 )
 MAX_CIRCLES = 100  # Maximum number of cirlces that can be detected in an image before ModuleInFrame fails
+MIN_CIRCLES = 4  # Minimum number of circles needed to perform calculations
 
 
 def ModuleInFrame(color_image: np.ndarray) -> bool:
@@ -34,12 +35,6 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
 
     # Ignore numpy warnings
     np.seterr(all="ignore")
-
-    # Remove depth channel
-    color_image = color_image[:, :, :3]
-
-    # Create output image
-    # output = img.copy()
 
     # Grayscale
     gray = cv2.cvtColor(src=color_image, code=cv2.COLOR_RGB2GRAY)
@@ -62,10 +57,10 @@ def ModuleInFrame(color_image: np.ndarray) -> bool:
         minRadius=0,
         maxRadius=50,
     )
-    if circles is None:  # no circles found
+    if (
+        np.shape(circles)[0] < MIN_CIRCLES or np.shape(circles)[0] > MAX_CIRCLES
+    ):  # too little or too many circles found
         return False
-    elif circles.shape[1] > MAX_CIRCLES:  # too many circles found
-        raise ValueError("Too many circles found (" + str(circles.shape[1]) + ")")
 
     circles = np.uint16(circles)
 
