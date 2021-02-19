@@ -159,7 +159,7 @@ async def start_flight(comm, drone: System):
                 # Worried about what happens here
             await asyncio.sleep(config.THINK_FOR_S)
             logging.info("Landing the drone")
-            await drone.action.land()
+            # await drone.action.land()
         except:
             logging.error("No system available")
             comm.set_state("final")

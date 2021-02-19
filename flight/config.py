@@ -4,7 +4,8 @@ from flight.utils.latlon import LatLon, Latitude, Longitude
 from mavsdk import System
 
 
-MAX_SPEED: float = 6.352  # m/s
+# MAX_SPEED: float = 6.352  # m/s
+MAX_SPEED: float = 5  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
 TAKEOFF_ALT: float = 1.0  # m

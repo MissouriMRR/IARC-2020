@@ -13,13 +13,16 @@ from flight.flight import flight
 
 
 def main() -> None:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-s", "--simulation", help="using the simulator", action="store_true"
-    )
-    args = parser.parse_args()
-    logging.debug("Simulation flag %s", "enabled" if args.simulation else "disabled")
-    run_threads(args.simulation)
+    try:
+        parser: argparse.ArgumentParser = argparse.ArgumentParser()
+        parser.add_argument(
+            "-s", "--simulation", help="using the simulator", action="store_true"
+        )
+        args = parser.parse_args()
+        logging.debug("Simulation flag %s", "enabled" if args.simulation else "disabled")
+        run_threads(args.simulation)
+    except:
+        print("exception thrown all the way back to main")
 
 
 def init_flight(flight_args):

@@ -6,6 +6,10 @@ import mavsdk as sdk
 import logging
 import math
 
+import time
+import sys
+import os
+
 
 class MovementController:
     """
@@ -95,25 +99,90 @@ class MovementController:
                 return True
             count += 1
 
+    f = 5 # initial forward vel
+    r = 0 # initial right vel
+    d = 0 # initial down vel
+    y = -30 # initial yawspeed
+    counter = 0 # initial count
+    tracker_time = time.time()
+
     async def turn(self, drone: System) -> bool:
         """
         Turns the drone around the pylon it is currently at
         Parameters:
             Drone(System): Our drone object
         """
+        # counts the number of data points read/sent to the drone per turn
         count: int = 0
+
+        # Gets the velocity of the drone going into the turn
+        async for tel in drone.telemetry.position_velocity_ned():
+            current_vel : double = (tel.velocity.north_m_s**2 + tel.velocity.east_m_s**2)**.5
+            break
+
+        MovementController.y = MovementController.y - 10
+        if(MovementController.counter % 8 == 0):
+            MovementController.y = -30
+            MovementController.d = MovementController.d - 1
+        if(MovementController.counter % 40 == 0):
+            MovementController.d = 0
+            MovementController.r = MovementController.r - 1
+        if(MovementController.counter % 320 == 0):
+            MovementController.r = 0
+            MovementController.f = MovementController.f + 5
+
+        MovementController.counter = MovementController.counter + 1
+
+        print("f:",MovementController.f,"r:",MovementController.r,"d:",MovementController.d,"y:",MovementController.y)
+
+        MovementController.tracker_time = time.time() - MovementController.tracker_time
+
+        # Making output to file data section *****************************
+
+        filename = "speed" + str(config.MAX_SPEED) + "data.txt"
+
+        with open(filename, "a+") as outfile:
+            datastring = "Forward_vel: " + str(MovementController.f) + " Right_vel: " + str(MovementController.r) + " Down_vel: " + str(MovementController.d) + " Yawspeed: " + str(MovementController.y) + " Time: " + str(MovementController.tracker_time) + "\n"
+            outfile.write(datastring)
+
+        # Making output to file data section *****************************
+
+        MovementController.tracker_time = time.time()
+
+        # print("Current velocity: ", current_vel)
+        # Calculate the correct turning variables based off of the incoming speed
+        # forward_m_s = current_vel * (5/6)
+        # forward_m_s = current_vel
+        # right_m_s = current_vel * (-.5)
+        # yawspeed_d_s = current_vel * (-10)
+
         async for tel in drone.telemetry.attitude_euler():
+            # EulerAngle: [roll_deg, pitch_deg, yaw_deg]
+            # Calculates the current angle of the drone
+            # print(tel)
             current: float = (360 + round(tel.yaw_deg)) % 360
+            # Calculate the angle required to turn 180 deg on the first data point
             if count == 0:
                 temp = (current + 180) % 360
 
+            # VelocityBodyYawspeed(forward m/s, right m/s, down m/s, yawspeed deg/s)
+            # Sends signal to the drone to turn. **No need to send this multiple times
+            #   unless the value is changing each data point
+            # Original is VelocityBodyYawspeed(5, -3, -0.1, -60)
             await drone.offboard.set_velocity_body(
-                sdk.offboard.VelocityBodyYawspeed(5, -3, -0.1, -60)
+                # sdk.offboard.VelocityBodyYawspeed(5, -3, -0.1, -60)
+                # sdk.offboard.VelocityBodyYawspeed(forward_m_s, right_m_s, -0.1, -60)
+                sdk.offboard.VelocityBodyYawspeed(MovementController.f,
+                                                  MovementController.r,
+                                                  MovementController.d,
+                                                  MovementController.y)
             )
             # await asyncio.sleep(config.FAST_THINK_S)
+            # Finds the difference between the current angle and desired angle
             val = abs(current - temp)
             # TODO: Add case so that it can overshoot the point and still complete
-            if val < 10:
+            if val < 15: # originally 10, gave it more leeway
+                ############## loop iteration ###############
                 logging.debug("Finished Turn")
                 return True
             count += 1
