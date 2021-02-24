@@ -1,7 +1,7 @@
 """
 For testing all module algorithms.
 """
-import os, sys
+import os, sys, time
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -189,7 +189,7 @@ class AccuracyModule:
         return None
 
 
-def bench_module_accuracy(folder: str) -> None:
+def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -204,18 +204,30 @@ def bench_module_accuracy(folder: str) -> None:
     None
     """
     OUTPUT_FILE = "results.csv"
+    DRAW_CENTERS_DIR = "marked_centers"
+
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
+    
+    if draw_centers and not os.path.isdir(DRAW_CENTERS_DIR):
+        os.mkdir(DRAW_CENTERS_DIR)
+
     f.write(
-        "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll()\n"
+        "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
     )
 
+    total_imgs = sum(".jpg" in s for s in os.listdir(folder))
+    total_time = 0
+    file_counter = 0
+    
     tester = AccuracyModule()
     for root, _, files in os.walk(folder):
         for file in files:
             if file.endswith(".jpg"):
+                file_counter += 1
                 crash = False  # whether the current image crashed at some point
+
                 # Attempt to read the file
                 filename = os.path.join(root, file)
                 depthname = filename[:-14] + "depthImage.npy"
@@ -249,24 +261,30 @@ def bench_module_accuracy(folder: str) -> None:
 
                 # Run tests on the image
 
+                # get start time of image processing
+                start_time = time.time()
+
                 # isInFrame
                 if not crash:
                     try:
                         in_frame = tester.accuracy_isInFrame(image, depth)
-                        f.write(str(in_frame) + ",")
+                        f.write(str(in_frame))
                     except:
-                        f.write("Crash,")
+                        f.write("Crash")
                         crash = True
+                
+                f.write(",")
 
                 # getCenter
                 center = (0, 1)
                 if in_frame and not crash:  # only runs further tests if in frame
                     try:
                         center = tester.accuracy_getCenter(image, depth)
-                        f.write(str(center[0]) + " . " + str(center[1]) + ",")
+                        f.write(str(center[0]) + " . " + str(center[1]))
                     except:
-                        f.write("Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
 
                 # get_module_depth
                 depth_val = 0.0
@@ -275,10 +293,11 @@ def bench_module_accuracy(folder: str) -> None:
                 ):  # only runs further tests if center found
                     try:
                         depth_val = tester.accuracy_get_module_depth(depth, center)
-                        f.write(str(depth_val) + ",")
+                        f.write(str(depth_val))
                     except:
-                        f.write("Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
 
                 # region_of_interest
                 roi = np.ndarray([])
@@ -287,20 +306,26 @@ def bench_module_accuracy(folder: str) -> None:
                         roi = tester.accuracy_region_of_interest(
                             depth, depth_val, center
                         )
-                        f.write("Found,")
+                        f.write("Found")
                     except:
-                        f.write("Crash,Dependency Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
 
                 # get_module_orientation
                 orientation = (0, 0)
+
+                if crash:
+                    f.write("Dependency Crash")
+
                 if depth_val != 0 and not crash:
                     try:
                         orientation = tester.accuracy_get_module_orientation(roi)
-                        f.write(str(orientation[0]) + " . " + str(orientation[1]) + ",")
+                        f.write(str(orientation[0]) + " . " + str(orientation[1]))
                     except:
-                        f.write("Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
 
                 # getModuleBounds
                 bounds = np.ndarray([])
@@ -309,29 +334,81 @@ def bench_module_accuracy(folder: str) -> None:
                         bounds = tester.accuracy_getModuleBounds(
                             (1920, 1080), center, depth_val
                         )
-                        f.write("Found,")
+                        f.write("Found")
                     except:
-                        f.write("Crash,Dependency Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
 
                 # get_module_roll
                 roll = 0.0
+
+                if crash:
+                    f.write("Dependency Crash")
+                
                 if depth_val != 0 and not crash:
                     try:
                         bound_region = image[
                             bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
                         ]
                         roll = tester.accuracy_get_module_roll(bound_region)
-                        f.write(str(roll) + ",")
+                        f.write(str(roll))
                     except:
-                        f.write("Crash,")
+                        f.write("Crash")
                         crash = True
+                f.write(",")
+
+                end_time = time.time()
+
+                # calculate execution time
+                exec_time = end_time - start_time
+                f.write(str(exec_time))
+                
+                total_time += exec_time
 
                 # Saves image with circles and the module in frame
                 if in_frame:
                     tester.accuracy_saveCircleImage(filename[-41:], image, depth)
 
                 f.write("\n")
+
+                # std output of file processing
+                if not quiet_output:
+                    print(
+                        "FILE ("+str(file_counter)+"/"+str(total_imgs)+"):",file,
+                        "TIME:", "{:.3f}".format(exec_time),
+                        "CRASH:",crash,
+                    )
+                
+                # if enabled and available, draw circle on center
+                if draw_centers:
+                    image_copy = np.copy(image)
+                    cv2.circle(
+                        image_copy, 
+                        (center[0], center[1]), 
+                        20, 
+                        (0, 0, 255), 
+                        3
+                    )
+                    cv2.circle(
+                        image_copy, 
+                        (center[0], center[1]), 
+                        1, 
+                        (0, 0, 255), 
+                        2
+                    )
+
+                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR,file), image_copy)
+
+
+        avg_time = total_time / total_imgs
+        f.write("\nAvg Time (s): " + str(avg_time) + "\n")
+        f.write("Total Time (s): " + str(total_time) + "\n")
+
+        if not quiet_output:
+            print("\nAverage Time (s):", avg_time)
+            print("Total Time (s):", total_time)
+
     f.close()
     return
 
@@ -343,8 +420,13 @@ if __name__ == "__main__":
     Will only run on images that have an .npy extension associated depth image.
 
     Command Line Arguments
-    -f {foldername}
+    -f, --folder {foldername}
         folder in module folder to run accuracy benchmarks on.
+    -q, --quiet
+        produce no output while running
+    -c, --draw-centers
+        draw a red circle in the calculated centers of each image, stored in ./marked_centers
+
     """
     import argparse
 
@@ -353,10 +435,22 @@ if __name__ == "__main__":
         description="To use a specific directory, use -f (folder)"
     )
     parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="outputs no file information while running",
+    )
+    parser.add_argument(
         "-f",
         "--folder",
         type=str,
         help="folder name in the vision_images/module directory",
+    )
+    parser.add_argument(
+        "-c",
+        "--draw-centers",
+        action="store_true",
+        help="draws a red circle in the center of the module of each file, stored in ./marked_centers",
     )
     args = parser.parse_args()
 
@@ -368,4 +462,4 @@ if __name__ == "__main__":
         folder = args.folder
 
     # run accuracy benchmarks
-    bench_module_accuracy(folder)
+    bench_module_accuracy(folder, args.quiet, args.draw_centers)
