@@ -31,6 +31,7 @@ from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import getModuleBounds
 
+
 class Pipeline:
     """
     Pipeline to carry information from the cameras through
@@ -93,7 +94,7 @@ class Pipeline:
 
         if state == "early_laps":  # navigation around the pylons
             bboxes = self.obstacle_finder.find(color_image, depth_image)
-            
+
             obstacle_tracker.update(bboxes)
             bboxes = obstacle_tracker.getPersistentObstacles()
 

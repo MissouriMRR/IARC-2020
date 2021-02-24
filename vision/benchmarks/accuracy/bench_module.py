@@ -189,7 +189,12 @@ class AccuracyModule:
         return None
 
 
-def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False, save_circle: bool = False) -> None:
+def bench_module_accuracy(
+    folder: str,
+    quiet_output: bool = False,
+    draw_centers: bool = False,
+    save_circle: bool = False,
+) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -375,31 +380,21 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                 # std output of file processing
                 if not quiet_output:
                     print(
-                        "FILE ("+str(file_counter)+"/"+str(total_imgs)+"):",file,
-                        "TIME:", "{:.3f}".format(exec_time),
-                        "CRASH:",crash,
+                        "FILE (" + str(file_counter) + "/" + str(total_imgs) + "):",
+                        file,
+                        "TIME:",
+                        "{:.3f}".format(exec_time),
+                        "CRASH:",
+                        crash,
                     )
 
                 # if enabled and available, draw circle on center
                 if in_frame and draw_centers:
                     image_copy = np.copy(image)
-                    cv2.circle(
-                        image_copy,
-                        (center[0], center[1]),
-                        20,
-                        (0, 0, 255),
-                        3
-                    )
-                    cv2.circle(
-                        image_copy,
-                        (center[0], center[1]),
-                        1,
-                        (0, 0, 255),
-                        2
-                    )
+                    cv2.circle(image_copy, (center[0], center[1]), 20, (0, 0, 255), 3)
+                    cv2.circle(image_copy, (center[0], center[1]), 1, (0, 0, 255), 2)
 
-                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR,file), image_copy)
-
+                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR, file), image_copy)
 
         avg_time = total_time / total_imgs
         f.write("\nAvg Time (s): " + str(avg_time) + "\n")
