@@ -1,6 +1,6 @@
 """
 This program grabs text from an image and compares it with 'модули иртибот'.
-It returns 'Match' if it identifies 'модули иртибот' and 'Not Match' when it doesnt.
+Nominal function returns a lsit of bounding boxes containing the desired text
 """
 import pytesseract
 import numpy as np
@@ -21,7 +21,7 @@ class TextDetector:
     def __init__(self):
         self.text = "модулииртибот"
 
-    def detect_russian_word(self, color_image: np.ndarray, depth_image: np.ndarray):
+    def detect_russian_word(self, color_image: np.ndarray, depth_image: np.ndarray) -> list:
         """
         Detect words in given image.
 
@@ -35,10 +35,11 @@ class TextDetector:
         Returns
         -------
         A list of bounding box objects that contain desired text
+            Note that there may be different bounding boxes for each word
         """
-        sliced_rotated_image = self.get_rotated_min_area_rect(color_image, depth_image)
+        sliced_rotated_image = self._get_rotated_min_area_rect(color_image, depth_image)
 
-        if sliced_rotated_image == []:
+        if len(sliced_rotated_image) == 0:
             return []
 
         tessdata = pytesseract.image_to_data(
@@ -61,7 +62,6 @@ class TextDetector:
                             tessdata["height"][i],
                         )
                         verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
-                        cv2.rectangle(color_image, verts[0], verts[-1], (0, 255, 0), 2)
                         box = BoundingBox(verts, ObjectType("text"))
                         box_obs.append(box)
                         break
@@ -69,7 +69,7 @@ class TextDetector:
         return box_obs
 
 
-    def get_rotated_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray):
+    def _get_rotated_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray) -> np.ndarray:
         """
         Returns min area rect of inside the tape
 
@@ -82,7 +82,8 @@ class TextDetector:
 
         Returns
         --------
-        min area rect
+        min area rect: np.ndarray
+            rotated ndarray of the largest contour
         """
         # the text is always in a blue rectangle. this finds the rectangle
         # remove noise, int16 to prevent negative overflow in following step
@@ -115,14 +116,8 @@ class TextDetector:
         if hierarchy is None:
             return []
 
-        largestArea = 0
-        largestContour = 0
-        for c in contours:
-            if cv2.contourArea(c) > largestArea:
-                largestContour = c
-
-        # contourAreas = np.array([cv2.contourArea(c) for c in contours])
-        # largestContour = contours[np.argmax(contourAreas)]
+        contourAreas = np.array([cv2.contourArea(c) for c in contours])
+        largestContour = contours[np.argmax(contourAreas)]
 
         x,y,w,h = cv2.boundingRect(largestContour)
 
@@ -137,16 +132,22 @@ class TextDetector:
             else:
                 theta = 90 - theta
 
-        # rotates/slices image to min area rect of largest contour
-        center, size = tuple(map(int, center)), tuple(map(int, size))
-        rot_matrix = cv2.getRotationMatrix2D(center, theta, 1)
-        dst = cv2.warpAffine(color_image, rot_matrix, color_image.shape[:2])
-        sliced_rotated_image = cv2.getRectSubPix(dst, size, center)
+        rows, columns = color_image.shape[0], color_image.shape[1]
+        matrix = cv2.getRotationMatrix2D((columns/2, rows/2), theta, 1)
+        rotated = cv2.warpAffine(color_image, matrix, (columns, rows))
+
+        rect0 = (rect[0], rect[1], 0.0) 
+        box = cv2.boxPoints(rect0)
+        points = np.int0(cv2.transform(np.array([box]), matrix))[0]    
+        points[points < 0] = 0
+
+        sliced_rotated_image = rotated[points[1][1]:points[0][1], 
+                                       points[1][0]:points[2][0]]
 
         return sliced_rotated_image
 
 
-    def visualize_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray):
+    def visualize_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray) -> None:
         """
         Allows for visualization of the rotated min area rect detect_words is using
 
@@ -156,8 +157,12 @@ class TextDetector:
             color ndarray from the realsense camera
         depth_image
             depth ndarray from the realsense camera
+
+        Returns
+        -----
+        None
         """
-        sliced_rotated_image = self.get_rotated_min_area_rect(color_image, depth_image)
+        sliced_rotated_image = self._get_rotated_min_area_rect(color_image, depth_image)
 
         cv2.imshow("MinAreaRect", sliced_rotated_image)
         cv2.waitKey(0)
