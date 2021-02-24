@@ -255,9 +255,9 @@ class ModuleLocation:
 
         # Guassian Blur / Median Blur
         # blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
-        blur = cv2.medianBlur(gray, 13)
+        blur = cv2.medianBlur(gray, 15)
 
-        # Laplacian Transform / ksize = 3 for Guassian
+        # Laplacian Transform / ksize = 3 for Guassian / ksize = 1 for Median
         laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=1)
         laplacian = np.uint8(laplacian)
 

@@ -1,0 +1,287 @@
+image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)
+vision/vision_images/module/Feb29/2020-02-29_15.35.26.539427-colorImage.jpg,True,True,False,,,,,,,0.11668276786804199
+vision/vision_images/module/Feb29/2020-02-29_15.35.28.575640-colorImage.jpg,True,True,False,,,,,,,0.09971737861633301
+vision/vision_images/module/Feb29/2020-02-29_15.35.28.666041-colorImage.jpg,True,True,False,,,,,,,0.09810638427734375
+vision/vision_images/module/Feb29/2020-02-29_15.35.29.810512-colorImage.jpg,True,True,False,,,,,,,0.10071229934692383
+vision/vision_images/module/Feb29/2020-02-29_15.35.29.939085-colorImage.jpg,True,True,False,,,,,,,0.09932780265808105
+vision/vision_images/module/Feb29/2020-02-29_15.35.31.313411-colorImage.jpg,True,True,False,,,,,,,0.09361124038696289
+vision/vision_images/module/Feb29/2020-02-29_15.35.35.815093-colorImage.jpg,True,True,False,,,,,,,0.10599899291992188
+vision/vision_images/module/Feb29/2020-02-29_15.35.37.788831-colorImage.jpg,True,True,False,,,,,,,0.1091766357421875
+vision/vision_images/module/Feb29/2020-02-29_15.35.37.891909-colorImage.jpg,True,True,False,,,,,,,0.10507488250732422
+vision/vision_images/module/Feb29/2020-02-29_15.35.38.936461-colorImage.jpg,True,True,False,,,,,,,0.10258293151855469
+vision/vision_images/module/Feb29/2020-02-29_15.35.39.052350-colorImage.jpg,True,True,False,,,,,,,0.10224056243896484
+vision/vision_images/module/Feb29/2020-02-29_15.35.40.045632-colorImage.jpg,True,True,False,,,,,,,0.1046757698059082
+vision/vision_images/module/Feb29/2020-02-29_15.35.41.273265-colorImage.jpg,True,True,False,,,,,,,0.09511375427246094
+vision/vision_images/module/Feb29/2020-02-29_15.35.41.406247-colorImage.jpg,True,True,False,,,,,,,0.09529304504394531
+vision/vision_images/module/Feb29/2020-02-29_15.35.42.631984-colorImage.jpg,True,True,False,,,,,,,0.08706355094909668
+vision/vision_images/module/Feb29/2020-02-29_15.35.44.568091-colorImage.jpg,True,True,False,,,,,,,0.1201019287109375
+vision/vision_images/module/Feb29/2020-02-29_15.35.45.963758-colorImage.jpg,True,True,False,,,,,,,0.09868645668029785
+vision/vision_images/module/Feb29/2020-02-29_15.35.47.992992-colorImage.jpg,True,True,False,,,,,,,0.09955954551696777
+vision/vision_images/module/Feb29/2020-02-29_15.35.48.089525-colorImage.jpg,True,True,False,,,,,,,0.09606003761291504
+vision/vision_images/module/Feb29/2020-02-29_15.35.49.676691-colorImage.jpg,True,True,False,,,,,,,0.1068422794342041
+vision/vision_images/module/Feb29/2020-02-29_15.35.49.795918-colorImage.jpg,True,True,False,,,,,,,0.10472249984741211
+vision/vision_images/module/Feb29/2020-02-29_15.35.50.603509-colorImage.jpg,True,True,False,,,,,,,0.1085810661315918
+vision/vision_images/module/Feb29/2020-02-29_15.35.50.694358-colorImage.jpg,True,True,False,,,,,,,0.10386872291564941
+vision/vision_images/module/Feb29/2020-02-29_15.35.52.894611-colorImage.jpg,True,True,True,1233 . 886,nan,Crash,Dependency Crash,,Dependency Crash,0.19214272499084473
+vision/vision_images/module/Feb29/2020-02-29_15.35.52.975356-colorImage.jpg,True,True,True,1248 . 909,289.861646234676,Found,1.7422094772687091 . 0.0,Found,Crash,0.18473553657531738
+vision/vision_images/module/Feb29/2020-02-29_15.35.54.261740-colorImage.jpg,True,True,False,,,,,,,0.08841133117675781
+vision/vision_images/module/Feb29/2020-02-29_15.35.54.371173-colorImage.jpg,True,True,False,,,,,,,0.08736085891723633
+vision/vision_images/module/Feb29/2020-02-29_15.35.55.390033-colorImage.jpg,True,True,True,1313 . 729,nan,Crash,Dependency Crash,,Dependency Crash,0.18480467796325684
+vision/vision_images/module/Feb29/2020-02-29_15.35.55.517311-colorImage.jpg,True,True,True,1279 . 757,nan,Crash,Dependency Crash,,Dependency Crash,0.18994474411010742
+vision/vision_images/module/Feb29/2020-02-29_15.35.56.436446-colorImage.jpg,True,True,False,,,,,,,0.08848094940185547
+vision/vision_images/module/Feb29/2020-02-29_15.35.56.521891-colorImage.jpg,True,True,False,,,,,,,0.09280633926391602
+vision/vision_images/module/Feb29/2020-02-29_15.35.57.439688-colorImage.jpg,True,True,False,,,,,,,0.09210395812988281
+vision/vision_images/module/Feb29/2020-02-29_15.35.57.551331-colorImage.jpg,True,True,False,,,,,,,0.09478592872619629
+vision/vision_images/module/Feb29/2020-02-29_15.35.58.393139-colorImage.jpg,True,True,False,,,,,,,0.09684395790100098
+vision/vision_images/module/Feb29/2020-02-29_15.35.58.507112-colorImage.jpg,True,True,False,,,,,,,0.09720230102539062
+vision/vision_images/module/Feb29/2020-02-29_15.35.59.949056-colorImage.jpg,True,True,False,,,,,,,0.10483646392822266
+vision/vision_images/module/Feb29/2020-02-29_15.36.00.076218-colorImage.jpg,True,True,False,,,,,,,0.10793495178222656
+vision/vision_images/module/Feb29/2020-02-29_15.36.11.693742-colorImage.jpg,True,True,False,,,,,,,0.09684920310974121
+vision/vision_images/module/Feb29/2020-02-29_15.36.13.076350-colorImage.jpg,True,True,False,,,,,,,0.09522271156311035
+vision/vision_images/module/Feb29/2020-02-29_15.36.14.067450-colorImage.jpg,True,True,False,,,,,,,0.0902869701385498
+vision/vision_images/module/Feb29/2020-02-29_15.36.15.079345-colorImage.jpg,True,True,True,1184 . 342,nan,Crash,Dependency Crash,,Dependency Crash,0.18659043312072754
+vision/vision_images/module/Feb29/2020-02-29_15.36.15.167565-colorImage.jpg,True,True,True,1171 . 351,269.0,Found,-4.0943284033929865 . -5.283150214428619,Found,Crash,0.18295025825500488
+vision/vision_images/module/Feb29/2020-02-29_15.36.16.096047-colorImage.jpg,True,True,False,,,,,,,0.08698081970214844
+vision/vision_images/module/Feb29/2020-02-29_15.36.16.200591-colorImage.jpg,True,True,False,,,,,,,0.08591151237487793
+vision/vision_images/module/Feb29/2020-02-29_15.36.17.169788-colorImage.jpg,True,True,False,,,,,,,0.09053945541381836
+vision/vision_images/module/Feb29/2020-02-29_15.36.17.284915-colorImage.jpg,True,True,False,,,,,,,0.09059691429138184
+vision/vision_images/module/Feb29/2020-02-29_15.36.18.409463-colorImage.jpg,True,True,False,,,,,,,0.09245777130126953
+vision/vision_images/module/Feb29/2020-02-29_15.36.19.440024-colorImage.jpg,True,True,False,,,,,,,0.09082770347595215
+vision/vision_images/module/Feb29/2020-02-29_15.36.19.554962-colorImage.jpg,True,True,False,,,,,,,0.09036564826965332
+vision/vision_images/module/Feb29/2020-02-29_15.36.20.490035-colorImage.jpg,True,True,False,,,,,,,0.09429669380187988
+vision/vision_images/module/Feb29/2020-02-29_15.36.20.594546-colorImage.jpg,True,True,False,,,,,,,0.09295082092285156
+vision/vision_images/module/Feb29/2020-02-29_15.36.21.509366-colorImage.jpg,True,True,False,,,,,,,0.09679675102233887
+vision/vision_images/module/Feb29/2020-02-29_15.36.21.617182-colorImage.jpg,True,True,False,,,,,,,0.09731006622314453
+vision/vision_images/module/Feb29/2020-02-29_15.38.13.780424-colorImage.jpg,True,True,False,,,,,,,0.0875861644744873
+vision/vision_images/module/Feb29/2020-02-29_15.38.14.952363-colorImage.jpg,True,True,False,,,,,,,0.09717774391174316
+vision/vision_images/module/Feb29/2020-02-29_15.38.16.170992-colorImage.jpg,True,True,False,,,,,,,0.09541487693786621
+vision/vision_images/module/Feb29/2020-02-29_15.38.16.286869-colorImage.jpg,True,True,False,,,,,,,0.09532284736633301
+vision/vision_images/module/Feb29/2020-02-29_15.38.18.408314-colorImage.jpg,True,True,True,1115 . 660,1523.09136331192,Found,-30.00643379045909 . 18.572348510407306,Found,Crash,0.20864105224609375
+vision/vision_images/module/Feb29/2020-02-29_15.38.19.407500-colorImage.jpg,True,True,False,,,,,,,0.10188674926757812
+vision/vision_images/module/Feb29/2020-02-29_15.38.19.526568-colorImage.jpg,True,True,True,981 . 581,1581.4415584415585,Found,-1.4216852293466085 . 11.063427991889052,Found,Crash,0.20604681968688965
+vision/vision_images/module/Feb29/2020-02-29_15.38.21.855788-colorImage.jpg,True,True,False,,,,,,,0.09872126579284668
+vision/vision_images/module/Feb29/2020-02-29_15.38.21.949488-colorImage.jpg,True,True,False,,,,,,,0.0986170768737793
+vision/vision_images/module/Feb29/2020-02-29_15.38.22.999718-colorImage.jpg,True,True,False,,,,,,,0.09290742874145508
+vision/vision_images/module/Feb29/2020-02-29_15.38.23.089800-colorImage.jpg,True,True,False,,,,,,,0.09383726119995117
+vision/vision_images/module/Feb29/2020-02-29_15.38.24.240662-colorImage.jpg,True,True,False,,,,,,,0.09893369674682617
+vision/vision_images/module/Feb29/2020-02-29_15.38.24.371124-colorImage.jpg,True,True,False,,,,,,,0.09772896766662598
+vision/vision_images/module/Feb29/2020-02-29_15.38.25.024174-colorImage.jpg,True,True,False,,,,,,,0.09833717346191406
+vision/vision_images/module/Feb29/2020-02-29_15.38.25.131946-colorImage.jpg,True,True,False,,,,,,,0.09672236442565918
+vision/vision_images/module/Feb29/2020-02-29_15.38.25.933502-colorImage.jpg,True,True,False,,,,,,,0.09507298469543457
+vision/vision_images/module/Feb29/2020-02-29_15.38.26.030175-colorImage.jpg,True,True,False,,,,,,,0.09575414657592773
+vision/vision_images/module/Feb29/2020-02-29_15.38.27.037261-colorImage.jpg,True,True,False,,,,,,,0.09515643119812012
+vision/vision_images/module/Feb29/2020-02-29_15.38.35.703917-colorImage.jpg,True,True,False,,,,,,,0.10283970832824707
+vision/vision_images/module/Feb29/2020-02-29_15.38.35.796644-colorImage.jpg,True,True,False,,,,,,,0.10106968879699707
+vision/vision_images/module/Feb29/2020-02-29_15.38.36.871059-colorImage.jpg,True,True,False,,,,,,,0.09665608406066895
+vision/vision_images/module/Feb29/2020-02-29_15.38.36.998015-colorImage.jpg,True,True,False,,,,,,,0.09740638732910156
+vision/vision_images/module/Feb29/2020-02-29_15.38.38.020474-colorImage.jpg,True,True,False,,,,,,,0.09734463691711426
+vision/vision_images/module/Feb29/2020-02-29_15.38.39.032614-colorImage.jpg,True,True,False,,,,,,,0.09564375877380371
+vision/vision_images/module/Feb29/2020-02-29_15.38.39.129822-colorImage.jpg,True,True,False,,,,,,,0.09652400016784668
+vision/vision_images/module/Feb29/2020-02-29_15.38.40.264657-colorImage.jpg,True,True,False,,,,,,,0.09685778617858887
+vision/vision_images/module/Feb29/2020-02-29_15.38.47.372181-colorImage.jpg,True,True,False,,,,,,,0.09791135787963867
+vision/vision_images/module/Feb29/2020-02-29_15.38.48.680666-colorImage.jpg,True,True,False,,,,,,,0.09675955772399902
+vision/vision_images/module/Feb29/2020-02-29_15.38.49.665034-colorImage.jpg,True,True,False,,,,,,,0.10324740409851074
+vision/vision_images/module/Feb29/2020-02-29_15.38.49.773725-colorImage.jpg,True,True,False,,,,,,,0.10729455947875977
+vision/vision_images/module/Feb29/2020-02-29_15.38.51.364047-colorImage.jpg,True,True,False,,,,,,,0.08827328681945801
+vision/vision_images/module/Feb29/2020-02-29_15.38.51.478452-colorImage.jpg,True,True,False,,,,,,,0.08857989311218262
+vision/vision_images/module/Feb29/2020-02-29_15.38.52.449824-colorImage.jpg,True,True,False,,,,,,,0.09681177139282227
+vision/vision_images/module/Feb29/2020-02-29_15.38.52.567045-colorImage.jpg,True,True,False,,,,,,,0.09702801704406738
+vision/vision_images/module/Feb29/2020-02-29_15.39.01.585199-colorImage.jpg,True,True,False,,,,,,,0.10191607475280762
+vision/vision_images/module/Feb29/2020-02-29_15.39.01.678540-colorImage.jpg,True,True,False,,,,,,,0.10224223136901855
+vision/vision_images/module/Feb29/2020-02-29_15.39.03.101439-colorImage.jpg,True,True,False,,,,,,,0.10128259658813477
+vision/vision_images/module/Feb29/2020-02-29_15.39.03.231298-colorImage.jpg,True,True,False,,,,,,,0.10228323936462402
+vision/vision_images/module/Feb29/2020-02-29_15.39.03.893830-colorImage.jpg,True,True,False,,,,,,,0.09581995010375977
+vision/vision_images/module/Feb29/2020-02-29_15.39.04.815338-colorImage.jpg,True,True,False,,,,,,,0.09811830520629883
+vision/vision_images/module/Feb29/2020-02-29_15.39.04.932718-colorImage.jpg,True,True,False,,,,,,,0.10447430610656738
+vision/vision_images/module/Feb29/2020-02-29_15.39.05.549239-colorImage.jpg,True,True,False,,,,,,,0.10349035263061523
+vision/vision_images/module/Feb29/2020-02-29_15.39.06.386740-colorImage.jpg,True,True,False,,,,,,,0.10209155082702637
+vision/vision_images/module/Feb29/2020-02-29_15.39.07.207007-colorImage.jpg,True,True,False,,,,,,,0.10246133804321289
+vision/vision_images/module/Feb29/2020-02-29_15.39.07.318249-colorImage.jpg,True,True,False,,,,,,,0.1002798080444336
+vision/vision_images/module/Feb29/2020-02-29_15.39.08.286325-colorImage.jpg,True,True,False,,,,,,,0.09878349304199219
+vision/vision_images/module/Feb29/2020-02-29_15.39.08.393650-colorImage.jpg,True,True,False,,,,,,,0.08929276466369629
+vision/vision_images/module/Feb29/2020-02-29_15.39.09.260491-colorImage.jpg,True,True,False,,,,,,,0.1021885871887207
+vision/vision_images/module/Feb29/2020-02-29_15.39.09.376061-colorImage.jpg,True,True,False,,,,,,,0.1026926040649414
+vision/vision_images/module/Feb29/2020-02-29_15.39.11.662306-colorImage.jpg,True,True,False,,,,,,,0.10608696937561035
+vision/vision_images/module/Feb29/2020-02-29_15.39.11.772621-colorImage.jpg,True,True,False,,,,,,,0.10579490661621094
+vision/vision_images/module/Feb29/2020-02-29_15.39.12.733339-colorImage.jpg,True,True,False,,,,,,,0.10907983779907227
+vision/vision_images/module/Feb29/2020-02-29_15.39.13.720341-colorImage.jpg,True,True,False,,,,,,,0.10572624206542969
+vision/vision_images/module/Feb29/2020-02-29_15.39.14.613446-colorImage.jpg,True,True,False,,,,,,,0.10637569427490234
+vision/vision_images/module/Feb29/2020-02-29_15.39.14.738058-colorImage.jpg,True,True,False,,,,,,,0.10471248626708984
+vision/vision_images/module/Feb29/2020-02-29_15.40.35.490833-colorImage.jpg,True,True,False,,,,,,,0.10343313217163086
+vision/vision_images/module/Feb29/2020-02-29_15.40.36.577191-colorImage.jpg,True,True,False,,,,,,,0.10314583778381348
+vision/vision_images/module/Feb29/2020-02-29_15.40.38.363928-colorImage.jpg,True,True,True,981 . 581,863.324375,Found,0.04082323599501516 . -0.07392999705193329,Found,Crash,0.20889568328857422
+vision/vision_images/module/Feb29/2020-02-29_15.40.40.348584-colorImage.jpg,True,True,True,934 . 621,814.4829142488717,Found,-5.895230403064552 . -4.203680890120576,Found,Crash,0.20633745193481445
+vision/vision_images/module/Feb29/2020-02-29_15.40.40.444538-colorImage.jpg,True,True,True,920 . 677,792.8703312191684,Found,-15.356879473999978 . 0.8795896266891547,Found,Crash,0.20021724700927734
+vision/vision_images/module/Feb29/2020-02-29_15.40.41.221677-colorImage.jpg,True,True,True,536 . 723,430.22639149468415,Found,5.85552897529246 . -2.1069078352889177,Found,Crash,0.20595741271972656
+vision/vision_images/module/Feb29/2020-02-29_15.40.41.313994-colorImage.jpg,True,True,True,624 . 747,408.06883604505634,Found,4.018929859990321 . -2.1155612601657245,Found,Crash,0.2051868438720703
+vision/vision_images/module/Feb29/2020-02-29_15.40.42.330979-colorImage.jpg,True,True,False,,,,,,,0.1009831428527832
+vision/vision_images/module/Feb29/2020-02-29_15.40.42.462549-colorImage.jpg,True,True,False,,,,,,,0.10074353218078613
+vision/vision_images/module/Feb29/2020-02-29_15.40.43.187957-colorImage.jpg,True,True,False,,,,,,,0.10025334358215332
+vision/vision_images/module/Feb29/2020-02-29_15.40.44.466216-colorImage.jpg,True,True,False,,,,,,,0.10512900352478027
+vision/vision_images/module/Feb29/2020-02-29_15.40.45.494239-colorImage.jpg,True,True,False,,,,,,,0.10019207000732422
+vision/vision_images/module/Feb29/2020-02-29_15.40.45.588821-colorImage.jpg,True,True,True,637 . 729,660.64625,Found,1.3861792427294137 . -0.21590624474724124,Found,Crash,0.20917296409606934
+vision/vision_images/module/Feb29/2020-02-29_15.40.46.554823-colorImage.jpg,True,True,True,549 . 694,594.6660401002506,Found,7.564903569578466 . 1.0056867485174796,Found,Crash,0.20982646942138672
+vision/vision_images/module/Feb29/2020-02-29_15.40.46.652448-colorImage.jpg,True,True,True,691 . 617,601.7147177419355,Found,-5.493378656865725 . 3.4253839211862873,Found,Crash,0.20974063873291016
+vision/vision_images/module/Feb29/2020-02-29_15.40.47.773572-colorImage.jpg,True,True,True,637 . 713,431.4816933638444,Found,3.530885241289509 . -10.471544874425332,Found,Crash,0.21541190147399902
+vision/vision_images/module/Feb29/2020-02-29_15.40.47.897484-colorImage.jpg,True,True,True,673 . 649,464.12484237074403,Found,2.3005253777058914 . -3.9200893349821757,Found,Crash,0.2170572280883789
+vision/vision_images/module/Feb29/2020-02-29_15.40.48.862847-colorImage.jpg,True,True,True,1103 . 799,508.41268844221105,Found,1.9041757065828377 . -0.12307963333931592,Found,Crash,0.20805144309997559
+vision/vision_images/module/Feb29/2020-02-29_15.40.49.862726-colorImage.jpg,True,True,True,821 . 537,1029.815864022663,Found,-10.865274791707368 . 0.0,Found,Crash,0.19012689590454102
+vision/vision_images/module/Feb29/2020-02-29_15.40.49.959114-colorImage.jpg,True,True,True,859 . 550,nan,Crash,Dependency Crash,,Dependency Crash,0.18689846992492676
+vision/vision_images/module/Feb29/2020-02-29_15.40.51.144707-colorImage.jpg,True,True,True,524 . 758,431.3963254593176,Found,14.214856424445964 . 8.105145307774567,Found,Crash,0.19141411781311035
+vision/vision_images/module/Feb29/2020-02-29_15.40.52.189071-colorImage.jpg,True,True,False,,,,,,,0.09282064437866211
+vision/vision_images/module/Feb29/2020-02-29_15.40.53.278353-colorImage.jpg,True,True,False,,,,,,,0.09697413444519043
+vision/vision_images/module/Feb29/2020-02-29_15.40.53.400146-colorImage.jpg,True,True,False,,,,,,,0.09781861305236816
+vision/vision_images/module/Feb29/2020-02-29_15.40.54.450220-colorImage.jpg,True,True,True,448 . 567,707.6220414201183,Found,15.345264567328035 . -3.7402061152561057,Found,Crash,0.19777297973632812
+vision/vision_images/module/Feb29/2020-02-29_15.40.54.564617-colorImage.jpg,True,True,True,540 . 740,746.850622406639,Found,-0.8995917156408217 . 3.558895120843103,Found,Crash,0.2059640884399414
+vision/vision_images/module/Feb29/2020-02-29_15.40.55.588342-colorImage.jpg,True,True,True,858 . 783,656.3175,Found,4.368158014478746 . 5.271971012712473,Found,Crash,0.20826292037963867
+vision/vision_images/module/Feb29/2020-02-29_15.40.55.697497-colorImage.jpg,True,True,False,,,,,,,0.10059142112731934
+vision/vision_images/module/Feb29/2020-02-29_15.40.57.750528-colorImage.jpg,True,True,True,505 . 616,620.9455006337136,Found,2.67254520329032 . 0.2493652840550707,Found,Crash,0.20713138580322266
+vision/vision_images/module/Feb29/2020-02-29_15.40.57.857660-colorImage.jpg,True,True,True,555 . 566,651.98875,Found,1.6270869258916896 . 0.11663767574542884,Found,Crash,0.20607757568359375
+vision/vision_images/module/Feb29/2020-02-29_15.41.07.117905-colorImage.jpg,True,True,False,,,,,,,0.10097217559814453
+vision/vision_images/module/Feb29/2020-02-29_15.41.08.460196-colorImage.jpg,True,True,False,,,,,,,0.10412740707397461
+vision/vision_images/module/Feb29/2020-02-29_15.41.12.385092-colorImage.jpg,True,True,False,,,,,,,0.10492086410522461
+vision/vision_images/module/Feb29/2020-02-29_15.41.13.682871-colorImage.jpg,True,True,False,,,,,,,0.10269498825073242
+vision/vision_images/module/Feb29/2020-02-29_15.41.13.811675-colorImage.jpg,True,True,False,,,,,,,0.10469818115234375
+vision/vision_images/module/Feb29/2020-02-29_15.41.14.874639-colorImage.jpg,True,True,False,,,,,,,0.1006765365600586
+vision/vision_images/module/Feb29/2020-02-29_15.41.16.095410-colorImage.jpg,True,True,False,,,,,,,0.10499978065490723
+vision/vision_images/module/Feb29/2020-02-29_15.41.17.326098-colorImage.jpg,True,True,False,,,,,,,0.10270810127258301
+vision/vision_images/module/Feb29/2020-02-29_15.41.18.669633-colorImage.jpg,True,True,False,,,,,,,0.1018514633178711
+vision/vision_images/module/Feb29/2020-02-29_15.41.19.842136-colorImage.jpg,True,True,True,1177 . 311,423.51466666666664,Found,17.277286553425274 . 2.6737702994200574,Found,Crash,0.20969128608703613
+vision/vision_images/module/Feb29/2020-02-29_15.41.26.939475-colorImage.jpg,True,True,False,,,,,,,0.10880303382873535
+vision/vision_images/module/Feb29/2020-02-29_15.41.28.050643-colorImage.jpg,True,True,True,1177 . 311,1213.715909090909,Found,11.813714914751504 . -50.819066740992604,Found,Crash,0.2129809856414795
+vision/vision_images/module/Feb29/2020-02-29_15.41.28.176878-colorImage.jpg,True,True,True,1177 . 311,963.1050724637681,Found,32.649717817719655 . -16.768679753977043,Found,Crash,0.2306504249572754
+vision/vision_images/module/Feb29/2020-02-29_15.41.29.127547-colorImage.jpg,True,True,False,,,,,,,0.1068730354309082
+vision/vision_images/module/Feb29/2020-02-29_15.41.29.222024-colorImage.jpg,True,True,False,,,,,,,0.10617589950561523
+vision/vision_images/module/Feb29/2020-02-29_15.41.30.018996-colorImage.jpg,True,True,False,,,,,,,0.10422492027282715
+vision/vision_images/module/Feb29/2020-02-29_15.41.31.268474-colorImage.jpg,True,True,True,623 . 644,538.0974114441417,Found,1.8403243351264698 . -0.44712269291257084,Found,Crash,0.21064305305480957
+vision/vision_images/module/Feb29/2020-02-29_15.41.32.053398-colorImage.jpg,True,True,True,815 . 682,559.3125,Found,3.6748203696431703 . 2.784252105657248,Found,Crash,0.21346020698547363
+vision/vision_images/module/Feb29/2020-02-29_15.41.32.182098-colorImage.jpg,True,True,True,795 . 503,581.844375,Found,-0.8760796799274779 . -0.05120047019146878,Found,Crash,0.2168717384338379
+vision/vision_images/module/Feb29/2020-02-29_15.41.33.500679-colorImage.jpg,True,True,False,,,,,,,0.09945464134216309
+vision/vision_images/module/Feb29/2020-02-29_15.41.38.582741-colorImage.jpg,True,True,True,795 . 503,778.844375,Found,1.1234898832125035 . -0.43052875441054,Found,Crash,0.21354961395263672
+vision/vision_images/module/Feb29/2020-02-29_15.41.38.681375-colorImage.jpg,True,True,False,,,,,,,0.10390448570251465
+vision/vision_images/module/Feb29/2020-02-29_15.41.39.421759-colorImage.jpg,True,True,False,,,,,,,0.10228800773620605
+vision/vision_images/module/Feb29/2020-02-29_15.41.40.331062-colorImage.jpg,True,True,False,,,,,,,0.10177969932556152
+vision/vision_images/module/Feb29/2020-02-29_15.41.40.425709-colorImage.jpg,True,True,False,,,,,,,0.10147953033447266
+vision/vision_images/module/Feb29/2020-02-29_15.41.41.749184-colorImage.jpg,True,True,False,,,,,,,0.10418462753295898
+vision/vision_images/module/Feb29/2020-02-29_15.41.42.902594-colorImage.jpg,True,True,False,,,,,,,0.10505366325378418
+vision/vision_images/module/Feb29/2020-02-29_15.41.44.291248-colorImage.jpg,True,True,False,,,,,,,0.10040640830993652
+vision/vision_images/module/Feb29/2020-02-29_15.41.44.413764-colorImage.jpg,True,True,False,,,,,,,0.09673428535461426
+vision/vision_images/module/Feb29/2020-02-29_15.41.45.407379-colorImage.jpg,True,True,True,812 . 709,441.6120253164557,Found,0.7110838917721923 . 11.0257511677739,Found,Crash,0.20310568809509277
+vision/vision_images/module/Feb29/2020-02-29_15.41.45.525379-colorImage.jpg,True,True,True,838 . 721,445.551875,Found,2.9111296510804 . 5.048646194306604,Found,Crash,0.20493102073669434
+vision/vision_images/module/Feb29/2020-02-29_15.41.46.313442-colorImage.jpg,True,True,False,,,,,,,0.10212469100952148
+vision/vision_images/module/Feb29/2020-02-29_15.41.46.411610-colorImage.jpg,True,True,False,,,,,,,0.10231614112854004
+vision/vision_images/module/Feb29/2020-02-29_15.41.47.869016-colorImage.jpg,True,True,False,,,,,,,0.09991264343261719
+vision/vision_images/module/Feb29/2020-02-29_15.41.47.987713-colorImage.jpg,True,True,True,1077 . 973,370.046365914787,Found,0.3715030661954661 . 5.726308032268585,Found,Crash,0.20560622215270996
+vision/vision_images/module/Feb29/2020-02-29_15.41.49.057789-colorImage.jpg,True,True,True,1061 . 863,398.120625,Found,2.1326312780628136 . 2.110270182818565,Found,Crash,0.2028026580810547
+vision/vision_images/module/Feb29/2020-02-29_15.41.49.202753-colorImage.jpg,True,True,True,1094 . 825,406.65125,Found,0.9882541819158697 . 0.7636134579488714,Found,Crash,0.20450282096862793
+vision/vision_images/module/Feb29/2020-02-29_15.41.57.682899-colorImage.jpg,True,True,False,,,,,,,0.10785627365112305
+vision/vision_images/module/Feb29/2020-02-29_15.42.00.321698-colorImage.jpg,True,True,False,,,,,,,0.1093912124633789
+vision/vision_images/module/Feb29/2020-02-29_15.42.01.196370-colorImage.jpg,True,True,False,,,,,,,0.11237835884094238
+vision/vision_images/module/Feb29/2020-02-29_15.42.01.306632-colorImage.jpg,True,True,False,,,,,,,0.107269287109375
+vision/vision_images/module/Feb29/2020-02-29_15.42.02.135370-colorImage.jpg,True,True,False,,,,,,,0.10038161277770996
+vision/vision_images/module/Feb29/2020-02-29_15.42.02.228210-colorImage.jpg,True,True,False,,,,,,,0.09981012344360352
+vision/vision_images/module/Feb29/2020-02-29_15.42.02.908851-colorImage.jpg,True,True,False,,,,,,,0.10656976699829102
+vision/vision_images/module/Feb29/2020-02-29_15.42.03.874024-colorImage.jpg,True,True,False,,,,,,,0.10553526878356934
+vision/vision_images/module/Feb29/2020-02-29_15.42.04.663763-colorImage.jpg,True,True,False,,,,,,,0.10267758369445801
+vision/vision_images/module/Feb29/2020-02-29_15.42.05.769023-colorImage.jpg,True,True,False,,,,,,,0.09840965270996094
+vision/vision_images/module/Feb29/2020-02-29_15.48.09.227496-colorImage.jpg,True,True,False,,,,,,,0.10063910484313965
+vision/vision_images/module/Feb29/2020-02-29_15.48.10.480039-colorImage.jpg,True,True,False,,,,,,,0.09822535514831543
+vision/vision_images/module/Feb29/2020-02-29_15.48.11.269984-colorImage.jpg,True,True,True,1270 . 411,nan,Crash,Dependency Crash,,Dependency Crash,0.18663477897644043
+vision/vision_images/module/Feb29/2020-02-29_15.48.12.449251-colorImage.jpg,True,True,False,,,,,,,0.10134339332580566
+vision/vision_images/module/Feb29/2020-02-29_15.48.13.590058-colorImage.jpg,True,True,False,,,,,,,0.09908199310302734
+vision/vision_images/module/Feb29/2020-02-29_15.48.13.718123-colorImage.jpg,True,True,False,,,,,,,0.10308384895324707
+vision/vision_images/module/Feb29/2020-02-29_15.48.14.650051-colorImage.jpg,True,True,False,,,,,,,0.1005392074584961
+vision/vision_images/module/Feb29/2020-02-29_15.48.14.754745-colorImage.jpg,True,True,False,,,,,,,0.11039209365844727
+vision/vision_images/module/Feb29/2020-02-29_15.48.15.913844-colorImage.jpg,True,True,False,,,,,,,0.0987241268157959
+vision/vision_images/module/Feb29/2020-02-29_15.48.17.006745-colorImage.jpg,True,True,False,,,,,,,0.10014700889587402
+vision/vision_images/module/Feb29/2020-02-29_15.48.18.022960-colorImage.jpg,True,True,False,,,,,,,0.1103971004486084
+vision/vision_images/module/Feb29/2020-02-29_15.48.18.114436-colorImage.jpg,True,True,False,,,,,,,0.1002492904663086
+vision/vision_images/module/Feb29/2020-02-29_15.48.19.003075-colorImage.jpg,True,True,False,,,,,,,0.10286283493041992
+vision/vision_images/module/Feb29/2020-02-29_15.48.19.105544-colorImage.jpg,True,True,False,,,,,,,0.10123634338378906
+vision/vision_images/module/Feb29/2020-02-29_15.48.20.061088-colorImage.jpg,True,True,False,,,,,,,0.0986933708190918
+vision/vision_images/module/Feb29/2020-02-29_15.48.20.174555-colorImage.jpg,True,True,False,,,,,,,0.09980106353759766
+vision/vision_images/module/Feb29/2020-02-29_15.48.21.099875-colorImage.jpg,True,True,False,,,,,,,0.09940385818481445
+vision/vision_images/module/Feb29/2020-02-29_15.48.21.999278-colorImage.jpg,True,True,False,,,,,,,0.11247563362121582
+vision/vision_images/module/Feb29/2020-02-29_15.48.22.965533-colorImage.jpg,True,True,False,,,,,,,0.09751009941101074
+vision/vision_images/module/Feb29/2020-02-29_15.48.24.088111-colorImage.jpg,True,True,False,,,,,,,0.09830665588378906
+vision/vision_images/module/Feb29/2020-02-29_15.48.25.122363-colorImage.jpg,True,True,False,,,,,,,0.09850859642028809
+vision/vision_images/module/Feb29/2020-02-29_15.48.25.257318-colorImage.jpg,True,True,False,,,,,,,0.09589099884033203
+vision/vision_images/module/Feb29/2020-02-29_15.48.26.815933-colorImage.jpg,True,True,False,,,,,,,0.10013651847839355
+vision/vision_images/module/Feb29/2020-02-29_15.48.28.774087-colorImage.jpg,True,True,False,,,,,,,0.09991097450256348
+vision/vision_images/module/Feb29/2020-02-29_15.48.30.428433-colorImage.jpg,True,True,False,,,,,,,0.10264229774475098
+vision/vision_images/module/Feb29/2020-02-29_15.48.31.313155-colorImage.jpg,True,True,False,,,,,,,0.10258340835571289
+vision/vision_images/module/Feb29/2020-02-29_15.48.32.548911-colorImage.jpg,True,True,False,,,,,,,0.10048246383666992
+vision/vision_images/module/Feb29/2020-02-29_15.48.33.420825-colorImage.jpg,True,True,False,,,,,,,0.10310482978820801
+vision/vision_images/module/Feb29/2020-02-29_15.48.33.519624-colorImage.jpg,True,True,False,,,,,,,0.10069918632507324
+vision/vision_images/module/Feb29/2020-02-29_15.48.34.412874-colorImage.jpg,True,True,False,,,,,,,0.09527587890625
+vision/vision_images/module/Feb29/2020-02-29_15.48.34.523170-colorImage.jpg,True,True,False,,,,,,,0.09770679473876953
+vision/vision_images/module/Feb29/2020-02-29_15.48.35.441041-colorImage.jpg,True,True,False,,,,,,,0.09727096557617188
+vision/vision_images/module/Feb29/2020-02-29_15.48.35.559585-colorImage.jpg,True,True,False,,,,,,,0.09876537322998047
+vision/vision_images/module/Feb29/2020-02-29_15.48.36.551173-colorImage.jpg,True,True,False,,,,,,,0.09905481338500977
+vision/vision_images/module/Feb29/2020-02-29_15.48.36.661082-colorImage.jpg,True,True,False,,,,,,,0.10059642791748047
+vision/vision_images/module/Feb29/2020-02-29_15.48.37.645421-colorImage.jpg,True,True,False,,,,,,,0.09833526611328125
+vision/vision_images/module/Feb29/2020-02-29_15.48.38.868535-colorImage.jpg,True,True,False,,,,,,,0.09402322769165039
+vision/vision_images/module/Feb29/2020-02-29_15.48.38.993575-colorImage.jpg,True,True,False,,,,,,,0.0942087173461914
+vision/vision_images/module/Feb29/2020-02-29_15.48.40.798249-colorImage.jpg,True,True,False,,,,,,,0.09705305099487305
+vision/vision_images/module/Feb29/2020-02-29_15.48.41.967899-colorImage.jpg,True,True,False,,,,,,,0.09714770317077637
+vision/vision_images/module/Feb29/2020-02-29_15.48.42.917979-colorImage.jpg,True,True,False,,,,,,,0.10318398475646973
+vision/vision_images/module/Feb29/2020-02-29_15.48.43.015432-colorImage.jpg,True,True,False,,,,,,,0.09949660301208496
+vision/vision_images/module/Feb29/2020-02-29_15.48.43.821882-colorImage.jpg,True,True,False,,,,,,,0.09147071838378906
+vision/vision_images/module/Feb29/2020-02-29_15.48.43.934355-colorImage.jpg,True,True,False,,,,,,,0.09053254127502441
+vision/vision_images/module/Feb29/2020-02-29_15.48.44.694799-colorImage.jpg,True,True,True,1085 . 468,nan,Crash,Dependency Crash,,Dependency Crash,0.19713997840881348
+vision/vision_images/module/Feb29/2020-02-29_15.48.46.110676-colorImage.jpg,True,True,False,,,,,,,0.10234189033508301
+vision/vision_images/module/Feb29/2020-02-29_15.48.47.382639-colorImage.jpg,True,True,False,,,,,,,0.09916019439697266
+vision/vision_images/module/Feb29/2020-02-29_15.48.54.487019-colorImage.jpg,True,True,False,,,,,,,0.10015201568603516
+vision/vision_images/module/Feb29/2020-02-29_15.48.55.557691-colorImage.jpg,True,True,False,,,,,,,0.10054159164428711
+vision/vision_images/module/Feb29/2020-02-29_15.48.56.475161-colorImage.jpg,True,True,False,,,,,,,0.10512423515319824
+vision/vision_images/module/Feb29/2020-02-29_15.48.56.599381-colorImage.jpg,True,True,False,,,,,,,0.09900045394897461
+vision/vision_images/module/Feb29/2020-02-29_15.48.57.490256-colorImage.jpg,True,True,False,,,,,,,0.1010282039642334
+vision/vision_images/module/Feb29/2020-02-29_15.48.58.230982-colorImage.jpg,True,True,True,1282 . 586,266.456875,Found,2.68415702111531 . -5.281511771831929,Found,Crash,0.21403050422668457
+vision/vision_images/module/Feb29/2020-02-29_15.48.58.349318-colorImage.jpg,True,True,True,1132 . 563,nan,Crash,Dependency Crash,,Dependency Crash,0.19918274879455566
+vision/vision_images/module/Feb29/2020-02-29_15.48.59.132376-colorImage.jpg,True,True,False,,,,,,,0.09116911888122559
+vision/vision_images/module/Feb29/2020-02-29_15.48.59.225897-colorImage.jpg,True,True,False,,,,,,,0.09467816352844238
+vision/vision_images/module/Feb29/2020-02-29_15.49.00.348148-colorImage.jpg,True,True,False,,,,,,,0.09889817237854004
+vision/vision_images/module/Feb29/2020-02-29_15.49.01.376851-colorImage.jpg,True,True,False,,,,,,,0.09955430030822754
+vision/vision_images/module/Feb29/2020-02-29_15.49.02.648738-colorImage.jpg,True,True,False,,,,,,,0.09561538696289062
+vision/vision_images/module/Feb29/2020-02-29_15.49.04.085643-colorImage.jpg,True,True,False,,,,,,,0.09467697143554688
+vision/vision_images/module/Feb29/2020-02-29_15.49.05.051264-colorImage.jpg,True,True,False,,,,,,,0.09534335136413574
+vision/vision_images/module/Feb29/2020-02-29_15.49.12.111055-colorImage.jpg,True,True,False,,,,,,,0.10158538818359375
+vision/vision_images/module/Feb29/2020-02-29_15.49.13.311223-colorImage.jpg,True,True,False,,,,,,,0.10135102272033691
+vision/vision_images/module/Feb29/2020-02-29_15.49.14.230557-colorImage.jpg,True,True,False,,,,,,,0.10028982162475586
+vision/vision_images/module/Feb29/2020-02-29_15.49.14.326560-colorImage.jpg,True,True,False,,,,,,,0.10032486915588379
+vision/vision_images/module/Feb29/2020-02-29_15.49.15.310088-colorImage.jpg,True,True,False,,,,,,,0.09844565391540527
+vision/vision_images/module/Feb29/2020-02-29_15.49.15.407350-colorImage.jpg,True,True,False,,,,,,,0.10037899017333984
+vision/vision_images/module/Feb29/2020-02-29_15.49.16.452161-colorImage.jpg,True,True,False,,,,,,,0.10350203514099121
+vision/vision_images/module/Feb29/2020-02-29_15.49.16.588036-colorImage.jpg,True,True,False,,,,,,,0.10615420341491699
+vision/vision_images/module/Feb29/2020-02-29_15.49.17.322183-colorImage.jpg,True,True,False,,,,,,,0.10085272789001465
+vision/vision_images/module/Feb29/2020-02-29_15.49.17.426628-colorImage.jpg,True,True,False,,,,,,,0.10145950317382812
+vision/vision_images/module/Feb29/2020-02-29_15.49.18.594762-colorImage.jpg,True,True,False,,,,,,,0.10179567337036133
+vision/vision_images/module/Feb29/2020-02-29_15.49.20.057606-colorImage.jpg,True,True,False,,,,,,,0.10283923149108887
+vision/vision_images/module/Feb29/2020-02-29_15.49.21.375380-colorImage.jpg,True,True,False,,,,,,,0.10245299339294434
+vision/vision_images/module/Feb29/2020-02-29_15.49.22.444068-colorImage.jpg,True,True,False,,,,,,,0.10258197784423828
+vision/vision_images/module/Feb29/2020-02-29_15.49.22.557212-colorImage.jpg,True,True,False,,,,,,,0.10287618637084961
+vision/vision_images/module/Feb29/2020-02-29_15.49.23.566543-colorImage.jpg,True,True,False,,,,,,,0.10328006744384766
+vision/vision_images/module/Feb29/2020-02-29_15.49.23.678718-colorImage.jpg,True,True,False,,,,,,,0.10343766212463379
+vision/vision_images/module/Feb29/2020-02-29_15.49.25.182331-colorImage.jpg,True,True,False,,,,,,,0.10030078887939453
+vision/vision_images/module/Feb29/2020-02-29_15.49.26.174982-colorImage.jpg,True,True,False,,,,,,,0.1026144027709961
+vision/vision_images/module/Feb29/2020-02-29_15.49.26.298748-colorImage.jpg,True,True,False,,,,,,,0.10124015808105469
+vision/vision_images/module/Feb29/2020-02-29_15.49.27.218355-colorImage.jpg,True,True,False,,,,,,,0.10060977935791016
+vision/vision_images/module/Feb29/2020-02-29_15.49.27.355077-colorImage.jpg,True,True,False,,,,,,,0.1006779670715332
+vision/vision_images/module/Feb29/2020-02-29_15.49.28.354254-colorImage.jpg,True,True,False,,,,,,,0.10031628608703613
+vision/vision_images/module/Feb29/2020-02-29_15.49.29.325199-colorImage.jpg,True,True,False,,,,,,,0.09972596168518066
+vision/vision_images/module/Feb29/2020-02-29_15.49.29.455467-colorImage.jpg,True,True,False,,,,,,,0.09970307350158691
+vision/vision_images/module/Feb29/2020-02-29_15.49.30.917059-colorImage.jpg,True,True,False,,,,,,,0.10028362274169922
+vision/vision_images/module/Feb29/2020-02-29_15.49.31.969794-colorImage.jpg,True,True,False,,,,,,,0.1004645824432373
+vision/vision_images/module/Feb29/2020-02-29_15.49.32.097220-colorImage.jpg,True,True,False,,,,,,,0.10056757926940918
+vision/vision_images/module/Feb29/2020-02-29_15.49.33.527944-colorImage.jpg,True,True,False,,,,,,,0.10074424743652344
+vision/vision_images/module/Feb29/2020-02-29_15.49.41.613977-colorImage.jpg,True,True,False,,,,,,,0.0974738597869873
+vision/vision_images/module/Feb29/2020-02-29_15.49.43.078623-colorImage.jpg,True,True,False,,,,,,,0.09934711456298828
+vision/vision_images/module/Feb29/2020-02-29_15.49.44.174733-colorImage.jpg,True,True,False,,,,,,,0.09757804870605469
+vision/vision_images/module/Feb29/2020-02-29_15.49.45.127113-colorImage.jpg,True,True,False,,,,,,,0.09334182739257812
+vision/vision_images/module/Feb29/2020-02-29_15.49.45.221201-colorImage.jpg,True,True,False,,,,,,,0.09182071685791016
+vision/vision_images/module/Feb29/2020-02-29_15.49.46.053366-colorImage.jpg,True,True,False,,,,,,,0.10298562049865723
+vision/vision_images/module/Feb29/2020-02-29_15.49.46.192258-colorImage.jpg,True,True,False,,,,,,,0.1039571762084961
+vision/vision_images/module/Feb29/2020-02-29_15.49.47.060347-colorImage.jpg,True,True,False,,,,,,,0.09243965148925781
+
+Avg Time (s): 0.11556795123609132
+Total Time (s): 32.70573019981384
