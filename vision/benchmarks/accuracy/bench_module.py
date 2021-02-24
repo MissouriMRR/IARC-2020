@@ -164,7 +164,9 @@ class AccuracyModule:
         """
         return get_module_roll(region)
 
-    def accuracy_saveCircleImage(self, filename, color_image: np.ndarray, depth_image: np.ndarray) -> None:
+    def accuracy_saveCircleImage(
+        self, filename, color_image: np.ndarray, depth_image: np.ndarray
+    ) -> None:
         """
         Saves copy of image with circles detected.
 
@@ -185,6 +187,7 @@ class AccuracyModule:
         self.location.getCenter()
         self.location.saveCircleImage(filename)
         return None
+
 
 def bench_module_accuracy(folder: str) -> None:
     """

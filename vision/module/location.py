@@ -254,7 +254,7 @@ class ModuleLocation:
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
 
         # Guassian Blur / Median Blur
-        #blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
+        # blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
         blur = cv2.medianBlur(gray, 13)
 
         # Laplacian Transform / ksize = 3 for Guassian
@@ -420,7 +420,11 @@ class ModuleLocation:
         centerImg = np.copy(self.img)
         for x, y, r in self.holes:
             cv2.circle(
-                img=centerImg, center=(int(x), int(y)), radius=int(r), color=(0, 0, 255), thickness=-1
+                img=centerImg,
+                center=(int(x), int(y)),
+                radius=int(r),
+                color=(0, 0, 255),
+                thickness=-1,
             )
 
         cv2.circle(
@@ -470,6 +474,5 @@ if __name__ == "__main__":
 
     print(loc.getCenter())
     print(loc.getDistance())
-
 
     loc.showCenter()
