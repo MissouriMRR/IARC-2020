@@ -390,7 +390,7 @@ class ModuleLocation:
 
         Returns
         -------
-        np.ndarray - image with circles
+        None
         """
 
         circleImg = np.copy(self.img)
