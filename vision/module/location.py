@@ -388,6 +388,11 @@ class ModuleLocation:
         """
         Saves image with circles in folder circles.
 
+        Parameters
+        ----------
+        file: string
+            Path and filename of image for saving.
+
         Returns
         -------
         None
