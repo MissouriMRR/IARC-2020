@@ -386,7 +386,7 @@ class ModuleLocation:
 
     def saveCircleImage(self, file: str) -> None:
         """
-        Saves image with circles in folder Circle_Images.
+        Saves image with circles in folder circles.
 
         Returns
         -------
