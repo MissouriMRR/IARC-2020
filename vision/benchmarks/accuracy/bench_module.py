@@ -165,7 +165,12 @@ class AccuracyModule:
         return get_module_roll(region)
 
 
-def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False, draw_hough_circles: bool = False) -> None:
+def bench_module_accuracy(
+    folder: str,
+    quiet_output: bool = False,
+    draw_circles: bool = False,
+    draw_centers: bool = False,
+) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -186,7 +191,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
     
-    if draw_centers and not os.path.isdir(OUTPUT_IMGS_DIR):
+    if (draw_centers or draw_circles) and not os.path.isdir(OUTPUT_IMGS_DIR):
         os.mkdir(OUTPUT_IMGS_DIR)
 
     f.write(
@@ -196,7 +201,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
     total_imgs = sum(".jpg" in s for s in os.listdir(folder))
     total_time = 0
     file_counter = 0
-    
+
     tester = AccuracyModule()
     for root, _, files in os.walk(folder):
         for file in files:
@@ -248,7 +253,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                     except:
                         f.write("Crash")
                         crash = True
-                
+
                 f.write(",")
 
                 # getCenter
@@ -321,7 +326,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
 
                 if crash:
                     f.write("Dependency Crash")
-                
+
                 if depth_val != 0 and not crash:
                     try:
                         bound_region = image[
@@ -339,46 +344,26 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                 # calculate execution time
                 exec_time = end_time - start_time
                 f.write(str(exec_time))
-                
-                total_time += exec_time
 
-                f.write("\n")
+                total_time += exec_time
 
                 # std output of file processing
                 if not quiet_output:
                     print(
-                        "FILE ("+str(file_counter)+"/"+str(total_imgs)+"):",file,
-                        "TIME:", "{:.3f}".format(exec_time),
-                        "CRASH:",crash,
+                        "FILE (" + str(file_counter) + "/" + str(total_imgs) + "):",
+                        file,
+                        "TIME:",
+                        "{:.3f}".format(exec_time),
+                        "CRASH:",
+                        crash,
                     )
-                
+                    
+                # Saves image with circles and, if enabled, center
+                if draw_circles or draw_centers:
+                    path = os.path.join(OUTPUT_IMGS_DIR, file)
+                    tester.location.saveCircleImage(path, draw_centers)
 
-                marked_image = np.copy(image)
-
-                # if enabled and available, draw circle on center
-                if draw_centers:
-                    cv2.circle(
-                        img=marked_image, 
-                        center=(center[0], center[1]), 
-                        radius=20, 
-                        color=(0, 0, 255), 
-                        thickness=3
-                    )
-                    cv2.circle(
-                        img=marked_image, 
-                        center=(center[0], center[1]), 
-                        radius=1, 
-                        color=(0, 0, 255), 
-                        thickness=2
-                    )
-
-                # if enabled and available, draw hough circles
-                if draw_hough_circles and tester.location.circles is not None:
-                    for x, y, r in tester.location.circles:
-                        cv2.circle(marked_image, (x, y), r, (0, 255, 0), 4)
-                        cv2.rectangle(marked_image, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-
-                cv2.imwrite(os.path.join(OUTPUT_IMGS_DIR,file), marked_image)
+                f.write("\n")
 
         avg_time = total_time / total_imgs
         f.write("\nAvg Time (s): " + str(avg_time) + "\n")
@@ -426,15 +411,16 @@ if __name__ == "__main__":
         help="folder name in the vision_images/module directory",
     )
     parser.add_argument(
-        "-c",
-        "--draw-centers",
+        "-s",
+        "--save-circles",
         action="store_true",
-        help="draws a red circle in the center for each image, stored in ./marked_images",
+        help="creates a folder that saves images with circles of which the module is in frame",
     )
     parser.add_argument(
-        "--draw-hough-circles",
+        "-c",
+        "--save-centers",
         action="store_true",
-        help="draw all hough circles for each image, stored in ./marked_images"
+        help="draws a red circle in the center for each image, stored in ./marked_images",
     )
     args = parser.parse_args()
 
@@ -446,4 +432,4 @@ if __name__ == "__main__":
         folder = args.folder
 
     # run accuracy benchmarks
-    bench_module_accuracy(folder, args.quiet, args.draw_centers, args.draw_hough_circles)
+    bench_module_accuracy(folder, args.quiet, args.save_circles, args.save_centers)

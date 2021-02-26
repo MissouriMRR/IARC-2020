@@ -257,10 +257,11 @@ class ModuleLocation:
         # Grayscale
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
 
-        # Guassian Blur
+        # Guassian Blur / Median Blur
+        # blur = cv2.GaussianBlur(src=gray, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
         blur = cv2.medianBlur(gray, 15)
 
-        # Laplacian Transform
+        # Laplacian Transform / ksize = 3 for Guassian / ksize = 1 for Median
         laplacian = cv2.Laplacian(src=blur, ddepth=cv2.CV_8U, ksize=1)
         laplacian = np.uint8(laplacian)
 
@@ -275,6 +276,12 @@ class ModuleLocation:
             minRadius=0,
             maxRadius=50,
         )
+
+        # Prevents TypeError if no circles detected
+        if self.circles is None:
+            self.circles = np.array([])
+            return self.circles
+
         self.circles = np.uint16(self.circles)
 
         # Resize circles into 2d array
@@ -383,6 +390,32 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+    def saveCircleImage(self, file: str, draw_center: bool = False) -> None:
+        """
+        Saves image with circles in folder circles.
+
+        Parameters
+        ----------
+        file: string
+            Path and filename.
+
+        Returns
+        -------
+        None
+        """
+
+        circleImg = np.copy(self.img)
+
+        for x, y, r in self.circles:
+            cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
+            cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+           
+        if draw_center:
+            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=20, color=(0, 0, 255), thickness=3) # outer circle
+            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=1, color=(0, 0, 255), thickness=2) # center dot
+
+        cv2.imwrite(file, circleImg)
+
     def showCenter(self) -> None:
         """
         Shows the image with detected holes and center.
@@ -395,7 +428,11 @@ class ModuleLocation:
         centerImg = np.copy(self.img)
         for x, y, r in self.holes:
             cv2.circle(
-                img=centerImg, center=(x, y), radius=r, color=(0, 0, 255), thickness=-1
+                img=centerImg,
+                center=(int(x), int(y)),
+                radius=int(r),
+                color=(0, 0, 255),
+                thickness=-1,
             )
 
         cv2.circle(
