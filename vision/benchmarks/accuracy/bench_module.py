@@ -165,7 +165,7 @@ class AccuracyModule:
         return get_module_roll(region)
 
 
-def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False) -> None:
+def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False, draw_hough_circles: bool = False) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -180,14 +180,14 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
     None
     """
     OUTPUT_FILE = "results.csv"
-    DRAW_CENTERS_DIR = "marked_centers"
+    OUTPUT_IMGS_DIR = "marked_images"
 
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
     
-    if draw_centers and not os.path.isdir(DRAW_CENTERS_DIR):
-        os.mkdir(DRAW_CENTERS_DIR)
+    if draw_centers and not os.path.isdir(OUTPUT_IMGS_DIR):
+        os.mkdir(OUTPUT_IMGS_DIR)
 
     f.write(
         "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
@@ -352,26 +352,33 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                         "CRASH:",crash,
                     )
                 
+
+                marked_image = np.copy(image)
+
                 # if enabled and available, draw circle on center
                 if draw_centers:
-                    image_copy = np.copy(image)
                     cv2.circle(
-                        image_copy, 
-                        (center[0], center[1]), 
-                        20, 
-                        (0, 0, 255), 
-                        3
+                        img=marked_image, 
+                        center=(center[0], center[1]), 
+                        radius=20, 
+                        color=(0, 0, 255), 
+                        thickness=3
                     )
                     cv2.circle(
-                        image_copy, 
-                        (center[0], center[1]), 
-                        1, 
-                        (0, 0, 255), 
-                        2
+                        img=marked_image, 
+                        center=(center[0], center[1]), 
+                        radius=1, 
+                        color=(0, 0, 255), 
+                        thickness=2
                     )
 
-                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR,file), image_copy)
+                # if enabled and available, draw hough circles
+                if draw_hough_circles and tester.location.circles is not None:
+                    for x, y, r in tester.location.circles:
+                        cv2.circle(marked_image, (x, y), r, (0, 255, 0), 4)
+                        cv2.rectangle(marked_image, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
+                cv2.imwrite(os.path.join(OUTPUT_IMGS_DIR,file), marked_image)
 
         avg_time = total_time / total_imgs
         f.write("\nAvg Time (s): " + str(avg_time) + "\n")
@@ -397,7 +404,7 @@ if __name__ == "__main__":
     -q, --quiet
         produce no output while running
     -c, --draw-centers
-        draw a red circle in the calculated centers of each image, stored in ./marked_centers
+        draw a red circle in the calculated centers of each image, stored in ./marked_images
 
     """
     import argparse
@@ -422,7 +429,12 @@ if __name__ == "__main__":
         "-c",
         "--draw-centers",
         action="store_true",
-        help="draws a red circle in the center of the module of each file, stored in ./marked_centers",
+        help="draws a red circle in the center for each image, stored in ./marked_images",
+    )
+    parser.add_argument(
+        "--draw-hough-circles",
+        action="store_true",
+        help="draw all hough circles for each image, stored in ./marked_images"
     )
     args = parser.parse_args()
 
@@ -434,4 +446,4 @@ if __name__ == "__main__":
         folder = args.folder
 
     # run accuracy benchmarks
-    bench_module_accuracy(folder, args.quiet, args.draw_centers)
+    bench_module_accuracy(folder, args.quiet, args.draw_centers, args.draw_hough_circles)
