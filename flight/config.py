@@ -5,7 +5,7 @@ from mavsdk import System
 
 
 # MAX_SPEED: float = 6.352  # m/s
-MAX_SPEED: float = 5  # m/s
+MAX_SPEED: float = 15  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
 TAKEOFF_ALT: float = 1.0  # m
@@ -45,7 +45,7 @@ MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
-NUM_LAPS: int = 2
+NUM_LAPS: int = 960 # FOR TESTING TURN TIMES
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
