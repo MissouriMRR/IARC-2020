@@ -385,7 +385,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def saveCircleImage(self, filename) -> None:
+    def saveCircleImage(self, filename, folder) -> None:
         """
         Saves image with circles in folder Circle_Images.
 
@@ -400,13 +400,7 @@ class ModuleLocation:
             cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
             cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
-        OUTPUT_FILE = "Circle_Images"
-        try:
-            os.mkdir(OUTPUT_FILE)
-        except FileExistsError:
-            pass
-
-        cv2.imwrite(os.path.join(OUTPUT_FILE, filename), circleImg)
+        cv2.imwrite(os.path.join(folder, filename), circleImg)
 
     def showCenter(self) -> None:
         """
