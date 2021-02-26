@@ -391,7 +391,7 @@ class ModuleLocation:
         Parameters
         ----------
         file: string
-            Path and filename of image for saving.
+            Path and filename.
 
         Returns
         -------
