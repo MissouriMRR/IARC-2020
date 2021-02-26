@@ -2,7 +2,6 @@
 This file contains the ModuleLocation class to find the location of the center of the module in an image.
 """
 
-import os
 import cv2
 import numpy as np
 
@@ -385,13 +384,13 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def saveCircleImage(self, filename, folder) -> None:
+    def saveCircleImage(self, file: str) -> None:
         """
         Saves image with circles in folder Circle_Images.
 
         Returns
         -------
-        None
+        np.ndarray - image with circles
         """
 
         circleImg = np.copy(self.img)
@@ -400,7 +399,7 @@ class ModuleLocation:
             cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
             cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
-        cv2.imwrite(os.path.join(folder, filename), circleImg)
+        cv2.imwrite(file, circleImg)
 
     def showCenter(self) -> None:
         """

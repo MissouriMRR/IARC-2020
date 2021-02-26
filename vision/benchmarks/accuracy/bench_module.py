@@ -164,35 +164,6 @@ class AccuracyModule:
         """
         return get_module_roll(region)
 
-    def accuracy_saveCircleImage(
-        self, filename, color_image: np.ndarray, depth_image: np.ndarray
-    ) -> None:
-        """
-        Creates a folder and calls on the saveCircleImage function to save images with circles.
-
-        Parameters
-        ----------
-        color_image: ndarray
-            The color image.
-        depth_image: ndarray
-            The depth image.
-        filename
-            The file name.
-
-        Returns
-        -------
-        None
-        """
-        OUTPUT_FILE = "Circle_Images"
-        try:
-            os.mkdir(OUTPUT_FILE)
-        except FileExistsError:
-            pass
-        self.location.setImg(color_image, depth_image)
-        self.location.getCenter()
-        self.location.saveCircleImage(filename, OUTPUT_FILE)
-        return None
-
 
 def bench_module_accuracy(
     folder: str,
@@ -215,6 +186,7 @@ def bench_module_accuracy(
     """
     OUTPUT_FILE = "results.csv"
     DRAW_CENTERS_DIR = "marked_centers"
+    DRAW_CIRCLES = "circles"
 
     f = open(
         OUTPUT_FILE, "w"
@@ -222,6 +194,9 @@ def bench_module_accuracy(
 
     if draw_centers and not os.path.isdir(DRAW_CENTERS_DIR):
         os.mkdir(DRAW_CENTERS_DIR)
+
+    if save_circle and not os.path.isdir(DRAW_CIRCLES):
+        os.mkdir(DRAW_CIRCLES)
 
     f.write(
         "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
@@ -378,7 +353,8 @@ def bench_module_accuracy(
 
                 # Saves image with circles and the module in frame
                 if in_frame and save_circle:
-                    tester.accuracy_saveCircleImage(file, image, depth)
+                    path = os.path.join(DRAW_CIRCLES, file)
+                    tester.location.saveCircleImage(path)
 
                 f.write("\n")
 
