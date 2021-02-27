@@ -6,6 +6,7 @@ from flight.states.land import Land
 from flight.states.final import Final
 from flight.states.early_laps import EarlyLaps
 from flight.states.to_mast import ToMast
+from flight.states.detect_module import DetectModule
 
 STATES = {
     "start": Start,
@@ -14,4 +15,5 @@ STATES = {
     "land": Land,
     "final": Final,
     "to_mast": ToMast,
+    "detect_module": DetectModule
 }
