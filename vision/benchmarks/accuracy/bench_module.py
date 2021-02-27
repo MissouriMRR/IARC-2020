@@ -165,7 +165,9 @@ class AccuracyModule:
         return get_module_roll(region)
 
 
-def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers: bool = False) -> None:
+def bench_module_accuracy(
+    folder: str, quiet_output: bool = False, draw_centers: bool = False
+) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
     Outputs results to csv file
@@ -185,7 +187,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
-    
+
     if draw_centers and not os.path.isdir(DRAW_CENTERS_DIR):
         os.mkdir(DRAW_CENTERS_DIR)
 
@@ -196,7 +198,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
     total_imgs = sum(".jpg" in s for s in os.listdir(folder))
     total_time = 0
     file_counter = 0
-    
+
     tester = AccuracyModule()
     for root, _, files in os.walk(folder):
         for file in files:
@@ -248,7 +250,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                     except:
                         f.write("Crash")
                         crash = True
-                
+
                 f.write(",")
 
                 # getCenter
@@ -321,7 +323,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
 
                 if crash:
                     f.write("Dependency Crash")
-                
+
                 if depth_val != 0 and not crash:
                     try:
                         bound_region = image[
@@ -339,7 +341,7 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                 # calculate execution time
                 exec_time = end_time - start_time
                 f.write(str(exec_time))
-                
+
                 total_time += exec_time
 
                 f.write("\n")
@@ -347,31 +349,21 @@ def bench_module_accuracy(folder: str, quiet_output: bool = False, draw_centers:
                 # std output of file processing
                 if not quiet_output:
                     print(
-                        "FILE ("+str(file_counter)+"/"+str(total_imgs)+"):",file,
-                        "TIME:", "{:.3f}".format(exec_time),
-                        "CRASH:",crash,
+                        "FILE (" + str(file_counter) + "/" + str(total_imgs) + "):",
+                        file,
+                        "TIME:",
+                        "{:.3f}".format(exec_time),
+                        "CRASH:",
+                        crash,
                     )
-                
+
                 # if enabled and available, draw circle on center
                 if draw_centers:
                     image_copy = np.copy(image)
-                    cv2.circle(
-                        image_copy, 
-                        (center[0], center[1]), 
-                        20, 
-                        (0, 0, 255), 
-                        3
-                    )
-                    cv2.circle(
-                        image_copy, 
-                        (center[0], center[1]), 
-                        1, 
-                        (0, 0, 255), 
-                        2
-                    )
+                    cv2.circle(image_copy, (center[0], center[1]), 20, (0, 0, 255), 3)
+                    cv2.circle(image_copy, (center[0], center[1]), 1, (0, 0, 255), 2)
 
-                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR,file), image_copy)
-
+                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR, file), image_copy)
 
         avg_time = total_time / total_imgs
         f.write("\nAvg Time (s): " + str(avg_time) + "\n")

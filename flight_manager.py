@@ -13,7 +13,6 @@ from flight.state_settings import StateSettings
 
 
 class FlightManager:
-
     def __init__(self, state_settings: StateSettings = None):
         if state_settings is None:
             state_settings = StateSettings()
@@ -25,7 +24,9 @@ class FlightManager:
             "-s", "--simulation", help="using the simulator", action="store_true"
         )
         args = parser.parse_args()
-        logging.debug("Simulation flag %s", "enabled" if args.simulation else "disabled")
+        logging.debug(
+            "Simulation flag %s", "enabled" if args.simulation else "disabled"
+        )
         self.run_threads(args.simulation)
 
     def init_flight(self, flight_args) -> Process:

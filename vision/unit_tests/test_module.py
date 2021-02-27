@@ -322,9 +322,7 @@ class TestRegionOfInterest(unittest.TestCase):
 
         for current_file in estimates.keys():
             # grabs and loads depth file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-            current_depth_file = (
-                os.path.join(img_dir, current_file) + "-depthImage.npy"
-            )
+            current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
             current_depth_image = np.load(current_depth_file)
 
             # get center
@@ -363,7 +361,9 @@ class TestRegionOfInterest(unittest.TestCase):
         #   and arbitrary center value
         depth_image = np.zeros(IMAGE_SIZE, dtype=int)
         arbitrary_value = 300
-        roi = region_of_interest(depth_image, arbitrary_value, (arbitrary_value, arbitrary_value))
+        roi = region_of_interest(
+            depth_image, arbitrary_value, (arbitrary_value, arbitrary_value)
+        )
 
         self.assertIs(type(roi), np.ndarray)
 

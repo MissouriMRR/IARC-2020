@@ -4,7 +4,6 @@ DEFAULT_EARLY_LAPS: int = 4
 
 
 class StateSettings:
-
     def __init__(self):
         """Default constructor results in default settings"""
         self.do_early_laps: bool = True

@@ -88,11 +88,15 @@ async def wait_for_drone(drone: System) -> None:
             return
 
 
-def flight(comm, sim: bool, log_queue, worker_configurer, state_settings: StateSettings) -> None:
+def flight(
+    comm, sim: bool, log_queue, worker_configurer, state_settings: StateSettings
+) -> None:
     """Starts the asyncronous event loop for the flight code"""
     worker_configurer(log_queue)
     logging.debug("Flight process started")
-    asyncio.get_event_loop().run_until_complete(init_and_begin(comm, sim, state_settings))
+    asyncio.get_event_loop().run_until_complete(
+        init_and_begin(comm, sim, state_settings)
+    )
 
 
 async def init_and_begin(comm, sim: bool, state_settings: StateSettings) -> None:

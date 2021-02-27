@@ -25,7 +25,9 @@ class EarlyLaps(State):
             logging.info("Moving to pylon 1")
             await mover.move_to(drone, config.pylon1)
             logging.info("Arrived at pylon 1")
-            logging.info("Beginning to perform %d laps", self.state_settings.num_early_laps)
+            logging.info(
+                "Beginning to perform %d laps", self.state_settings.num_early_laps
+            )
             async for i in arange(self.state_settings.num_early_laps):
                 logging.info("Starting lap: %d", i)
                 logging.debug("Lap %d: Straight one", i)

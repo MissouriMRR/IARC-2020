@@ -15,5 +15,5 @@ STATES = {
     "land": Land,
     "final": Final,
     "to_mast": ToMast,
-    "detect_module": DetectModule
+    "detect_module": DetectModule,
 }

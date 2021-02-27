@@ -36,7 +36,9 @@ def run_threads(sim: bool) -> None:
     # Create new processes
     logging.info("Spawning Processes")
 
-    camera: Realsense = Realsense(config.REALSENSE_WIDTH, config.REALSENSE_HEIGHT, config.REALSENSE_FRAMERATE)
+    camera: Realsense = Realsense(
+        config.REALSENSE_WIDTH, config.REALSENSE_HEIGHT, config.REALSENSE_FRAMERATE
+    )
 
     try:
         while True:
@@ -54,4 +56,3 @@ if __name__ == "__main__":
         main()
     except:
         logging.exception("Unfixable error detected")
-

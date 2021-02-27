@@ -14,14 +14,18 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 from bounding_box import BoundingBox, ObjectType
 
+
 class TextDetector:
     """
     Finds the bounding boxes of the specified text in the frame.
     """
+
     def __init__(self):
         self.text = "модулииртибот"
 
-    def detect_russian_word(self, color_image: np.ndarray, depth_image: np.ndarray) -> list:
+    def detect_russian_word(
+        self, color_image: np.ndarray, depth_image: np.ndarray
+    ) -> list:
         """
         Detect words in given image.
 
@@ -68,8 +72,9 @@ class TextDetector:
 
         return box_obs
 
-
-    def _get_rotated_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray) -> np.ndarray:
+    def _get_rotated_min_area_rect(
+        self, color_image: np.ndarray, depth_image: np.ndarray
+    ) -> np.ndarray:
         """
         Returns min area rect of inside the tape
 
@@ -119,12 +124,12 @@ class TextDetector:
         contourAreas = np.array([cv2.contourArea(c) for c in contours])
         largestContour = contours[np.argmax(contourAreas)]
 
-        x,y,w,h = cv2.boundingRect(largestContour)
+        x, y, w, h = cv2.boundingRect(largestContour)
 
         rect = cv2.minAreaRect(largestContour)
 
         center, size, theta = rect
-        
+
         # adjust angle so the image isn't corrected to a 90 degree angle
         if abs(theta) > 45:
             if theta < 0:
@@ -133,21 +138,23 @@ class TextDetector:
                 theta = 90 - theta
 
         rows, columns = color_image.shape[0], color_image.shape[1]
-        matrix = cv2.getRotationMatrix2D((columns/2, rows/2), theta, 1)
+        matrix = cv2.getRotationMatrix2D((columns / 2, rows / 2), theta, 1)
         rotated = cv2.warpAffine(color_image, matrix, (columns, rows))
 
-        rect0 = (rect[0], rect[1], 0.0) 
+        rect0 = (rect[0], rect[1], 0.0)
         box = cv2.boxPoints(rect0)
-        points = np.int0(cv2.transform(np.array([box]), matrix))[0]    
+        points = np.int0(cv2.transform(np.array([box]), matrix))[0]
         points[points < 0] = 0
 
-        sliced_rotated_image = rotated[points[1][1]:points[0][1], 
-                                       points[1][0]:points[2][0]]
+        sliced_rotated_image = rotated[
+            points[1][1] : points[0][1], points[1][0] : points[2][0]
+        ]
 
         return sliced_rotated_image
 
-
-    def visualize_min_area_rect(self, color_image: np.ndarray, depth_image: np.ndarray) -> None:
+    def visualize_min_area_rect(
+        self, color_image: np.ndarray, depth_image: np.ndarray
+    ) -> None:
         """
         Allows for visualization of the rotated min area rect detect_words is using
 
@@ -198,6 +205,6 @@ if __name__ == "__main__":
     detector = TextDetector()
     detector.visualize_min_area_rect(color_image, depth_image)
     result = detector.detect_russian_word(color_image, depth_image)
-    print (result)
+    print(result)
 
     # box_plotter.plot_box(result, mask_image)
