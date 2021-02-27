@@ -19,13 +19,13 @@ class ToMast(State):
             mover: MovementController = MovementController()
             # Go to the mast
             logging.info("Moving to mast")
-            await mover.move_to(drone, config.MAST_LOCATION)
+            await mover.move_to(drone, config.MAST_LOCATION, True, config.FLYING_ALT)
             logging.info("Arrived at mast")
             # (NSm/s, EWm/s, DUm/s, Ydeg) Stop moving
             await drone.offboard.set_velocity_ned(
-                sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
+                sdk.offboard.VelocityNedYaw(0.0, 0.0, -0.01, 0.0)
             )
-            await asyncio.sleep(20)
+            await asyncio.sleep(5)
             return Land()
         else:
             return Land()
