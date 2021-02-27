@@ -49,6 +49,10 @@ NUM_LAPS: int = 2
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
 
+REALSENSE_WIDTH: int = 0
+REALSENSE_HEIGHT: int = 0
+REALSENSE_FRAMERATE: int = 60
+
 run_states = {"early_laps": True, "to_mast": True}
 
 

@@ -6,7 +6,7 @@ import mavsdk as sdk
 from flight import config
 
 from flight.utils.movement_controller import MovementController
-from .land import Land
+from .detect_module import DetectModule
 from .state import State
 
 
@@ -25,7 +25,7 @@ class ToMast(State):
             await drone.offboard.set_velocity_ned(
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
             )
-            await asyncio.sleep(20)
-            return Land(self.state_settings)
+            await asyncio.sleep(10)
+            return DetectModule(self.state_settings)
         else:
-            return Land(self.state_settings)
+            return DetectModule(self.state_settings)
