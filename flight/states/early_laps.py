@@ -1,7 +1,5 @@
 """Runs the 8 laps to get to the mast"""
 import logging
-import asyncio
-import mavsdk as sdk
 
 from flight import config
 
@@ -21,13 +19,14 @@ class EarlyLaps(State):
 
     async def run(self, drone):
         """Moves the drone to the first pylon, then begins the 8 laps"""
-        if config.run_states["early_laps"]:
+        if self.state_settings.do_early_laps:
             mover: MovementController = MovementController()
             # Go to pylon 1
             logging.info("Moving to pylon 1")
             await mover.move_to(drone, config.pylon1)
             logging.info("Arrived at pylon 1")
-            async for i in arange(config.NUM_LAPS):
+            logging.info("Beginning to perform %d laps", self.state_settings.num_early_laps)
+            async for i in arange(self.state_settings.num_early_laps):
                 logging.info("Starting lap: %d", i)
                 logging.debug("Lap %d: Straight one", i)
                 await mover.move_to(drone, config.pylon2)  # move to pylon 2
@@ -40,6 +39,6 @@ class EarlyLaps(State):
 
                 logging.debug("Lap %d: Turn two", i)
                 await mover.turn(drone)  # turn around pylon 1
-            return ToMast()
+            return ToMast(self.state_settings)
         else:
-            return ToMast()
+            return ToMast(self.state_settings)

@@ -44,4 +44,4 @@ class Land(State):
             )
         logging.info("Disarming the drone")
         await drone.action.kill()
-        return Final()
+        return Final(self.state_settings)

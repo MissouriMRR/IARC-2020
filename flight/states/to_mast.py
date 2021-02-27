@@ -15,7 +15,7 @@ class ToMast(State):
 
     async def run(self, drone):
         """Sends the drone from the first pylon to the mast"""
-        if config.run_states["to_mast"]:
+        if self.state_settings.go_to_mast:
             mover: MovementController = MovementController()
             # Go to the mast
             logging.info("Moving to mast")
@@ -26,6 +26,6 @@ class ToMast(State):
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
             )
             await asyncio.sleep(20)
-            return Land()
+            return Land(self.state_settings)
         else:
-            return Land()
+            return Land(self.state_settings)
