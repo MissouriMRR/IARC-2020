@@ -168,8 +168,8 @@ class AccuracyModule:
 def bench_module_accuracy(
     folder: str,
     quiet_output: bool = False,
+    draw_circles: bool = False,
     draw_centers: bool = False,
-    save_circle: bool = False,
 ) -> None:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
@@ -185,18 +185,14 @@ def bench_module_accuracy(
     None
     """
     OUTPUT_FILE = "results.csv"
-    DRAW_CENTERS_DIR = "marked_centers"
-    DRAW_CIRCLES = "circles"
+    OUTPUT_IMGS_DIR = "marked_images"
 
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
-
-    if draw_centers and not os.path.isdir(DRAW_CENTERS_DIR):
-        os.mkdir(DRAW_CENTERS_DIR)
-
-    if save_circle and not os.path.isdir(DRAW_CIRCLES):
-        os.mkdir(DRAW_CIRCLES)
+    
+    if (draw_centers or draw_circles) and not os.path.isdir(OUTPUT_IMGS_DIR):
+        os.mkdir(OUTPUT_IMGS_DIR)
 
     f.write(
         "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
@@ -351,13 +347,6 @@ def bench_module_accuracy(
 
                 total_time += exec_time
 
-                # Saves image with circles and the module in frame
-                if in_frame and save_circle:
-                    path = os.path.join(DRAW_CIRCLES, file)
-                    tester.location.saveCircleImage(path)
-
-                f.write("\n")
-
                 # std output of file processing
                 if not quiet_output:
                     print(
@@ -368,14 +357,13 @@ def bench_module_accuracy(
                         "CRASH:",
                         crash,
                     )
+                    
+                # Saves image with circles and, if enabled, center
+                if draw_circles or draw_centers:
+                    path = os.path.join(OUTPUT_IMGS_DIR, file)
+                    tester.location.saveCircleImage(path, draw_centers)
 
-                # if enabled and available, draw circle on center
-                if in_frame and draw_centers:
-                    image_copy = np.copy(image)
-                    cv2.circle(image_copy, (center[0], center[1]), 20, (0, 0, 255), 3)
-                    cv2.circle(image_copy, (center[0], center[1]), 1, (0, 0, 255), 2)
-
-                    cv2.imwrite(os.path.join(DRAW_CENTERS_DIR, file), image_copy)
+                f.write("\n")
 
         avg_time = total_time / total_imgs
         f.write("\nAvg Time (s): " + str(avg_time) + "\n")
@@ -401,7 +389,7 @@ if __name__ == "__main__":
     -q, --quiet
         produce no output while running
     -c, --draw-centers
-        draw a red circle in the calculated centers of each image, stored in ./marked_centers
+        draw a red circle in the calculated centers of each image, stored in ./marked_images
 
     """
     import argparse
@@ -423,16 +411,16 @@ if __name__ == "__main__":
         help="folder name in the vision_images/module directory",
     )
     parser.add_argument(
-        "-c",
-        "--draw-centers",
-        action="store_true",
-        help="draws a red circle in the center of the module of each file, stored in ./marked_centers",
-    )
-    parser.add_argument(
         "-s",
-        "--save-circle",
+        "--save-circles",
         action="store_true",
         help="creates a folder that saves images with circles of which the module is in frame",
+    )
+    parser.add_argument(
+        "-c",
+        "--save-centers",
+        action="store_true",
+        help="draws a red circle in the center for each image, stored in ./marked_images",
     )
     args = parser.parse_args()
 
@@ -444,4 +432,4 @@ if __name__ == "__main__":
         folder = args.folder
 
     # run accuracy benchmarks
-    bench_module_accuracy(folder, args.quiet, args.draw_centers, args.save_circle)
+    bench_module_accuracy(folder, args.quiet, args.save_circles, args.save_centers)

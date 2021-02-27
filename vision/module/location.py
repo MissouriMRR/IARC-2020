@@ -49,7 +49,7 @@ class ModuleLocation:
         bool - true if module is in the frame and false if module is not in the frame
         """
         MIN_SLOPES_IN_BUCKET = (
-            15  # Minimum number of slopes per bucket to identify the module
+            4  # Minimum number of slopes per bucket to identify the module
         )
         MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
         MIN_CIRCLES = 4  # minimum number of circles needed to perform calculations
@@ -58,17 +58,18 @@ class ModuleLocation:
             # Circle Detection
             self._circleDetection()
 
+        # Only perform more calculations if there are a reasonable number of circles
         if (
-            np.shape(self.circles)[0] < MIN_CIRCLES
-            or np.shape(self.circles)[0] > MAX_CIRCLES
-        ):  # too little or too many circles found
+            np.shape(self.circles)[0] <= MAX_CIRCLES
+            and np.shape(self.circles)[0] >= MIN_CIRCLES
+        ):  # not too little and not too many circles found
+            if self.needsRecalc:
+                # Get slopes and group parallel slopes
+                self._getSlopes()
+                self._groupSlopes()
+                self.needsRecalc = False
+        else:
             return False
-
-        if self.needsRecalc:
-            # Get slopes and group parallel slopes
-            self._getSlopes()
-            self._groupSlopes()
-            self.needsRecalc = False
 
         return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
 
@@ -92,10 +93,10 @@ class ModuleLocation:
         # Filter out far away circles
         # self._filterCircleDepth()
 
-        # Only perform more calculations if there are few circles
+        # Only perform more calculations if there are a reasonable number of circles
         if (
             np.shape(self.circles)[0] <= MAX_CIRCLES
-            and np.shape(self.circles)[0] > MIN_CIRCLES
+            and np.shape(self.circles)[0] >= MIN_CIRCLES
         ):
             if self.needsRecalc:
                 # Get Slopes and Parallels
@@ -195,6 +196,7 @@ class ModuleLocation:
             idx += 1
 
         self.holes = self.holes.reshape((-1, 3))
+        self.holes = np.unique(self.holes, axis=0) # remove duplicates
         return self.holes
 
     def _groupSlopes(self) -> None:
@@ -206,13 +208,16 @@ class ModuleLocation:
         None
         """
         BUCKET_MODIFIER = 0.5  # Changes how many buckets are in the range
+        NUM_CIRCLES = np.shape(self.circles)[0]  # The number of circles
+        NUM_SLOPES = np.shape(self.slopes)[0] # The number of slopes
 
         # Get parameters for bucket sorting
         self.upper_bound = np.amax(self.slopes)
         self.lower_bound = np.amin(self.slopes)
-        self.num_buckets = np.int32(
-            (self.upper_bound - self.lower_bound) * BUCKET_MODIFIER
-        )
+
+        interquartile_range = np.percentile(self.slopes, 75) - np.percentile(self.slopes, 25)
+        bucket_width = (2 * interquartile_range) / (NUM_SLOPES**(1/3)) # Freedman–Diaconis rule
+        self.num_buckets = int(round((self.upper_bound - self.lower_bound) / bucket_width))
 
         # Bucket sort
         self.slope_heights, self.slope_bounds = np.histogram(
@@ -337,6 +342,7 @@ class ModuleLocation:
         """
         self.depth = depth
         self.img = color
+        self.center = np.arange(2)
         self.needsRecalc = True
 
     ## Visualization Functions
@@ -384,7 +390,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def saveCircleImage(self, file: str) -> None:
+    def saveCircleImage(self, file: str, draw_center: bool = False) -> None:
         """
         Saves image with circles in folder circles.
 
@@ -403,6 +409,10 @@ class ModuleLocation:
         for x, y, r in self.circles:
             cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
             cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+           
+        if draw_center:
+            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=20, color=(0, 0, 255), thickness=3) # outer circle
+            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=1, color=(0, 0, 255), thickness=2) # center dot
 
         cv2.imwrite(file, circleImg)
 
