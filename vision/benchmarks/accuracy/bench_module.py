@@ -190,7 +190,7 @@ def bench_module_accuracy(
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
-    
+
     if (draw_centers or draw_circles) and not os.path.isdir(OUTPUT_IMGS_DIR):
         os.mkdir(OUTPUT_IMGS_DIR)
 
@@ -357,7 +357,7 @@ def bench_module_accuracy(
                         "CRASH:",
                         crash,
                     )
-                    
+
                 # Saves image with circles and, if enabled, center
                 if draw_circles or draw_centers:
                     path = os.path.join(OUTPUT_IMGS_DIR, file)

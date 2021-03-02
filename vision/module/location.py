@@ -196,7 +196,7 @@ class ModuleLocation:
             idx += 1
 
         self.holes = self.holes.reshape((-1, 3))
-        self.holes = np.unique(self.holes, axis=0) # remove duplicates
+        self.holes = np.unique(self.holes, axis=0)  # remove duplicates
         return self.holes
 
     def _groupSlopes(self) -> None:
@@ -209,15 +209,21 @@ class ModuleLocation:
         """
         BUCKET_MODIFIER = 0.5  # Changes how many buckets are in the range
         NUM_CIRCLES = np.shape(self.circles)[0]  # The number of circles
-        NUM_SLOPES = np.shape(self.slopes)[0] # The number of slopes
+        NUM_SLOPES = np.shape(self.slopes)[0]  # The number of slopes
 
         # Get parameters for bucket sorting
         self.upper_bound = np.amax(self.slopes)
         self.lower_bound = np.amin(self.slopes)
 
-        interquartile_range = np.percentile(self.slopes, 75) - np.percentile(self.slopes, 25)
-        bucket_width = (2 * interquartile_range) / (NUM_SLOPES**(1/3)) # Freedman–Diaconis rule
-        self.num_buckets = int(round((self.upper_bound - self.lower_bound) / bucket_width))
+        interquartile_range = np.percentile(self.slopes, 75) - np.percentile(
+            self.slopes, 25
+        )
+        bucket_width = (2 * interquartile_range) / (
+            NUM_SLOPES ** (1 / 3)
+        )  # Freedman–Diaconis rule
+        self.num_buckets = int(
+            round((self.upper_bound - self.lower_bound) / bucket_width)
+        )
 
         # Bucket sort
         self.slope_heights, self.slope_bounds = np.histogram(
@@ -409,10 +415,22 @@ class ModuleLocation:
         for x, y, r in self.circles:
             cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
             cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-           
+
         if draw_center:
-            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=20, color=(0, 0, 255), thickness=3) # outer circle
-            cv2.circle(img=circleImg, center=(self.center[0], self.center[1]), radius=1, color=(0, 0, 255), thickness=2) # center dot
+            cv2.circle(
+                img=circleImg,
+                center=(self.center[0], self.center[1]),
+                radius=20,
+                color=(0, 0, 255),
+                thickness=3,
+            )  # outer circle
+            cv2.circle(
+                img=circleImg,
+                center=(self.center[0], self.center[1]),
+                radius=1,
+                color=(0, 0, 255),
+                thickness=2,
+            )  # center dot
 
         cv2.imwrite(file, circleImg)
 
