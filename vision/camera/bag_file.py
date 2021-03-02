@@ -87,7 +87,7 @@ class BagFile(Camera):
             try:
                 # returns the next color/depth frame
                 frames = self.pipeline.wait_for_frames()
-            except: # next frame not received within 5 seconds, assume end of file
+            except:  # next frame not received within 5 seconds, assume end of file
                 # will only happen if repeat is False
                 more_frames = False
                 break
