@@ -13,6 +13,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import cv2
 import numpy as np
 import pyrealsense2 as rs
+
 try:
     from vision.camera.template import Camera
 except ImportError:
@@ -41,7 +42,16 @@ class BagFile(Camera):
     repeat: bool
         Whether to repeatedly loop through the bag file.
     """
-    def __init__(self, screen_width: int, screen_height: int, frame_rate: int, filename: str, repeat: bool = True, **kwargs):
+
+    def __init__(
+        self,
+        screen_width: int,
+        screen_height: int,
+        frame_rate: int,
+        filename: str,
+        repeat: bool = True,
+        **kwargs
+    ):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.filename = filename
@@ -98,7 +108,7 @@ class BagFile(Camera):
         clipping: bool
             defaults to false, can be set true to remove data from the images
             beyond a given distance from the camera
-        
+
         Returns
         -------
         None
@@ -110,8 +120,8 @@ class BagFile(Camera):
 
             # render depth/color images
             depth_colormap = cv2.applyColorMap(
-                cv2.convertScaleAbs(depth_image, alpha=0.03),
-                cv2.COLORMAP_JET)
+                cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET
+            )
 
             if clipping:
                 bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
@@ -119,20 +129,24 @@ class BagFile(Camera):
             else:
                 images = np.hstack((color_image, depth_colormap))
 
-            cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_NORMAL)
-            cv2.resizeWindow('Depth/Color Stream', self.width, int(self.height / 2))
-            cv2.imshow('Depth/Color Stream', images)
+            cv2.namedWindow("Depth/Color Stream", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("Depth/Color Stream", self.width, int(self.height / 2))
+            cv2.imshow("Depth/Color Stream", images)
 
             key = cv2.waitKey(1)
 
-            if key == ord('c'):
+            if key == ord("c"):
                 save_camera_frame(depth_image, color_image)
 
             # if pressed 'q' or escape (27) exit program
-            if key == ord('q') or key == 27 or cv2.getWindowProperty("Depth/Color Stream", 0) == -1:
+            if (
+                key == ord("q")
+                or key == 27
+                or cv2.getWindowProperty("Depth/Color Stream", 0) == -1
+            ):
                 cv2.destroyAllWindows()
                 break
-    
+
     def save_as_img(self, folder_name: str = "new_set") -> None:
         """
         Iterates through the .bag file and saves color and depth frames as .jpg and .npy files respectively.
@@ -158,6 +172,8 @@ class BagFile(Camera):
 
         return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import sys
+
     BagFile(720, 1080, 0, sys.argv[1], True).display_in_window()
