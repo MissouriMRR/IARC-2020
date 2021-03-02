@@ -133,7 +133,7 @@ class BagFile(Camera):
                 cv2.destroyAllWindows()
                 break
     
-    def saveAsImg(self, folder_name: str = "new_set") -> None:
+    def save_as_img(self, folder_name: str = "new_set") -> None:
         """
         Iterates through the .bag file and saves color and depth frames as .jpg and .npy files respectively.
         NOTE: Due to how .bag file is read, the number of frames saved may vary. Not every frame of the file is saved.
@@ -160,4 +160,4 @@ class BagFile(Camera):
 
 if __name__ == '__main__':
     import sys
-    BagFile(720, 1080, 0, sys.argv[1], False).saveAsImg()
+    BagFile(720, 1080, 0, sys.argv[1], True).display_in_window()
