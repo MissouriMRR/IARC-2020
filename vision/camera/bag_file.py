@@ -81,9 +81,16 @@ class BagFile(Camera):
         align_to = rs.stream.color
         align = rs.align(align_to)
 
-        while True:
-            # returns the next color/depth frame
-            frames = self.pipeline.wait_for_frames()
+        more_frames = True
+
+        while more_frames:
+            try:
+                # returns the next color/depth frame
+                frames = self.pipeline.wait_for_frames()
+            except: # next frame not received within 5 seconds, assume end of file
+                # will only happen if repeat is False
+                more_frames = False
+                break
 
             # Align the depth frame to color frame
             aligned_frames = align.process(frames)
