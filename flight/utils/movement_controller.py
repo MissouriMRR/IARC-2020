@@ -83,16 +83,16 @@ class MovementController:
                 reference_x: float = abs(x)
                 reference_y: float = abs(y)
 
-                dx: float = math.copysign(
-                    config.MAX_SPEED
-                    * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                    x,
-                )
-                dy: float = math.copysign(
-                    config.MAX_SPEED
-                    * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                    y,
-                )
+            dx: float = math.copysign(
+                config.MAX_SPEED
+                * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                x,
+            )
+            dy: float = math.copysign(
+                config.MAX_SPEED
+                * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                y,
+            )
             # continuously update information on the drone's location
             # and update the velocity of the drone
             await drone.offboard.set_velocity_ned(
