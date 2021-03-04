@@ -118,4 +118,4 @@ venv.bak/
 .vscode/
 
 # Spreadsheets
-.csv
+*.csv
