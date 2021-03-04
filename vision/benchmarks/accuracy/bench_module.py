@@ -70,7 +70,9 @@ class AccuracyModule:
         -------
         tuple - (x, y) coordinates of the center of the module in color_image.
         """
-        self.location.setImg(color_image, depth_image) ## TODO: Don't need to set image if in frame already run on an image
+        self.location.setImg(
+            color_image, depth_image
+        )  ## TODO: Don't need to set image if in frame already run on an image
         return self.location.getCenter()
 
     def accuracy_get_module_depth(
@@ -172,9 +174,8 @@ def bench_module_accuracy(
     image: np.ndarray,
     depth: np.ndarray,
     filename: str,
-
     draw_circles: bool = False,
-    draw_centers: bool = False, ## TODO: Ability to draw centers without circles
+    draw_centers: bool = False,  ## TODO: Ability to draw centers without circles
 ) -> bool:
     """
     Runs all module accuracy benchmarks on all images in a specified folder.
@@ -199,10 +200,10 @@ def bench_module_accuracy(
     -------
     bool - whether all tests were completed.
     """
-    OUTPUT_IMGS_DIR = "marked_images" # Folder to output saved images to if necessary
+    OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
 
-    crash = False # Whether an algorithm crashed
-    
+    crash = False  # Whether an algorithm crashed
+
     ## Run tests on the image ##
 
     in_frame = False
@@ -230,9 +231,7 @@ def bench_module_accuracy(
 
     # get_module_depth
     depth_val = 0.0
-    if (
-        center != (0, 1) and not crash
-    ):  # only runs further tests if center found
+    if center != (0, 1) and not crash:  # only runs further tests if center found
         try:
             depth_val = tester.accuracy_get_module_depth(depth, center)
             file_output.write(str(depth_val))
@@ -245,9 +244,7 @@ def bench_module_accuracy(
     roi = np.ndarray([])
     if depth_val != 0 and not crash:
         try:
-            roi = tester.accuracy_region_of_interest(
-                depth, depth_val, center
-            )
+            roi = tester.accuracy_region_of_interest(depth, depth_val, center)
             file_output.write("Found")
         except:
             file_output.write("Crash")
@@ -273,9 +270,7 @@ def bench_module_accuracy(
     bounds = np.ndarray([])
     if depth_val != 0 and not crash:
         try:
-            bounds = tester.accuracy_getModuleBounds(
-                (1920, 1080), center, depth_val
-            )
+            bounds = tester.accuracy_getModuleBounds((1920, 1080), center, depth_val)
             file_output.write("Found")
         except:
             file_output.write("Crash")
@@ -304,7 +299,7 @@ def bench_module_accuracy(
     if draw_circles or draw_centers:
         path = os.path.join(OUTPUT_IMGS_DIR, filename)
         tester.location.saveCircleImage(path, draw_centers)
-    
+
     return crash
 
 

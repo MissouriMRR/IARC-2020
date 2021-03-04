@@ -15,19 +15,30 @@ import cv2
 
 from vision.camera.bag_file import BagFile
 
-from vision.benchmarks.accuracy.bench_module import bench_module_accuracy, AccuracyModule
+from vision.benchmarks.accuracy.bench_module import (
+    bench_module_accuracy,
+    AccuracyModule,
+)
 
 # .bag file constants
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 FRAME_RATE = 60
-REPEAT = False # Whether to continously run through a .bag file test
+REPEAT = False  # Whether to continously run through a .bag file test
 
 # benchmark constants
 OUTPUT_FILE = "results.csv"
 OUTPUT_IMGS_DIR = "marked_images"
 
-def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = False, save_circles: bool = False, save_centers: bool = False) -> None:
+
+def run_set(
+    bench_name: str,
+    folder: str,
+    file_output,
+    quiet_output: bool = False,
+    save_circles: bool = False,
+    save_centers: bool = False,
+) -> None:
     """
     Run a dataset of color and depth images through a benchmark.
 
@@ -39,30 +50,32 @@ def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = Fals
         The directory of the dataset.
     """
 
-    benchmark = 0 # benchmark function to run
-    tester = 0 # benchmark class to run
+    benchmark = 0  # benchmark function to run
+    tester = 0  # benchmark class to run
     if bench_name == "module":
         benchmark = bench_module_accuracy
         tester = AccuracyModule()
-        file_output.write("image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n")
+        file_output.write(
+            "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
+        )
     elif bench_name == "obstacle":
         pass
-    elif bench_name == "pylon": ## NOTE: pylon algorithm not in use
+    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
         pass
     elif bench_name == "text":
         pass
 
     total_imgs = sum(".jpg" in s for s in os.listdir(folder))
-    total_algorithms_time = 0 # total time to execute the algorithms
-    total_time = 0 # total time to read in images and execute algorithms
+    total_algorithms_time = 0  # total time to execute the algorithms
+    total_time = 0  # total time to read in images and execute algorithms
     file_counter = 0
 
     # Iterate through the images
     for root, _, files in os.walk(folder):
         for file in files:
             if file.endswith(".jpg"):
-                file_counter += 1 # Track the number of images processed
-                crash = False # Whether reading in the file crashed
+                file_counter += 1  # Track the number of images processed
+                crash = False  # Whether reading in the file crashed
                 exec_time = 0.0
 
                 # Attempt to read the file
@@ -74,7 +87,7 @@ def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = Fals
 
                 file_output.write(filename + ",")
 
-                start_time = time.time() # take time before reading in images
+                start_time = time.time()  # take time before reading in images
 
                 try:
                     image = cv2.imread(filename)
@@ -97,19 +110,32 @@ def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = Fals
                 file_output.write("True,")
 
                 # Run test if image read successfully
-                if not crash: # image read successfully
+                if not crash:  # image read successfully
                     start_exec_time = time.time()
-                    crash = benchmark(folder=folder, file_output=file_output, tester=tester, image=image, depth=depth, filename=file, draw_circles=save_circles, draw_centers=save_centers) # TODO: way to set args ahead of time. maybe in tester?
+                    crash = benchmark(
+                        folder=folder,
+                        file_output=file_output,
+                        tester=tester,
+                        image=image,
+                        depth=depth,
+                        filename=file,
+                        draw_circles=save_circles,
+                        draw_centers=save_centers,
+                    )  # TODO: way to set args ahead of time. maybe in tester?
                     end_time = time.time()
 
                     # calculate execution and total times
-                    algorithms_time = end_time - start_exec_time # time to execute algorithms
-                    image_time = end_time - start_time # time to read in images and execute algorithms
+                    algorithms_time = (
+                        end_time - start_exec_time
+                    )  # time to execute algorithms
+                    image_time = (
+                        end_time - start_time
+                    )  # time to read in images and execute algorithms
                     file_output.write(str(algorithms_time) + ",")
                     file_output.write(str(image_time))
                     total_algorithms_time += algorithms_time
                     total_time += image_time
-                
+
                 file_output.write("\n")
 
                 # std output of file processing
@@ -124,7 +150,7 @@ def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = Fals
                         "CRASH:",
                         crash,
                     )
-    
+
     # Add timing results to output file
     avg_alg_time = total_algorithms_time / total_imgs
     avg_total_time = total_time / total_imgs
@@ -141,7 +167,16 @@ def run_set(bench_name: str, folder: str, file_output, quiet_output: bool = Fals
 
     return
 
-def run_bag_stream(self, bench_name: str, filename: str, file_output, quiet_output: bool = False, save_circles: bool = False, save_centers: bool = False) -> None:
+
+def run_bag_stream(
+    self,
+    bench_name: str,
+    filename: str,
+    file_output,
+    quiet_output: bool = False,
+    save_circles: bool = False,
+    save_centers: bool = False,
+) -> None:
     """
     Run the .bag file in "real time" through a benchmark.
     NOTE: Since the file is being run as a stream, the number of frames processed
@@ -163,13 +198,23 @@ def run_bag_stream(self, bench_name: str, filename: str, file_output, quiet_outp
         pass
     elif bench_name == "obstacle":
         pass
-    elif bench_name == "pylon": ## NOTE: pylon algorithm not in use
+    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
         pass
     elif bench_name == "text":
         pass
     return
 
-def run_bag_set(self, bench_name: str, filename: str, file_output, folder_name: str = "new_set", quiet_output: bool = False,  save_circles: bool = False, save_centers: bool = False) -> None:
+
+def run_bag_set(
+    self,
+    bench_name: str,
+    filename: str,
+    file_output,
+    folder_name: str = "new_set",
+    quiet_output: bool = False,
+    save_circles: bool = False,
+    save_centers: bool = False,
+) -> None:
     """
     Saves bag file as dataset of images before sending dataset to specified benchmark.
     NOTE: Due to how .bag file is read, the number of frames saved may vary. Not every frame of the file is saved.
@@ -189,22 +234,33 @@ def run_bag_set(self, bench_name: str, filename: str, file_output, folder_name: 
     -------
     None
     """
-    REPEAT = False # Whether to continously run through the bag file (True will cause infinite image generation)
+    REPEAT = False  # Whether to continously run through the bag file (True will cause infinite image generation)
 
     # Create the data set from the bag file.
-    BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT).save_as_img(folder_name)
+    BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT).save_as_img(
+        folder_name
+    )
 
     if bench_name == "module":
         pass
     elif bench_name == "obstacle":
         pass
-    elif bench_name == "pylon": ## NOTE: pylon algorithm not in use
+    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
         pass
     elif bench_name == "text":
         pass
     return
 
-def run_bench(bench_name: str, file_loc: str, dataset_bag: bool = False, folder_name: str = "new_set", quiet_output: bool = False, save_circles: bool = False, save_centers: bool = False) -> None:
+
+def run_bench(
+    bench_name: str,
+    file_loc: str,
+    dataset_bag: bool = False,
+    folder_name: str = "new_set",
+    quiet_output: bool = False,
+    save_circles: bool = False,
+    save_centers: bool = False,
+) -> None:
     """
     Runs the specified benchmark on an image folder or bag file.
 
@@ -217,7 +273,7 @@ def run_bench(bench_name: str, file_loc: str, dataset_bag: bool = False, folder_
     dataset_bag: bool
         For .bag files. Whether to create and iterate through data set of images.
     TODO: Update documentation
-    
+
     Returns
     -------
     None
@@ -232,22 +288,45 @@ def run_bench(bench_name: str, file_loc: str, dataset_bag: bool = False, folder_
     if not os.path.isdir(OUTPUT_IMGS_DIR):
         os.mkdir(OUTPUT_IMGS_DIR)
 
-    if file_loc[-4:] == ".bag": # running on bag file
+    if file_loc[-4:] == ".bag":  # running on bag file
         if dataset_bag:
-            run_bag_set(bench_name=bench_name, filename=file_loc, file_output=f, folder_name=folder_name, quiet_output=quiet_output, save_circles=save_circles, save_centers=save_centers)
+            run_bag_set(
+                bench_name=bench_name,
+                filename=file_loc,
+                file_output=f,
+                folder_name=folder_name,
+                quiet_output=quiet_output,
+                save_circles=save_circles,
+                save_centers=save_centers,
+            )
         else:
-            run_bag_stream(bench_name=bench_name, filename=file_loc, file_output=f, quiet_output=quiet_output, save_circles=save_circles, save_centers=save_centers)
-    
-    else: # running on image directory
-        run_set(bench_name=bench_name, folder=file_loc, file_output=f, quiet_output=quiet_output, save_circles=save_circles, save_centers=save_centers)
-    
+            run_bag_stream(
+                bench_name=bench_name,
+                filename=file_loc,
+                file_output=f,
+                quiet_output=quiet_output,
+                save_circles=save_circles,
+                save_centers=save_centers,
+            )
+
+    else:  # running on image directory
+        run_set(
+            bench_name=bench_name,
+            folder=file_loc,
+            file_output=f,
+            quiet_output=quiet_output,
+            save_circles=save_circles,
+            save_centers=save_centers,
+        )
+
     f.close()
     return
+
 
 if __name__ == "__main__":
     """
     Run a specified benchmark on a dataset or .bag file.
-    
+
     Command Line Arguments
     -f, --folder {foldername}
         folder in module folder to run accuracy benchmarks on.
@@ -279,7 +358,7 @@ if __name__ == "__main__":
         "-q",
         "--quiet",
         action="store_true",
-        help="Output no file information while running"
+        help="Output no file information while running",
     )
 
     # .bag file settings
@@ -287,7 +366,7 @@ if __name__ == "__main__":
         "-d",
         "--dataset_bag",
         action="store_true",
-        help="For use with .bag files. Enables creation of and iteration through data set of images."
+        help="For use with .bag files. Enables creation of and iteration through data set of images.",
     )
     parser.add_argument(
         "-n",
@@ -295,19 +374,19 @@ if __name__ == "__main__":
         type=str,
         help="Name of new dataset if parsing bag as dataset. Defaults to new_set if not specified.",
     )
-    
+
     # module benchmark settings
     parser.add_argument(
         "-c",
         "--save_circles",
         action="store_true",
-        help="Save images with circles when the module is in frame."
+        help="Save images with circles when the module is in frame.",
     )
     parser.add_argument(
         "-e",
         "--save_centers",
         action="store_true",
-        help="Save images with centers when the module is in frame."
+        help="Save images with centers when the module is in frame.",
     )
 
     args = parser.parse_args()
@@ -320,4 +399,11 @@ if __name__ == "__main__":
     if not args.file_location:
         raise RuntimeError("No file location specified.")
 
-    run_bench(bench_name=args.bench_name, file_loc=args.file_location, dataset_bag=args.dataset_bag, quiet_output=args.quiet, save_circles=args.save_circles, save_centers=args.save_centers)
+    run_bench(
+        bench_name=args.bench_name,
+        file_loc=args.file_location,
+        dataset_bag=args.dataset_bag,
+        quiet_output=args.quiet,
+        save_circles=args.save_circles,
+        save_centers=args.save_centers,
+    )
