@@ -16,7 +16,7 @@ import cv2
 from vision.camera.bag_file import BagFile
 
 from vision.benchmarks.accuracy.bench_module import (
-    bench_module_accuracy,
+    BenchModuleAccuracy,
     AccuracyModule,
 )
 
@@ -53,7 +53,7 @@ def run_set(
     benchmark = 0  # benchmark function to run
     tester = 0  # benchmark class to run
     if bench_name == "module":
-        benchmark = bench_module_accuracy
+        benchmark = BenchModuleAccuracy(draw_circles=save_circles, draw_center=save_centers)
         tester = AccuracyModule()
         file_output.write(
             "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
@@ -112,16 +112,14 @@ def run_set(
                 # Run test if image read successfully
                 if not crash:  # image read successfully
                     start_exec_time = time.time()
-                    crash = benchmark(
+                    crash = benchmark.bench_accuracy(
                         folder=folder,
                         file_output=file_output,
                         tester=tester,
                         image=image,
                         depth=depth,
                         filename=file,
-                        draw_circles=save_circles,
-                        draw_centers=save_centers,
-                    )  # TODO: way to set args ahead of time. maybe in tester?
+                    )
                     end_time = time.time()
 
                     # calculate execution and total times
