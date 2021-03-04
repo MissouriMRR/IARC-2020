@@ -1,5 +1,5 @@
 """
-benchmarks/time __init__.
+benchmarks/accuracy __init__.
 """
 import __init__
 
@@ -15,7 +15,7 @@ try:
     modules = []
 
     for filename in os.listdir("vision/benchmarks/accuracy"):
-        if filename is "runall.py":
+        if filename == "runall.py":
             continue
 
         if filename[:5] != "bench" or filename[-3:] != ".py":
