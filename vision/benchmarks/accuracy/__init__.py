@@ -3,15 +3,18 @@ benchmarks/time __init__.
 """
 import __init__
 
-import sys
-import os
-sys.path.append(os.path.dirname(__file__))
+import os, sys
 
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+gggparent_dir = os.path.dirname(ggparent_dir)
+sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
 try:
     modules = []
 
-    for filename in os.listdir('accuracy'):
+    for filename in os.listdir('vision/benchmarks/accuracy'):
         if filename is 'runall.py':
             continue
 
