@@ -21,10 +21,11 @@ UPPER_RED = np.array([255, 255, 120])
 # Hold a treshold for the number of red pixels there should be in the image.
 RED_THRESHOLD = 50
 
-
-def detect_red(color_image, depth_image):
+def detect_red(color_image: np.ndarray, depth_image: np.ndarray) -> list:
     """
     Counts the number of red(ish) pixels in an image.
+
+    NOTE: No current plans to use in competition.
 
     Parameters
     ----------
