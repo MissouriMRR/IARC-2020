@@ -2,6 +2,7 @@
 For testing all module algorithms.
 """
 import os, sys, time
+from io import IOBase
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -181,8 +182,13 @@ class BenchModuleAccuracy:
         Whether to save an image with the center found by the getCenter function from the location class.
     """
     def __init__(self, draw_circles: bool = False, draw_center: bool = False):
+        self.OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
+        
         self.draw_circles = draw_circles
         self.draw_center = draw_center
+
+        if not os.path.isdir(self.OUTPUT_IMGS_DIR):
+            os.mkdir(self.OUTPUT_IMGS_DIR)
 
     def set_parameters(self, draw_circles: bool = False, draw_center: bool = False) -> None:
         """
@@ -206,15 +212,14 @@ class BenchModuleAccuracy:
     def bench_accuracy(
         self,
         folder: str,
-        file_output,
+        file_output: IOBase,
         tester: AccuracyModule,
         image: np.ndarray,
         depth: np.ndarray,
-        filename: str,
+        filename: str
     ) -> bool:
         """
-        Runs all module accuracy benchmarks on all images in a specified folder.
-        Outputs results to csv file
+        Runs all module accuracy benchmarks on an image. Outputs results to csv file.
 
         Parameters
         ----------
@@ -235,8 +240,6 @@ class BenchModuleAccuracy:
         -------
         bool - whether all tests were completed.
         """
-        OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
-
         crash = False  # Whether an algorithm crashed
 
         ## Run tests on the image ##
@@ -332,65 +335,7 @@ class BenchModuleAccuracy:
 
         # Saves image with circles and, if enabled, center
         if self.draw_circles or self.draw_center:
-            path = os.path.join(OUTPUT_IMGS_DIR, filename)
+            path = os.path.join(self.OUTPUT_IMGS_DIR, filename)
             tester.location.saveImage(file=path, draw_circles=self.draw_circles, draw_center= self.draw_center)
 
         return crash
-
-
-if __name__ == "__main__":
-    """
-    Runs bench_module_accuracy() to test all module accuracy benchmarks.
-    Defaults to IMG_FOLDER if no folder is specified.
-    Will only run on images that have an .npy extension associated depth image.
-
-    Command Line Arguments
-    -f, --folder {foldername}
-        folder in module folder to run accuracy benchmarks on.
-    -q, --quiet
-        produce no output while running
-    -c, --draw-centers
-        draw a red circle in the calculated centers of each image, stored in ./marked_images
-
-    """
-    import argparse
-
-    # handle argument parsing
-    parser = argparse.ArgumentParser(
-        description="To use a specific directory, use -f (folder)"
-    )
-    parser.add_argument(
-        "-q",
-        "--quiet",
-        action="store_true",
-        help="outputs no file information while running",
-    )
-    parser.add_argument(
-        "-f",
-        "--folder",
-        type=str,
-        help="folder name in the vision_images/module directory",
-    )
-    parser.add_argument(
-        "-s",
-        "--save-circles",
-        action="store_true",
-        help="creates a folder that saves images with circles of which the module is in frame",
-    )
-    parser.add_argument(
-        "-c",
-        "--save-centers",
-        action="store_true",
-        help="draws a red circle in the center for each image, stored in ./marked_images",
-    )
-    args = parser.parse_args()
-
-    # default folder
-    folder = IMG_FOLDER
-
-    # change folder if specified
-    if args.folder:
-        folder = args.folder
-
-    # run accuracy benchmarks
-    bench_module_accuracy(folder, args.quiet, args.save_circles, args.save_centers)

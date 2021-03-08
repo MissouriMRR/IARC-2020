@@ -119,3 +119,6 @@ venv.bak/
 
 # Spreadsheets
 *.csv
+
+# Vision Benchmark Ouputs
+results/*.txt

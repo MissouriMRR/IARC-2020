@@ -19,6 +19,8 @@ from vision.benchmarks.accuracy.bench_module import (
     BenchModuleAccuracy,
     AccuracyModule,
 )
+from vision.benchmarks.accuracy.bench_text import BenchTextAccuracy, AccuracyRussianWord
+from vision.benchmarks.accuracy.bench_obstacle import BenchObstacleAccuracy, AccuracyObstacle
 
 # .bag file constants
 SCREEN_WIDTH = 1920
@@ -28,8 +30,6 @@ REPEAT = False  # Whether to continously run through a .bag file test
 
 # benchmark constants
 OUTPUT_FILE = "results.csv"
-OUTPUT_IMGS_DIR = "marked_images"
-
 
 def run_set(
     bench_name: str,
@@ -59,11 +59,17 @@ def run_set(
             "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
         )
     elif bench_name == "obstacle":
-        pass
-    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
-        pass
+        benchmark = BenchObstacleAccuracy()
+        tester = AccuracyObstacle()
+        file_output.write("image,read color,read depth,find(),track(),exec time (s),total image time (s)\n")
+    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use, so benchmark not implemented
+        return
     elif bench_name == "text":
-        pass
+        benchmark = BenchTextAccuracy()
+        tester = AccuracyRussianWord()
+        file_output.write("image,read color,read depth,detect_russian_word(),exec time (s),total image time (s)\n")
+    else:
+        raise RuntimeError("Invalid benchmark")
 
     total_imgs = sum(".jpg" in s for s in os.listdir(folder))
     total_algorithms_time = 0  # total time to execute the algorithms
@@ -195,11 +201,13 @@ def run_bag_stream(
     if bench_name == "module":
         pass
     elif bench_name == "obstacle":
-        pass
+        return
     elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
-        pass
+        return
     elif bench_name == "text":
-        pass
+        return
+    else:
+        raise RuntimeError("Invalid benchmark")
     return
 
 
@@ -242,11 +250,13 @@ def run_bag_set(
     if bench_name == "module":
         pass
     elif bench_name == "obstacle":
-        pass
+        return
     elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
-        pass
+        return
     elif bench_name == "text":
-        pass
+        return
+    else:
+        raise RuntimeError("Invalid benchmark")
     return
 
 
@@ -281,10 +291,6 @@ def run_bench(
     f = open(
         OUTPUT_FILE, "w"
     )  # will overwrite existing file, backup previous results if needed
-
-    # Initialize marked image output folder
-    if not os.path.isdir(OUTPUT_IMGS_DIR):
-        os.mkdir(OUTPUT_IMGS_DIR)
 
     if file_loc[-4:] == ".bag":  # running on bag file
         if dataset_bag:
