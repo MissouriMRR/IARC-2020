@@ -397,7 +397,9 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def saveImage(self, file: str, draw_circles: bool = False, draw_center: bool = False) -> None:
+    def saveImage(
+        self, file: str, draw_circles: bool = False, draw_center: bool = False
+    ) -> None:
         """
         Saves image, with circles or center if desired, in folder circles.
 
@@ -419,7 +421,9 @@ class ModuleLocation:
         if draw_circles:
             for x, y, r in self.circles:
                 cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
-                cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                cv2.rectangle(
+                    circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1
+                )
 
         if draw_center:
             cv2.circle(

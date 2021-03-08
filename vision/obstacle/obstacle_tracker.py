@@ -111,7 +111,7 @@ class ObstacleTracker:
                     new_obstacles[i].frame_persisted = (
                         self.obstacles[i].frames_persisted + 1
                     )
-                    break # Found obstacle in old buffer, so don't need to check more obstacles
+                    break  # Found obstacle in old buffer, so don't need to check more obstacles
 
         # update buffer
         self.obstacles = new_obstacles

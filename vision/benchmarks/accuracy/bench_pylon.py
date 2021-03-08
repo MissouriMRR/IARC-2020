@@ -2,6 +2,7 @@
 Runs through images and determines which have the pylon
 """
 import os, sys
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -12,7 +13,8 @@ import numpy as np
 
 from vision.pylon.detect_pylon import detect_red
 
-IMG_FOLDER = 'pylon'
+IMG_FOLDER = "pylon"
+
 
 class AccuracyPylon:
     """
@@ -21,6 +23,7 @@ class AccuracyPylon:
     NOTE: No current plans to use pylon detector. Using GPS instead to know location of pylons.
           Any other functionality is covered by obstacle detection.
     """
+
     def accuracy_pylon(self, color_image: np.ndarray, depth_image: np.ndarray) -> list:
         """
         Measuring accuracy of detect red.

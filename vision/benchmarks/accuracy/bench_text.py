@@ -14,12 +14,14 @@ import numpy as np
 
 from text.detect_words import TextDetector
 
-IMG_FOLDER = 'text'
+IMG_FOLDER = "text"
+
 
 class AccuracyRussianWord:
     """
     Measuring accuracy of the text detector.
     """
+
     def __init__(self):
         self.setup()
 
@@ -33,7 +35,9 @@ class AccuracyRussianWord:
         """
         self.text_detector = TextDetector()
 
-    def accuracy_detector(self, color_image: np.ndarray, depth_image: np.ndarray) -> list:
+    def accuracy_detector(
+        self, color_image: np.ndarray, depth_image: np.ndarray
+    ) -> list:
         """
         Accuracy of detectRussianWord.
 
@@ -41,21 +45,29 @@ class AccuracyRussianWord:
         -------
         List[BoundingBox]
         """
-        return self.text_detector.detect_russian_word(color_image=color_image, depth_image=depth_image)
+        return self.text_detector.detect_russian_word(
+            color_image=color_image, depth_image=depth_image
+        )
+
 
 class BenchTextAccuracy:
     """
     Object for storing parameters of and running the text accuracy benchmark.
     """
+
     def __init__(self):
-        self.OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
-        self.OUTPUT_RESULTS_DIR = "results" # Folder to output resulting BoundingBoxes to
+        self.OUTPUT_IMGS_DIR = (
+            "marked_images"  # Folder to output saved images to if necessary
+        )
+        self.OUTPUT_RESULTS_DIR = (
+            "results"  # Folder to output resulting BoundingBoxes to
+        )
 
         if not os.path.isdir(self.OUTPUT_IMGS_DIR):
             os.mkdir(self.OUTPUT_IMGS_DIR)
         if not os.path.isdir(self.OUTPUT_RESULTS_DIR):
             os.mkdir(self.OUTPUT_RESULTS_DIR)
-    
+
     def set_parameters(self) -> None:
         """
         Sets the parameters for running the benchmark.
@@ -73,7 +85,7 @@ class BenchTextAccuracy:
         tester: AccuracyRussianWord,
         image: np.ndarray,
         depth: np.ndarray,
-        filename: str
+        filename: str,
     ) -> bool:
         """
         Runs all text detection accuracy benchmarks on an image. Outputs results to csv file.
@@ -118,5 +130,5 @@ class BenchTextAccuracy:
                 file_output.write("Crash")
                 crash = True
         file_output.write(",")
-        
+
         return crash

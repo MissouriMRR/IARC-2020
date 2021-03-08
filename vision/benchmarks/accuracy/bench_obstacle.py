@@ -18,12 +18,14 @@ from vision.common.import_params import import_params
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.obstacle.obstacle_tracker import Obstacle, ObstacleTracker
 
-IMG_FOLDER = 'obstacle'
+IMG_FOLDER = "obstacle"
+
 
 class AccuracyObstacle:
     """
     Measuring accuracy of obstacle detection.
     """
+
     def __init__(self):
         self.setup()
 
@@ -35,9 +37,9 @@ class AccuracyObstacle:
         -------
         None
         """
-        config_filename = os.path.join("vision", 'obstacle', 'config.json')
+        config_filename = os.path.join("vision", "obstacle", "config.json")
 
-        with open(config_filename, 'r') as config_file:
+        with open(config_filename, "r") as config_file:
             config = json.load(config_file)
 
         self.obstacle_finder = ObstacleFinder(params=import_params(config))
@@ -60,7 +62,7 @@ class AccuracyObstacle:
             A list of detected obstacles.
         """
         return self.obstacle_finder.find(color_image, depth_image)
-    
+
     def acuracy_track(self, new_obstacles: list) -> list:
         """
         Test accuracy of obstacle tracker.
@@ -78,19 +80,25 @@ class AccuracyObstacle:
         self.obstacle_tracker.update(new_obstacle_boxes=new_obstacles)
         return self.obstacle_tracker.getPersistentObstacles()
 
+
 class BenchObstacleAccuracy:
     """
     Object for storing parameters of and running the obstacle accuracy benchmark.
     """
+
     def __init__(self):
-        self.OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
-        self.OUTPUT_RESULTS_DIR = "results" # Folder to output resulting BoundingBoxes to
+        self.OUTPUT_IMGS_DIR = (
+            "marked_images"  # Folder to output saved images to if necessary
+        )
+        self.OUTPUT_RESULTS_DIR = (
+            "results"  # Folder to output resulting BoundingBoxes to
+        )
 
         if not os.path.isdir(self.OUTPUT_IMGS_DIR):
             os.mkdir(self.OUTPUT_IMGS_DIR)
         if not os.path.isdir(self.OUTPUT_RESULTS_DIR):
             os.mkdir(self.OUTPUT_RESULTS_DIR)
-    
+
     def set_parameters(self) -> None:
         """
         Sets the parameters for running the benchmark.
@@ -108,7 +116,7 @@ class BenchObstacleAccuracy:
         tester: AccuracyObstacle,
         image: np.ndarray,
         depth: np.ndarray,
-        filename: str
+        filename: str,
     ) -> bool:
         """
         Runs all obstacle accuracy benchmarks on an image. Outputs results to csv file.
@@ -133,7 +141,9 @@ class BenchObstacleAccuracy:
         bool - whether all tests were completed.
         """
         crash = False
-        output_bounding = open(os.path.join(self.OUTPUT_RESULTS_DIR, (filename[:-4] + ".txt")), "w")
+        output_bounding = open(
+            os.path.join(self.OUTPUT_RESULTS_DIR, (filename[:-4] + ".txt")), "w"
+        )
 
         ## Run tests on the image ##
 
@@ -142,13 +152,13 @@ class BenchObstacleAccuracy:
         if not crash:
             try:
                 bboxes = tester.accuracy_find(color_image=image, depth_image=depth)
-                
+
                 # output BoundingBoxes to text file
                 bbstr = [((b.__repr__()) + "\n") for b in bboxes]
                 bbstr = "".join(bbstr)
                 output_bounding.write(bbstr)
                 output_bounding.write("\n\n")
-                
+
                 file_output.write("Found")
 
             except:
@@ -158,10 +168,10 @@ class BenchObstacleAccuracy:
 
         # obstacle tracking
         if not crash:
-            #try:
+            # try:
 
             bboxes = tester.acuracy_track(new_obstacles=bboxes)
-            
+
             # output BoundingBoxes to text file
             bbstr = [((b.__repr__()) + "\n") for b in bboxes]
             bbstr = "".join(bbstr)
@@ -170,11 +180,11 @@ class BenchObstacleAccuracy:
 
             file_output.write("Found")
 
-            #except:
-             #   file_output.write("Crash")
-              #  crash = True
+            # except:
+            #   file_output.write("Crash")
+            #  crash = True
         file_output.write(",")
-        
+
         output_bounding.close()
 
         return crash

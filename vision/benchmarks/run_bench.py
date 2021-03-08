@@ -20,7 +20,10 @@ from vision.benchmarks.accuracy.bench_module import (
     AccuracyModule,
 )
 from vision.benchmarks.accuracy.bench_text import BenchTextAccuracy, AccuracyRussianWord
-from vision.benchmarks.accuracy.bench_obstacle import BenchObstacleAccuracy, AccuracyObstacle
+from vision.benchmarks.accuracy.bench_obstacle import (
+    BenchObstacleAccuracy,
+    AccuracyObstacle,
+)
 
 # .bag file constants
 SCREEN_WIDTH = 1920
@@ -30,6 +33,7 @@ REPEAT = False  # Whether to continously run through a .bag file test
 
 # benchmark constants
 OUTPUT_FILE = "results.csv"
+
 
 def run_set(
     bench_name: str,
@@ -53,7 +57,9 @@ def run_set(
     benchmark = 0  # benchmark function to run
     tester = 0  # benchmark class to run
     if bench_name == "module":
-        benchmark = BenchModuleAccuracy(draw_circles=save_circles, draw_center=save_centers)
+        benchmark = BenchModuleAccuracy(
+            draw_circles=save_circles, draw_center=save_centers
+        )
         tester = AccuracyModule()
         file_output.write(
             "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
@@ -61,13 +67,19 @@ def run_set(
     elif bench_name == "obstacle":
         benchmark = BenchObstacleAccuracy()
         tester = AccuracyObstacle()
-        file_output.write("image,read color,read depth,find(),track(),exec time (s),total image time (s)\n")
-    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use, so benchmark not implemented
+        file_output.write(
+            "image,read color,read depth,find(),track(),exec time (s),total image time (s)\n"
+        )
+    elif (
+        bench_name == "pylon"
+    ):  ## NOTE: pylon algorithm not in use, so benchmark not implemented
         return
     elif bench_name == "text":
         benchmark = BenchTextAccuracy()
         tester = AccuracyRussianWord()
-        file_output.write("image,read color,read depth,detect_russian_word(),exec time (s),total image time (s)\n")
+        file_output.write(
+            "image,read color,read depth,detect_russian_word(),exec time (s),total image time (s)\n"
+        )
     else:
         raise RuntimeError("Invalid benchmark")
 

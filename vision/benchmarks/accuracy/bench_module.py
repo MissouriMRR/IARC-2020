@@ -170,6 +170,7 @@ class AccuracyModule:
         """
         return get_module_roll(region)
 
+
 class BenchModuleAccuracy:
     """
     Object for storing parameters of and running the module accuracy benchmark.
@@ -181,19 +182,24 @@ class BenchModuleAccuracy:
     draw_centers: bool
         Whether to save an image with the center found by the getCenter function from the location class.
     """
+
     def __init__(self, draw_circles: bool = False, draw_center: bool = False):
-        self.OUTPUT_IMGS_DIR = "marked_images"  # Folder to output saved images to if necessary
-        
+        self.OUTPUT_IMGS_DIR = (
+            "marked_images"  # Folder to output saved images to if necessary
+        )
+
         self.draw_circles = draw_circles
         self.draw_center = draw_center
 
         if not os.path.isdir(self.OUTPUT_IMGS_DIR):
             os.mkdir(self.OUTPUT_IMGS_DIR)
 
-    def set_parameters(self, draw_circles: bool = False, draw_center: bool = False) -> None:
+    def set_parameters(
+        self, draw_circles: bool = False, draw_center: bool = False
+    ) -> None:
         """
         Sets the parameters for running the benchmark.
-        
+
         Parameters
         ----------
         draw_circles: bool
@@ -216,7 +222,7 @@ class BenchModuleAccuracy:
         tester: AccuracyModule,
         image: np.ndarray,
         depth: np.ndarray,
-        filename: str
+        filename: str,
     ) -> bool:
         """
         Runs all module accuracy benchmarks on an image. Outputs results to csv file.
@@ -308,7 +314,9 @@ class BenchModuleAccuracy:
         bounds = np.ndarray([])
         if depth_val != 0 and not crash:
             try:
-                bounds = tester.accuracy_getModuleBounds((1920, 1080), center, depth_val)
+                bounds = tester.accuracy_getModuleBounds(
+                    (1920, 1080), center, depth_val
+                )
                 file_output.write("Found")
             except:
                 file_output.write("Crash")
@@ -336,6 +344,8 @@ class BenchModuleAccuracy:
         # Saves image with circles and, if enabled, center
         if self.draw_circles or self.draw_center:
             path = os.path.join(self.OUTPUT_IMGS_DIR, filename)
-            tester.location.saveImage(file=path, draw_circles=self.draw_circles, draw_center= self.draw_center)
+            tester.location.saveImage(
+                file=path, draw_circles=self.draw_circles, draw_center=self.draw_center
+            )
 
         return crash
