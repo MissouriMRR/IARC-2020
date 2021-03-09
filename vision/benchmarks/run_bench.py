@@ -3,6 +3,7 @@ Run a benchmark on a specified image folder or bag file.
 """
 
 import os, sys, time
+from io import IOBase
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -38,10 +39,11 @@ OUTPUT_FILE = "results.csv"
 def run_set(
     bench_name: str,
     folder: str,
-    file_output,
+    file_output: IOBase,
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
+    plot_boxes: bool = False
 ) -> None:
     """
     Run a dataset of color and depth images through a benchmark.
@@ -52,6 +54,16 @@ def run_set(
         The name of the benchmark to run
     folder: str
         The directory of the dataset.
+    file_output: IOBase 
+        File output stream for results.
+    quiet_output: bool
+        Whether to silence terminal output.
+    save_circles: bool
+        For module benchmark. Whether to save images with circles plotted.
+    save_centers: bool
+        For module benchmark. Whether to save images with center plotted.
+    plot_boxes: bool
+        For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
     """
 
     benchmark = 0  # benchmark function to run
@@ -65,7 +77,7 @@ def run_set(
             "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
         )
     elif bench_name == "obstacle":
-        benchmark = BenchObstacleAccuracy()
+        benchmark = BenchObstacleAccuracy(plot_obs=plot_boxes)
         tester = AccuracyObstacle()
         file_output.write(
             "image,read color,read depth,find(),track(),exec time (s),total image time (s)\n"
@@ -75,7 +87,7 @@ def run_set(
     ):  ## NOTE: pylon algorithm not in use, so benchmark not implemented
         return
     elif bench_name == "text":
-        benchmark = BenchTextAccuracy()
+        benchmark = BenchTextAccuracy(plot_text=plot_boxes)
         tester = AccuracyRussianWord()
         file_output.write(
             "image,read color,read depth,detect_russian_word(),exec time (s),total image time (s)\n"
@@ -188,10 +200,11 @@ def run_bag_stream(
     self,
     bench_name: str,
     filename: str,
-    file_output,
+    file_output: IOBase,
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
+    plot_boxes: bool = False
 ) -> None:
     """
     Run the .bag file in "real time" through a benchmark.
@@ -203,6 +216,16 @@ def run_bag_stream(
     ----------
     bench_name: str
         The name of the benchmark to run.
+    file_output: IOBase 
+        File output stream for results.
+    quiet_output: bool
+        Whether to silence terminal output.
+    save_circles: bool
+        For module benchmark. Whether to save images with circles plotted.
+    save_centers: bool
+        For module benchmark. Whether to save images with center plotted.
+    plot_boxes: bool
+        For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
 
     Returns
     -------
@@ -227,11 +250,12 @@ def run_bag_set(
     self,
     bench_name: str,
     filename: str,
-    file_output,
+    file_output: IOBase,
     folder_name: str = "new_set",
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
+    plot_boxes: bool = False
 ) -> None:
     """
     Saves bag file as dataset of images before sending dataset to specified benchmark.
@@ -245,8 +269,18 @@ def run_bag_set(
         The name of the benchmark to run.
     filename: str
         The name of the .bag file.
+    file_output: IOBase 
+        File output stream for results.
     folder_name: str
         The folder to save the new dataset to, relative to vision_images.
+    quiet_output: bool
+        Whether to silence terminal output.
+    save_circles: bool
+        For module benchmark. Whether to save images with circles plotted.
+    save_centers: bool
+        For module benchmark. Whether to save images with center plotted.
+    plot_boxes: bool
+        For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
 
     Returns
     -------
@@ -280,6 +314,7 @@ def run_bench(
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
+    plot_boxes: bool = False
 ) -> None:
     """
     Runs the specified benchmark on an image folder or bag file.
@@ -292,7 +327,16 @@ def run_bench(
         The directory of the image folder or bag file to run the benchmark on.
     dataset_bag: bool
         For .bag files. Whether to create and iterate through data set of images.
-    TODO: Update documentation
+    folder_name: str
+        For .bag files as dataset. Name of folder to save new dataset in. Relative to vision_images
+    quiet_output: bool
+        Whether to silence terminal output.
+    save_circles: bool
+        For module benchmark. Whether to save images with circles plotted.
+    save_centers: bool
+        For module benchmark. Whether to save images with center plotted.
+    plot_boxes: bool
+        For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
 
     Returns
     -------
@@ -305,7 +349,7 @@ def run_bench(
     )  # will overwrite existing file, backup previous results if needed
 
     if file_loc[-4:] == ".bag":  # running on bag file
-        if dataset_bag:
+        if dataset_bag: # run as dataset of images
             run_bag_set(
                 bench_name=bench_name,
                 filename=file_loc,
@@ -314,8 +358,9 @@ def run_bench(
                 quiet_output=quiet_output,
                 save_circles=save_circles,
                 save_centers=save_centers,
+                plot_boxes= plot_boxes
             )
-        else:
+        else: # run as image stream
             run_bag_stream(
                 bench_name=bench_name,
                 filename=file_loc,
@@ -323,6 +368,7 @@ def run_bench(
                 quiet_output=quiet_output,
                 save_circles=save_circles,
                 save_centers=save_centers,
+                plot_boxes= plot_boxes
             )
 
     else:  # running on image directory
@@ -333,6 +379,7 @@ def run_bench(
             quiet_output=quiet_output,
             save_circles=save_circles,
             save_centers=save_centers,
+            plot_boxes= plot_boxes
         )
 
     f.close()
@@ -344,10 +391,22 @@ if __name__ == "__main__":
     Run a specified benchmark on a dataset or .bag file.
 
     Command Line Arguments
+    -b, --bench_name {benchmark_name}
+        Required. Name of benchmark to run.
     -f, --folder {foldername}
-        folder in module folder to run accuracy benchmarks on.
+        Required. Folder to run accuracy benchmarks on.
     -q, --quiet
         produce no output while running
+    -d, --dataset_bag
+        For use with .bag files. Enables creation of and iteration through data set of images.
+    -n, --dataset_name {name}
+        Name of new dataset if parsing bag as dataset. Defaults to new_set if not specified.
+    -c, --save_circles
+        Save images with circles when the module is in frame.
+    -e, --save_centers
+        Save images with centers when the module is in frame.
+    -p, --plot_boxes
+        Save images with bounding boxes plotted (for obstacles or text).
     """
     import argparse
 
@@ -405,6 +464,14 @@ if __name__ == "__main__":
         help="Save images with centers when the module is in frame.",
     )
 
+    # Text and Obstacle benchmark settings
+    parser.add_argument(
+        "-p",
+        "--plot_boxes",
+        action="store_true",
+        help="Save images with bounding boxes plotted (for obstacles or text).",
+    )
+
     args = parser.parse_args()
 
     # no benchmark name specified, cannot continue
@@ -422,4 +489,5 @@ if __name__ == "__main__":
         quiet_output=args.quiet,
         save_circles=args.save_circles,
         save_centers=args.save_centers,
+        plot_boxes=args.plot_boxes
     )

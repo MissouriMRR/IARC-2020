@@ -53,9 +53,14 @@ class AccuracyRussianWord:
 class BenchTextAccuracy:
     """
     Object for storing parameters of and running the text accuracy benchmark.
+
+    Parameters
+    ----------
+    plot_text: bool
+        Whether to plot the text on the image and save.
     """
 
-    def __init__(self):
+    def __init__(self, plot_text: bool = False):
         self.OUTPUT_IMGS_DIR = (
             "marked_images"  # Folder to output saved images to if necessary
         )
@@ -63,19 +68,27 @@ class BenchTextAccuracy:
             "results"  # Folder to output resulting BoundingBoxes to
         )
 
+        self.plot_text = plot_text
+
         if not os.path.isdir(self.OUTPUT_IMGS_DIR):
             os.mkdir(self.OUTPUT_IMGS_DIR)
         if not os.path.isdir(self.OUTPUT_RESULTS_DIR):
             os.mkdir(self.OUTPUT_RESULTS_DIR)
 
-    def set_parameters(self) -> None:
+    def set_parameters(self, plot_text: bool = False) -> None:
         """
         Sets the parameters for running the benchmark.
+
+        Parameters
+        ----------
+        plot_text: bool
+            Whether to plot the text on the image and save.
 
         Returns
         -------
         None
         """
+        self.plot_text = plot_text
         return
 
     def bench_accuracy(
@@ -130,5 +143,8 @@ class BenchTextAccuracy:
                 file_output.write("Crash")
                 crash = True
         file_output.write(",")
+
+        if not crash and self.plot_text:
+            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_text, path=os.path.join(self.OUTPUT_FIND_DIR, filename))
 
         return crash

@@ -14,6 +14,7 @@ import json
 import numpy as np
 
 from vision.common.import_params import import_params
+from vision.common.box_plotter import plot_box
 
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.obstacle.obstacle_tracker import Obstacle, ObstacleTracker
@@ -84,22 +85,35 @@ class AccuracyObstacle:
 class BenchObstacleAccuracy:
     """
     Object for storing parameters of and running the obstacle accuracy benchmark.
+
+    Parameters
+    ----------
+    plot_obs: bool
+        Whether to plot obstacles on the image and save.
     """
 
-    def __init__(self):
+    def __init__(self, plot_obs: bool = False):
         self.OUTPUT_IMGS_DIR = (
             "marked_images"  # Folder to output saved images to if necessary
         )
         self.OUTPUT_RESULTS_DIR = (
             "results"  # Folder to output resulting BoundingBoxes to
         )
+        self.OUTPUT_FIND_DIR = os.path.join(self.OUTPUT_IMGS_DIR, "find")
+        self.OUTPUT_TRACK_DIR = os.path.join(self.OUTPUT_IMGS_DIR, "track")
+
+        self.plot_obs = plot_obs
 
         if not os.path.isdir(self.OUTPUT_IMGS_DIR):
             os.mkdir(self.OUTPUT_IMGS_DIR)
         if not os.path.isdir(self.OUTPUT_RESULTS_DIR):
             os.mkdir(self.OUTPUT_RESULTS_DIR)
+        if not os.path.isdir(self.OUTPUT_FIND_DIR):
+            os.mkdir(self.OUTPUT_FIND_DIR)
+        if not os.path.isdir(self.OUTPUT_TRACK_DIR):
+            os.mkdir(self.OUTPUT_TRACK_DIR)
 
-    def set_parameters(self) -> None:
+    def set_parameters(self, plot_obs: bool = False) -> None:
         """
         Sets the parameters for running the benchmark.
 
@@ -107,6 +121,7 @@ class BenchObstacleAccuracy:
         -------
         None
         """
+        self.plot_obs = plot_obs
         return
 
     def bench_accuracy(
@@ -166,24 +181,28 @@ class BenchObstacleAccuracy:
                 crash = True
         file_output.write(",")
 
+        if not crash and self.plot_obs:
+            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_obs, path=os.path.join(self.OUTPUT_FIND_DIR, filename))
+
         # obstacle tracking
         if not crash:
-            # try:
+            try:
+                bboxes = tester.acuracy_track(new_obstacles=bboxes)
 
-            bboxes = tester.acuracy_track(new_obstacles=bboxes)
+                # output BoundingBoxes to text file
+                bbstr = [((b.__repr__()) + "\n") for b in bboxes]
+                bbstr = "".join(bbstr)
+                output_bounding.write(bbstr)
+                output_bounding.write("\n\n")
 
-            # output BoundingBoxes to text file
-            bbstr = [((b.__repr__()) + "\n") for b in bboxes]
-            bbstr = "".join(bbstr)
-            output_bounding.write(bbstr)
-            output_bounding.write("\n\n")
-
-            file_output.write("Found")
-
-            # except:
-            #   file_output.write("Crash")
-            #  crash = True
+                file_output.write("Found")
+            except:
+                file_output.write("Crash")
+                crash = True
         file_output.write(",")
+
+        if not crash and self.plot_obs:
+            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_obs, path=os.path.join(self.OUTPUT_TRACK_DIR, filename))
 
         output_bounding.close()
 

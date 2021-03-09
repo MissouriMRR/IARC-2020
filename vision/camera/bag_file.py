@@ -181,6 +181,52 @@ class BagFile(Camera):
 
 
 if __name__ == "__main__":
-    import sys
+    """
+    Tool for viewing bag files or saving bag files as a dataset of images.
 
-    BagFile(720, 1080, 0, sys.argv[1], True).display_in_window()
+    Command Line Arguments
+    -f, --file_location {location}
+        Required. Bag file to use.
+    -n, --no_repeat
+        Don't repeat iteration through file.
+    
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Must specify file location."
+    )
+
+    parser.add_argument(
+        "-f",
+        "--file_location",
+        type=str,
+        help="Location of the .bag file to run. Required Argument.",
+    )
+    parser.add_argument(
+        "-n",
+        "--no_repeat",
+        action="store_true",
+        help="Don't repeat iteration through file.",
+    )
+    parser.add_argument(
+        "-s",
+        "--save_set",
+        action="store_true",
+        help="Save as dataset instead of viewing in window",
+    )
+
+    args = parser.parse_args()
+
+    # no file location specified, cannot continue
+    if not args.file_location:
+        raise RuntimeError("No file location specified.")
+
+    repeat = not args.no_repeat
+    if args.save_set:
+        repeat = False
+
+    if not args.save_set:
+        BagFile(screen_width=720, screen_height=1080, frame_rate=0, filename=args.file_location, repeat=repeat).display_in_window()
+    else:
+        BagFile(screen_width=720, screen_height=1080, frame_rate=0, filename=args.file_location, repeat=repeat).save_as_img()
