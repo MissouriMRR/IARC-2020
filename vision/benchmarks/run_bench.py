@@ -66,7 +66,7 @@ def run_set(
         For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
     """
 
-    benchmark = 0  # benchmark function to run
+    benchmark = 0  # benchmark runner
     tester = 0  # benchmark class to run
     if bench_name == "module":
         benchmark = BenchModuleAccuracy(
@@ -106,7 +106,6 @@ def run_set(
             if file.endswith(".jpg"):
                 file_counter += 1  # Track the number of images processed
                 crash = False  # Whether reading in the file crashed
-                exec_time = 0.0
 
                 # Attempt to read the file
                 filename = os.path.join(root, file)
@@ -143,7 +142,6 @@ def run_set(
                 if not crash:  # image read successfully
                     start_exec_time = time.time()
                     crash = benchmark.bench_accuracy(
-                        folder=folder,
                         file_output=file_output,
                         tester=tester,
                         image=image,
@@ -197,14 +195,14 @@ def run_set(
 
 
 def run_bag_stream(
-    self,
     bench_name: str,
     filename: str,
     file_output: IOBase,
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
-    plot_boxes: bool = False
+    plot_boxes: bool = False,
+    save_frames: bool = True
 ) -> None:
     """
     Run the .bag file in "real time" through a benchmark.
@@ -226,28 +224,107 @@ def run_bag_stream(
         For module benchmark. Whether to save images with center plotted.
     plot_boxes: bool
         For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
+    save_frames: bool
+        Whether or not to save frames pulled from the bag file during benchmark.
+        NOTE: Saving frames takes time and will thus result in less frames being pulled from the .bag file.
 
     Returns
     -------
     None
     """
-    stream = BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT)
+    SAVED_FRAMES_DIR = "saved_frames"
+    if not os.path.isdir(SAVED_FRAMES_DIR):
+        os.mkdir(SAVED_FRAMES_DIR)
 
+    benchmark = 0  # benchmark runner
+    tester = 0  # benchmark class to run
     if bench_name == "module":
-        pass
+        benchmark = BenchModuleAccuracy(
+            draw_circles=save_circles, draw_center=save_centers
+        )
+        tester = AccuracyModule()
+        file_output.write(
+            "image,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
+        )
     elif bench_name == "obstacle":
-        return
-    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
+        benchmark = BenchObstacleAccuracy(plot_obs=plot_boxes)
+        tester = AccuracyObstacle()
+        file_output.write(
+            "image,find(),track(),exec time (s)\n"
+        )
+    elif (
+        bench_name == "pylon"
+    ):  ## NOTE: pylon algorithm not in use, so benchmark not implemented
         return
     elif bench_name == "text":
-        return
+        benchmark = BenchTextAccuracy(plot_text=plot_boxes)
+        tester = AccuracyRussianWord()
+        file_output.write(
+            "image,detect_russian_word(),exec time (s)\n"
+        )
     else:
         raise RuntimeError("Invalid benchmark")
+
+    total_time = 0  # total time to execute algorithms
+    file_counter = 0
+
+    # Initialize stream from bag file
+    stream = BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT)
+
+    # Iterate through the stream
+    for depth, image in stream:
+        file = str(time.time()) + ".jpg"
+        file_counter += 1  # Track the number of images processed
+        crash = False  # Whether reading in the file crashed
+
+        # Run test on frame
+        start_exec_time = time.time() ## NOTE: if save_frames is true, time to save the frame is included in timing
+
+        if save_frames:
+            cv2.imwrite(os.path.join(SAVED_FRAMES_DIR, file), image)
+
+        crash = benchmark.bench_accuracy(
+            file_output=file_output,
+            tester=tester,
+            image=image,
+            depth=depth,
+            filename=file,
+        )
+        end_time = time.time()
+
+        # calculate execution and total times
+        algorithms_time = (
+            end_time - start_exec_time
+        )  # time to execute algorithms
+        file_output.write(str(algorithms_time))
+        total_time += algorithms_time
+
+        file_output.write("\n")
+
+        # std output of file processing
+        if not quiet_output:
+            print(
+                "FRAME (" + str(file_counter) + "):",
+                file,
+                "TIME:",
+                "{:.3f}".format(algorithms_time),
+                "CRASH:",
+                crash,
+            )
+
+    # Add timing results to output file
+    avg_time = total_time / file_counter
+    file_output.write("\n\nAvg Time (s): " + str(avg_time) + "\n")
+    file_output.write("Total Time (s): " + str(total_time) + "\n")
+
+    if not quiet_output:
+        print("\n\nAvg Time (s): " + str(avg_time))
+        print("Total Time (s): " + str(total_time))
+
     return
 
 
 def run_bag_set(
-    self,
     bench_name: str,
     filename: str,
     file_output: IOBase,
@@ -287,22 +364,24 @@ def run_bag_set(
     None
     """
     REPEAT = False  # Whether to continously run through the bag file (True will cause infinite image generation)
+    IMAGE_FOLDER = os.path.join("vision", "vision_images", folder_name)
+
+    if not quiet_output:
+        print("CREATING DATASET")
+    
+    if not os.path.isdir(IMAGE_FOLDER):
+        os.mkdir(IMAGE_FOLDER)
 
     # Create the data set from the bag file.
     BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT).save_as_img(
-        folder_name
+        IMAGE_FOLDER
     )
 
-    if bench_name == "module":
-        pass
-    elif bench_name == "obstacle":
-        return
-    elif bench_name == "pylon":  ## NOTE: pylon algorithm not in use
-        return
-    elif bench_name == "text":
-        return
-    else:
-        raise RuntimeError("Invalid benchmark")
+    if not quiet_output:
+        print("DATASET CREATED")
+
+    run_set(bench_name=bench_name, folder=IMAGE_FOLDER, file_output=file_output, quiet_output=quiet_output, save_circles=save_circles, save_centers=save_centers, plot_boxes=plot_boxes)
+    
     return
 
 
@@ -314,7 +393,8 @@ def run_bench(
     quiet_output: bool = False,
     save_circles: bool = False,
     save_centers: bool = False,
-    plot_boxes: bool = False
+    plot_boxes: bool = False,
+    save_frames: bool = True
 ) -> None:
     """
     Runs the specified benchmark on an image folder or bag file.
@@ -337,6 +417,8 @@ def run_bench(
         For module benchmark. Whether to save images with center plotted.
     plot_boxes: bool
         For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
+    save_frames: bool
+        For .bag files as stream. Whether or not to save frames pulled from the bag file during benchmark.
 
     Returns
     -------
@@ -368,7 +450,8 @@ def run_bench(
                 quiet_output=quiet_output,
                 save_circles=save_circles,
                 save_centers=save_centers,
-                plot_boxes= plot_boxes
+                plot_boxes= plot_boxes,
+                save_frames=save_frames
             )
 
     else:  # running on image directory
@@ -407,6 +490,8 @@ if __name__ == "__main__":
         Save images with centers when the module is in frame.
     -p, --plot_boxes
         Save images with bounding boxes plotted (for obstacles or text).
+    -s, --skip_save_frame
+        For use with .bag files as streams. Disables saving frames pulled from video.
     """
     import argparse
 
@@ -449,6 +534,12 @@ if __name__ == "__main__":
         type=str,
         help="Name of new dataset if parsing bag as dataset. Defaults to new_set if not specified.",
     )
+    parser.add_argument(
+        "-s",
+        "--skip_save_frame",
+        action="store_true",
+        help="For use with .bag files as streams. Disables saving frames pulled from video.",
+    )
 
     # module benchmark settings
     parser.add_argument(
@@ -482,12 +573,19 @@ if __name__ == "__main__":
     if not args.file_location:
         raise RuntimeError("No file location specified.")
 
+    folder_name = "new_set"
+    if args.dataset_name:
+        folder_name = args.dataset_name
+    save_frames = not args.skip_save_frame
+
     run_bench(
         bench_name=args.bench_name,
         file_loc=args.file_location,
         dataset_bag=args.dataset_bag,
+        folder_name=folder_name,
         quiet_output=args.quiet,
         save_circles=args.save_circles,
         save_centers=args.save_centers,
-        plot_boxes=args.plot_boxes
+        plot_boxes=args.plot_boxes,
+        save_frames=save_frames
     )

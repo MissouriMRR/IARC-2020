@@ -217,7 +217,6 @@ class BenchModuleAccuracy:
 
     def bench_accuracy(
         self,
-        folder: str,
         file_output: IOBase,
         tester: AccuracyModule,
         image: np.ndarray,
@@ -229,8 +228,6 @@ class BenchModuleAccuracy:
 
         Parameters
         ----------
-        folder: str
-            The folder of images to test.
         file_output: IO
             File stream to output results to.
         tester: AccuracyModule

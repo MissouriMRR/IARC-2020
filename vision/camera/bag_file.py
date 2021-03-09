@@ -164,13 +164,13 @@ class BagFile(Camera):
         Paramters
         ---------
         folder_name: str
-            The name of the folder in vision_images to save the frames to.
+            The name of the folder to save the frames to.
 
         Returns
         -------
         None.
         """
-        DIRECTORY = os.path.join("vision", "vision_images", folder_name)
+        DIRECTORY = os.path.join(folder_name)
         if not os.path.isdir(DIRECTORY):
             os.mkdir(DIRECTORY)
 

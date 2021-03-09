@@ -93,7 +93,6 @@ class BenchTextAccuracy:
 
     def bench_accuracy(
         self,
-        folder: str,
         file_output: IOBase,
         tester: AccuracyRussianWord,
         image: np.ndarray,
@@ -105,8 +104,6 @@ class BenchTextAccuracy:
 
         Parameters
         ----------
-        folder: str
-            The folder of images to test.
         file_output: IO
             File stream to output results to.
         tester: AccuracyRussianWord

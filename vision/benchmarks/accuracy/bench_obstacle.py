@@ -126,7 +126,6 @@ class BenchObstacleAccuracy:
 
     def bench_accuracy(
         self,
-        folder: str,
         file_output: IOBase,
         tester: AccuracyObstacle,
         image: np.ndarray,
@@ -138,8 +137,6 @@ class BenchObstacleAccuracy:
 
         Parameters
         ----------
-        folder: str
-            The folder of images to test.
         file_output: IO
             File stream to output results to.
         tester: AccuracyObstacle
@@ -201,7 +198,7 @@ class BenchObstacleAccuracy:
                 crash = True
         file_output.write(",")
 
-        if not crash and self.plot_obs:
+        if not crash and self.plot_obs and (bboxes != []):
             plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_obs, path=os.path.join(self.OUTPUT_TRACK_DIR, filename))
 
         output_bounding.close()
