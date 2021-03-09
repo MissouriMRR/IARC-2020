@@ -109,7 +109,7 @@ class ObstacleTracker:
                     new_obstacles[i], self.obstacles[j]
                 ):  # if new obj is within MVMT_TOLERANCE of old obj
                     new_obstacles[i].frame_persisted = (
-                        self.obstacles[i].frames_persisted + 1
+                        self.obstacles[j].frames_persisted + 1
                     )
                     break  # Found obstacle in old buffer, so don't need to check more obstacles
 
