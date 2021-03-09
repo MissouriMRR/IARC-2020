@@ -179,7 +179,13 @@ class BenchObstacleAccuracy:
         file_output.write(",")
 
         if not crash and self.plot_obs:
-            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_obs, path=os.path.join(self.OUTPUT_FIND_DIR, filename))
+            plot_box(
+                boxes=bboxes,
+                image=image,
+                waittime=0,
+                saveImg=self.plot_obs,
+                path=os.path.join(self.OUTPUT_FIND_DIR, filename),
+            )
 
         # obstacle tracking
         if not crash:
@@ -199,7 +205,13 @@ class BenchObstacleAccuracy:
         file_output.write(",")
 
         if not crash and self.plot_obs and (bboxes != []):
-            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_obs, path=os.path.join(self.OUTPUT_TRACK_DIR, filename))
+            plot_box(
+                boxes=bboxes,
+                image=image,
+                waittime=0,
+                saveImg=self.plot_obs,
+                path=os.path.join(self.OUTPUT_TRACK_DIR, filename),
+            )
 
         output_bounding.close()
 

@@ -9,7 +9,13 @@ BBOX_COLOR = (0, 255, 0)
 BBOX_THICKNESS = 2
 
 
-def plot_box(boxes: list, image: np.ndarray, waittime: int = 0, saveImg: bool = False, path: str = "plot_imgs") -> None:
+def plot_box(
+    boxes: list,
+    image: np.ndarray,
+    waittime: int = 0,
+    saveImg: bool = False,
+    path: str = "plot_imgs",
+) -> None:
     """
     Display BoundingBoxes on image.
 
@@ -29,13 +35,15 @@ def plot_box(boxes: list, image: np.ndarray, waittime: int = 0, saveImg: bool = 
     if not isinstance(boxes, list):
         raise ValueError(f"Expected list of BoundingBox, got {type(boxes)} instead")
     if not isinstance(image, np.ndarray):
-        raise ValueError(f"Expected argument of type ObstacleFinder, got {type(image)} instead")
+        raise ValueError(
+            f"Expected argument of type ObstacleFinder, got {type(image)} instead"
+        )
 
     output = np.copy(image)  # Important so dont have to copy before passing here
     for bbox in boxes:
         if not bbox.vertices:
             continue
-        #print(bbox.vertices)
+        # print(bbox.vertices)
         X, Y = [], []
         for pair in bbox.vertices:
             x, y = pair[0], pair[1]
@@ -45,10 +53,12 @@ def plot_box(boxes: list, image: np.ndarray, waittime: int = 0, saveImg: bool = 
             X.append(x)
             Y.append(y)
 
-        cv2.rectangle(output, (min(X), min(Y)), (max(X), max(Y)), BBOX_COLOR, BBOX_THICKNESS)
-        
-        #print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
-        #output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        cv2.rectangle(
+            output, (min(X), min(Y)), (max(X), max(Y)), BBOX_COLOR, BBOX_THICKNESS
+        )
+
+        # print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+        # output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     if not saveImg:
         cv2.imshow("Obstacles", output)

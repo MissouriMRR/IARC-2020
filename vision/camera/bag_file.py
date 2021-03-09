@@ -189,13 +189,11 @@ if __name__ == "__main__":
         Required. Bag file to use.
     -n, --no_repeat
         Don't repeat iteration through file.
-    
+
     """
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Must specify file location."
-    )
+    parser = argparse.ArgumentParser(description="Must specify file location.")
 
     parser.add_argument(
         "-f",
@@ -227,6 +225,18 @@ if __name__ == "__main__":
         repeat = False
 
     if not args.save_set:
-        BagFile(screen_width=720, screen_height=1080, frame_rate=0, filename=args.file_location, repeat=repeat).display_in_window()
+        BagFile(
+            screen_width=720,
+            screen_height=1080,
+            frame_rate=0,
+            filename=args.file_location,
+            repeat=repeat,
+        ).display_in_window()
     else:
-        BagFile(screen_width=720, screen_height=1080, frame_rate=0, filename=args.file_location, repeat=repeat).save_as_img()
+        BagFile(
+            screen_width=720,
+            screen_height=1080,
+            frame_rate=0,
+            filename=args.file_location,
+            repeat=repeat,
+        ).save_as_img()

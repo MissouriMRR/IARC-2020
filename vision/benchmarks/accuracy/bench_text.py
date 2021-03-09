@@ -142,6 +142,12 @@ class BenchTextAccuracy:
         file_output.write(",")
 
         if not crash and self.plot_text:
-            plot_box(boxes=bboxes, image=image, waittime=0, saveImg=self.plot_text, path=os.path.join(self.OUTPUT_FIND_DIR, filename))
+            plot_box(
+                boxes=bboxes,
+                image=image,
+                waittime=0,
+                saveImg=self.plot_text,
+                path=os.path.join(self.OUTPUT_FIND_DIR, filename),
+            )
 
         return crash
