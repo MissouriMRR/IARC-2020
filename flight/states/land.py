@@ -30,8 +30,8 @@ class Land(State):
             sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
         )
 
-        await asyncio.sleep(config.THINK_FOR_S)
-        await mover.move_to(drone, config.takeoff_pos, False, 2)
+        # await asyncio.sleep(config.THINK_FOR_S)
+        await mover.move_to(drone, config.takeoff_pos, config.OFFSET_BACK, 2)
         await asyncio.sleep(config.THINK_FOR_S)
         logging.info("Preparing to land")
         await mover.manual_land(drone)

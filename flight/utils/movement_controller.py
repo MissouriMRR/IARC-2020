@@ -16,7 +16,7 @@ class MovementController:
     """
 
     async def move_to(
-        self, drone: System, pylon: LatLon, offset: bool, fly_at: int
+        self, drone: System, pylon: LatLon, offset: {float, int}, fly_at: int
     ) -> bool:
         """
         Function to calculate movement velocity:
@@ -52,23 +52,15 @@ class MovementController:
 
             # Only for first run through loop
             if count == 0:
-                if offset:
-                    # How many degrees we need to turn in order to look at the pylon
-                    # Think of a unit circle
-                    deg_to_pylon: float = current.heading_initial(pylon)
-                    # Creating a new position we need to go to
-                    # Distance to the offset point from the pylon
-                    offset_point: float = pylon.offset(
-                        deg_to_pylon + config.DEG_OFFSET, config.OFFSET
-                    )
-                    logging.debug(
-                        offset_point.to_string("d% %m% %S% %H")
-                    )  # you are here
-                else:
-                    offset_point: float = pylon
-                    logging.debug(
-                        offset_point.to_string("d% %m% %S% %H")
-                    )  # you are here
+                # How many degrees we need to turn in order to look at the pylon
+                # Think of a unit circle
+                deg_to_pylon: float = current.heading_initial(pylon)
+                # Creating a new position we need to go to
+                # Distance to the offset point from the pylon
+                offset_point: float = pylon.offset(
+                    deg_to_pylon + offset["DEG"], offset["KM"]
+                )
+                logging.debug(offset_point.to_string("d% %m% %S% %H"))  # you are here
             # distance we have to go in order to get to the offset point
             dist: float = current.distance(offset_point)
             # degrees needed to change to get to offset position
@@ -83,16 +75,20 @@ class MovementController:
                 reference_x: float = abs(x)
                 reference_y: float = abs(y)
 
-            dx: float = math.copysign(
-                config.MAX_SPEED
-                * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                x,
-            )
-            dy: float = math.copysign(
-                config.MAX_SPEED
-                * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
-                y,
-            )
+            try:
+                dx = math.copysign(config.MAX_SPEED * math.cos(math.atan(y / x)), x)
+                dy = math.copysign(config.MAX_SPEED * math.sin(math.atan(y / x)), y)
+            except:
+                dx: float = math.copysign(
+                    config.MAX_SPEED
+                    * math.cos(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    x,
+                )
+                dy: float = math.copysign(
+                    config.MAX_SPEED
+                    * math.sin(math.asin(y / (math.sqrt((x ** 2) + (y ** 2))))),
+                    y,
+                )
             # continuously update information on the drone's location
             # and update the velocity of the drone
             await drone.offboard.set_velocity_ned(
@@ -102,8 +98,8 @@ class MovementController:
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
             if (
-                abs(x) <= 1  # reference_x * config.POINT_PERCENT_ACCURACY
-                and abs(y) <= 1  # reference_y * config.POINT_PERCENT_ACCURACY
+                abs(x) <= 0.25  # reference_x * config.POINT_PERCENT_ACCURACY
+                and abs(y) <= 0.25  # reference_y * config.POINT_PERCENT_ACCURACY
             ):
                 await drone.offboard.set_velocity_ned(
                     sdk.offboard.VelocityNedYaw(0, 0, alt, deg)
@@ -111,7 +107,7 @@ class MovementController:
                 return True
             count += 1
 
-    async def turn(self, drone: System) -> bool:
+    async def turn(self, drone: System, deg: int) -> bool:
         """
         Turns the drone around the pylon it is currently at
         Parameters:
@@ -121,7 +117,7 @@ class MovementController:
         async for tel in drone.telemetry.attitude_euler():
             current: float = (360 + round(tel.yaw_deg)) % 360
             if count == 0:
-                temp = (current + 180) % 360
+                temp = (current + deg) % 360
 
             await drone.offboard.set_velocity_body(
                 sdk.offboard.VelocityBodyYawspeed(5, -3, -0.1, -60)
@@ -185,3 +181,26 @@ class MovementController:
                     sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
                 )
                 return
+
+    async def turn_right(self, drone: System, deg: int) -> bool:
+        """
+        Turns the drone around the pylon it is currently at
+        Parameters:
+            Drone(System): Our drone object
+        """
+        count: int = 0
+        async for tel in drone.telemetry.attitude_euler():
+            current: float = (360 + round(tel.yaw_deg)) % 360
+            if count == 0:
+                temp = (current + deg) % 360
+
+            await drone.offboard.set_velocity_body(
+                sdk.offboard.VelocityBodyYawspeed(5, 3, -0.1, 60)
+            )
+            # await asyncio.sleep(config.FAST_THINK_S)
+            val = abs(current - temp)
+            # TODO: Add case so that it can overshoot the point and still complete
+            if val < 10:
+                logging.debug("Finished Turn")
+                return True
+            count += 1

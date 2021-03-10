@@ -41,15 +41,19 @@ MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder 
 MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)
 MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 
-OFFSET: float = 0.005  # km
-DEG_OFFSET: int = 90  # deg
+# OFFSET: float = 0.005  # km
+# DEG_OFFSET: int = 90  # deg
+
+OFFSET_RIGHT = {"KM": 0.005, "DEG": 90}
+OFFSET_LEFT = {"KM": 0.005, "DEG": -90}
+OFFSET_BACK = {"KM": 0.005, "DEG": 180}
+OFFSET_FRONT = {"KM": 0.005, "DEG": 0}
 
 NUM_LAPS: int = 2
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
-
-run_states = {"early_laps": True, "to_mast": True}
+run_states = {"early_laps": True, "to_mast": True, "return_laps": True}
 
 
 async def config_params(drone: System):
@@ -68,8 +72,3 @@ async def config_params(drone: System):
 
     # Set RC loss failsafe mode HOLD
     await drone.param.set_param_int("NAV_RCL_ACT", 1)
-    await drone.param.set_param_float("LNDMC_XY_VEL_MAX", 0.5)
-    # await drone.param.set_param_float("LNDMC_FFALL_THR", 3)
-    # await drone.param.set_param_float("LNDMC_FFALL_TTRI", 0.15)
-    await drone.param.set_param_float("LNDMC_ALT_MAX", MAX_ALT)
-    # await drone.param.set_param_float("LNDMC_LOW_T_THR", 0.2)
