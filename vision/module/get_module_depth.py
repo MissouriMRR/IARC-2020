@@ -11,7 +11,7 @@ import argparse
 SEARCH_RADIUS = 20
 
 
-def get_module_depth(depth_image, coordinates) -> float:
+def get_module_depth(depth_image: np.ndarray, coordinates: tuple) -> float:
     """
     Finds relative depth of the module
 
@@ -37,21 +37,17 @@ def get_module_depth(depth_image, coordinates) -> float:
         search_radius_multipler = direct_center_depth / 750
 
         # inverted because higher depth values means further away
-        if search_radius_multipler > 1:
-            if search_radius_multipler > 2:
-                search_radius_multipler = .01
-            else:
-                search_radius_multipler = 1 - (search_radius_multipler - 1)
+        if search_radius_multipler > 2:
+            search_radius_multipler = .01
+        elif search_radius_multipler > 1:
+            search_radius_multipler = 1 - (search_radius_multipler - 1)
         else:
             search_radius_multipler = 1 + (1 - search_radius_multipler)
 
-        search_radius = round(SEARCH_RADIUS * search_radius_multipler)
+        search_radius = int(round(SEARCH_RADIUS * search_radius_multipler))
         
         if search_radius < 10:
             search_radius = 10
-
-    # must be an integer for array indexing
-    search_radius = int(search_radius)
 
     depth_values_in_radius = depth_image[y_pos - search_radius:y_pos + search_radius, x_pos - search_radius: x_pos + search_radius]
 
