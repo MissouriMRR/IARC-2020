@@ -272,6 +272,7 @@ def run_bag_stream(
         file = str(time.time()) + ".jpg"
         file_counter += 1  # Track the number of images processed
         crash = False  # Whether reading in the file crashed
+        file_output.write(file + ",")
 
         # Run test on frame
         start_exec_time = (
