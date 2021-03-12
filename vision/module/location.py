@@ -34,13 +34,13 @@ class ModuleLocation:
         self.lower_bound = np.array(0)  # lower bound of slopes
         self.num_buckets = np.array(0)  # number of buckets applied to slopes
 
-        self.needsRecalc = (
+        self.needs_recalc = (
             True  # Prevents recalculation of circles, slopes, and slope grouping
         )
 
     ## Determining if Module is in frame
 
-    def isInFrame(self) -> bool:
+    def is_in_frame(self) -> bool:
         """
         Determines if the Module is in the frame
 
@@ -54,20 +54,20 @@ class ModuleLocation:
         MAX_CIRCLES = 100  # maximum number of circles that are allowed to be detected before in_frame fails
         MIN_CIRCLES = 4  # minimum number of circles needed to perform calculations
 
-        if self.needsRecalc:
+        if self.needs_recalc:
             # Circle Detection
-            self._circleDetection()
+            self._circle_detection()
 
         # Only perform more calculations if there are a reasonable number of circles
         if (
             np.shape(self.circles)[0] <= MAX_CIRCLES
             and np.shape(self.circles)[0] >= MIN_CIRCLES
         ):  # not too little and not too many circles found
-            if self.needsRecalc:
+            if self.needs_recalc:
                 # Get slopes and group parallel slopes
-                self._getSlopes()
-                self._groupSlopes()
-                self.needsRecalc = False
+                self._get_slopes()
+                self._group_slopes()
+                self.needs_recalc = False
         else:
             return False
 
@@ -75,7 +75,7 @@ class ModuleLocation:
 
     ## Finding the Center
 
-    def getCenter(self) -> tuple:
+    def get_center(self) -> tuple:
         """
         Find the center of the front face of the module.
 
@@ -86,26 +86,26 @@ class ModuleLocation:
         MAX_CIRCLES = 100  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
 
-        if self.needsRecalc:
+        if self.needs_recalc:
             # Circle detection
-            self._circleDetection()
+            self._circle_detection()
 
         # Filter out far away circles
-        # self._filterCircleDepth()
+        # self._filter_circle_depth()
 
         # Only perform more calculations if there are a reasonable number of circles
         if (
             np.shape(self.circles)[0] <= MAX_CIRCLES
             and np.shape(self.circles)[0] >= MIN_CIRCLES
         ):
-            if self.needsRecalc:
+            if self.needs_recalc:
                 # Get Slopes and Parallels
-                self._getSlopes()
-                self._groupSlopes()
-                self.needsRecalc = False
+                self._get_slopes()
+                self._group_slopes()
+                self.needs_recalc = False
 
             # Find the Holes
-            self._getHoleLocations()
+            self._get_hole_locations()
 
             # Coordinates of the center of the front face of the module
             self.center = np.arange(0, 2)
@@ -126,7 +126,7 @@ class ModuleLocation:
         # or the previous center if no slope calculations were performed
         return tuple(self.center)
 
-    def _filterCircleDepth(self) -> np.ndarray:
+    def _filter_circle_depth(self) -> np.ndarray:
         """
         Filters out circles based on the depth at the circles' centers.
 
@@ -136,7 +136,7 @@ class ModuleLocation:
         """
         DEPTH_THRESH = 1000
 
-        nCir = np.array([0, 0, 0])  # new array of circles within DEPTH_THRESH
+        new_cir = np.array([0, 0, 0])  # new array of circles within DEPTH_THRESH
         count = 0
 
         for x, y, r in self.circles:
@@ -147,16 +147,16 @@ class ModuleLocation:
                     self.depth[x, y] < DEPTH_THRESH and self.depth[x, y] != 0
                 ):  # remove far-away circles
                     if count == 0:
-                        nCir = np.array([x, y, r])
+                        new_cir = np.array([x, y, r])
                     else:
-                        nCir = np.append(nCir, [x, y, r])
+                        new_cir = np.append(new_cir, [x, y, r])
                     count += 1
 
-        if np.shape(nCir)[0] != 0:
-            nCir = nCir.reshape((-1, 3))
-            self.circles = nCir
+        if np.shape(new_cir)[0] != 0:
+            new_cir = new_cir.reshape((-1, 3))
+            self.circles = new_cir
 
-    def _getHoleLocations(self) -> np.ndarray:
+    def _get_hole_locations(self) -> np.ndarray:
         """
         Finds the locations of the 4 holes on the front face of the module.
 
@@ -199,7 +199,7 @@ class ModuleLocation:
         self.holes = np.unique(self.holes, axis=0)  # remove duplicates
         return self.holes
 
-    def _groupSlopes(self) -> None:
+    def _group_slopes(self) -> None:
         """
         Bucket sort slopes to find parallels.
 
@@ -230,7 +230,7 @@ class ModuleLocation:
             self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound)
         )
 
-    def _getSlopes(self) -> None:
+    def _get_slopes(self) -> None:
         """
         Finds slopes between detected circles
 
@@ -249,7 +249,7 @@ class ModuleLocation:
         # Convert slopes to degrees
         self.slopes = np.degrees(np.arctan(self.slopes))
 
-    def _circleDetection(self) -> np.ndarray:
+    def _circle_detection(self) -> np.ndarray:
         """
         Uses cv2 to detect circles in the color image.
 
@@ -299,7 +299,7 @@ class ModuleLocation:
 
     def _filterDepth(self) -> None:
         """
-        Uses the depth channel to eliminate far away parts of the color image
+        Uses the depth channel to eliminate far away parts of the color image. Sets far away parts of color image to 0.
 
         Returns
         -------
@@ -312,7 +312,7 @@ class ModuleLocation:
         tempDepth = np.dstack((self.depth, self.depth, self.depth))
         self.img = np.where(tempDepth < DEPTH_THRESH, self.img, 0)
 
-    def _increaseBrightness(self, increase: int) -> None:
+    def _increase_brightness(self, increase: int) -> None:
         """
         Increases the brightness of the image.
 
@@ -331,7 +331,7 @@ class ModuleLocation:
 
     ## Input Functions
 
-    def setImg(self, color: np.ndarray, depth: np.ndarray) -> None:
+    def set_img(self, color: np.ndarray, depth: np.ndarray) -> None:
         """
         Sets the image detection is performed on.
 
@@ -350,11 +350,11 @@ class ModuleLocation:
         self.img = color
         self.circles = np.array([])
         self.center = np.arange(2)
-        self.needsRecalc = True
+        self.needs_recalc = True
 
     ## Visualization Functions
 
-    def showImg(self) -> None:
+    def show_img(self) -> None:
         """
         Shows the initial input image.
 
@@ -366,7 +366,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showDepth(self) -> None:
+    def show_depth(self) -> None:
         """
         Shows the depth channel image.
 
@@ -374,11 +374,11 @@ class ModuleLocation:
         -------
         None
         """
-        cv2.imshow("Module Depth Image", self.depth)
+        cv2.imshow("Module Depth Image", np.uint8((self.depth / np.amax(self.depth)) * 255))
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def showCircles(self) -> None:
+    def show_circles(self) -> None:
         """
         Shows an image of detected circles.
 
@@ -387,13 +387,13 @@ class ModuleLocation:
         None
         """
 
-        circleImg = np.copy(self.img)
+        circle_img = np.copy(self.img)
 
         for x, y, r in self.circles:
-            cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
-            cv2.rectangle(circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+            cv2.circle(circle_img, (x, y), r, (0, 255, 0), 4)
+            cv2.rectangle(circle_img, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
 
-        cv2.imshow("Module Circles", circleImg)
+        cv2.imshow("Module Circles", circle_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -416,34 +416,34 @@ class ModuleLocation:
         -------
         None
         """
-        circleImg = np.copy(self.img)
+        circle_img = np.copy(self.img)
 
         if draw_circles:
             for x, y, r in self.circles:
-                cv2.circle(circleImg, (x, y), r, (0, 255, 0), 4)
+                cv2.circle(circle_img, (x, y), r, (0, 255, 0), 4)
                 cv2.rectangle(
-                    circleImg, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1
+                    circle_img, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1
                 )
 
         if draw_center:
             cv2.circle(
-                img=circleImg,
+                img=circle_img,
                 center=(self.center[0], self.center[1]),
                 radius=20,
                 color=(0, 0, 255),
                 thickness=3,
             )  # outer circle
             cv2.circle(
-                img=circleImg,
+                img=circle_img,
                 center=(self.center[0], self.center[1]),
                 radius=1,
                 color=(0, 0, 255),
                 thickness=2,
             )  # center dot
 
-        cv2.imwrite(file, circleImg)
+        cv2.imwrite(file, circle_img)
 
-    def showCenter(self) -> None:
+    def show_center(self) -> None:
         """
         Shows the image with detected holes and center.
 
@@ -452,10 +452,10 @@ class ModuleLocation:
         None
         """
 
-        centerImg = np.copy(self.img)
+        center_img = np.copy(self.img)
         for x, y, r in self.holes:
             cv2.circle(
-                img=centerImg,
+                img=center_img,
                 center=(int(x), int(y)),
                 radius=int(r),
                 color=(0, 0, 255),
@@ -463,14 +463,14 @@ class ModuleLocation:
             )
 
         cv2.circle(
-            img=centerImg,
+            img=center_img,
             center=(self.center[0], self.center[1]),
             radius=10,
             color=(0, 255, 0),
             thickness=-1,
         )
 
-        cv2.imshow("Module Location Center", centerImg)
+        cv2.imshow("Module Location Center", center_img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -505,9 +505,9 @@ if __name__ == "__main__":
 
     loc = ModuleLocation()
 
-    loc.setImg(image, depth)
+    loc.set_img(image, depth)
 
-    print(loc.getCenter())
+    print(loc.get_center())
     print(loc.getDistance())
 
-    loc.showCenter()
+    loc.show_center()

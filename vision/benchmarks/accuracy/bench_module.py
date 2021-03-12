@@ -18,7 +18,7 @@ from vision.bounding_box import BoundingBox, ObjectType
 from vision.module.location import ModuleLocation
 from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
-from vision.module.module_bounding import getModuleBounds
+from vision.module.module_bounding import get_module_bounds
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
 
@@ -34,11 +34,11 @@ class AccuracyModule:
     def __init__(self):
         self.location = ModuleLocation()
 
-    def accuracy_isInFrame(
+    def accuracy_is_in_frame(
         self, color_image: np.ndarray, depth_image: np.ndarray
     ) -> bool:
         """
-        Measuring accuracy of isInFrame() from ModuleLocation class.
+        Measuring accuracy of is_in_frame() from ModuleLocation class.
 
         Parameters
         ----------
@@ -51,14 +51,14 @@ class AccuracyModule:
         -------
         bool - whether the module was detected in color_image.
         """
-        self.location.setImg(color_image, depth_image)
-        return self.location.isInFrame()
+        self.location.set_img(color_image, depth_image)
+        return self.location.is_in_frame()
 
-    def accuracy_getCenter(
+    def accuracy_get_center(
         self, color_image: np.ndarray, depth_image: np.ndarray, set_img: bool = False
     ) -> tuple:
         """
-        Measuring accuracy of isInFrame() from ModuleLocation class.
+        Measuring accuracy of get_center() from ModuleLocation class.
 
         Parameters
         ----------
@@ -68,7 +68,7 @@ class AccuracyModule:
             The depth image.
         set_img: bool
             Whether or not to set the image in the location class.
-            Defaults to False, which assumes image has already been set when isInFrame was benchmarked.
+            Defaults to False, which assumes image has already been set when is_in_frame was benchmarked.
 
         Returns
         -------
@@ -76,8 +76,8 @@ class AccuracyModule:
         """
 
         if set_img:
-            self.location.setImg(color_image, depth_image)
-        return self.location.getCenter()
+            self.location.set_img(color_image, depth_image)
+        return self.location.get_center()
 
     def accuracy_get_module_depth(
         self, depth_image: np.ndarray, center: tuple
@@ -134,11 +134,11 @@ class AccuracyModule:
         """
         return get_module_orientation(roi)
 
-    def accuracy_getModuleBounds(
+    def accuracy_get_module_bounds(
         self, dimensions: tuple, center: tuple, depth: float
     ) -> list:
         """
-        Measuring accuracy of getModuleBounds.
+        Measuring accuracy of get_module_bounds.
 
         Parameters
         ----------
@@ -153,7 +153,7 @@ class AccuracyModule:
         -------
         list<tuple> - list of four (x, y) vertices around padded module.
         """
-        return getModuleBounds(dimensions, center, depth)
+        return get_module_bounds(dimensions, center, depth)
 
     def accuracy_get_module_roll(self, region: np.ndarray) -> float:
         """
@@ -180,7 +180,7 @@ class BenchModuleAccuracy:
     draw_circles: bool
         Whether to save an image with the circles found by location class.
     draw_centers: bool
-        Whether to save an image with the center found by the getCenter function from the location class.
+        Whether to save an image with the center found by the get_center function from the location class.
     """
 
     def __init__(self, draw_circles: bool = False, draw_center: bool = False):
@@ -205,7 +205,7 @@ class BenchModuleAccuracy:
         draw_circles: bool
             Whether to save an image with the circles found by location class.
         draw_centers: bool
-            Whether to save an image with the center found by the getCenter function from the location class.
+            Whether to save an image with the center found by the get_center function from the location class.
 
         Returns
         -------
@@ -248,10 +248,10 @@ class BenchModuleAccuracy:
         ## Run tests on the image ##
 
         in_frame = False
-        # isInFrame
+        # is_in_frame
         if not crash:
             try:
-                in_frame = tester.accuracy_isInFrame(image, depth)
+                in_frame = tester.accuracy_is_in_frame(image, depth)
                 file_output.write(str(in_frame))
             except:
                 file_output.write("Crash")
@@ -259,11 +259,11 @@ class BenchModuleAccuracy:
 
         file_output.write(",")
 
-        # getCenter
+        # get_center
         center = (0, 1)
         if in_frame and not crash:  # only runs further tests if in frame
             try:
-                center = tester.accuracy_getCenter(image, depth)
+                center = tester.accuracy_get_center(image, depth)
                 file_output.write(str(center[0]) + " . " + str(center[1]))
             except:
                 file_output.write("Crash")
@@ -307,11 +307,11 @@ class BenchModuleAccuracy:
                 crash = True
         file_output.write(",")
 
-        # getModuleBounds
+        # get_module_bounds
         bounds = np.ndarray([])
         if depth_val != 0 and not crash:
             try:
-                bounds = tester.accuracy_getModuleBounds(
+                bounds = tester.accuracy_get_module_bounds(
                     (1920, 1080), center, depth_val
                 )
                 file_output.write("Found")
