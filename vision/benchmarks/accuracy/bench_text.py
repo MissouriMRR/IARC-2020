@@ -148,7 +148,7 @@ class BenchTextAccuracy:
                 boxes=bboxes,
                 image=image,
                 waittime=0,
-                saveImg=self.plot_text,
+                save_img=self.plot_text,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
                 quiet_output=True,
             )

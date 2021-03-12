@@ -185,10 +185,13 @@ if __name__ == "__main__":
     Tool for viewing bag files or saving bag files as a dataset of images.
 
     Command Line Arguments
+    ----------------------
     -f, --file_location {location}
         Required. Bag file to use.
     -n, --no_repeat
         Don't repeat iteration through file.
+    -s, --save_set
+        Save as dataset instead of viewing in window.
 
     """
     import argparse

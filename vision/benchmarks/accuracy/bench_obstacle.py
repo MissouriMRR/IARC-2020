@@ -183,7 +183,7 @@ class BenchObstacleAccuracy:
                 boxes=bboxes,
                 image=image,
                 waittime=0,
-                saveImg=self.plot_obs,
+                save_img=self.plot_obs,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
                 quiet_output=True,
             )
@@ -210,7 +210,7 @@ class BenchObstacleAccuracy:
                 boxes=bboxes,
                 image=image,
                 waittime=0,
-                saveImg=self.plot_obs,
+                save_img=self.plot_obs,
                 path=os.path.join(self.OUTPUT_TRACK_DIR, filename),
                 quiet_output=True,
             )

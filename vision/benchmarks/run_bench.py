@@ -20,7 +20,10 @@ from vision.benchmarks.accuracy.bench_module import (
     BenchModuleAccuracy,
     AccuracyModule,
 )
-from vision.benchmarks.accuracy.bench_text import BenchTextAccuracy, AccuracyRussianWord
+from vision.benchmarks.accuracy.bench_text import (
+    BenchTextAccuracy,
+    AccuracyRussianWord,
+)
 from vision.benchmarks.accuracy.bench_obstacle import (
     BenchObstacleAccuracy,
     AccuracyObstacle,
@@ -480,6 +483,7 @@ if __name__ == "__main__":
     Run a specified benchmark on a dataset or .bag file.
 
     Command Line Arguments
+    ----------------------
     -b, --bench_name {benchmark_name}
         Required. Name of benchmark to run.
     -f, --folder {foldername}
