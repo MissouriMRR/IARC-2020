@@ -241,7 +241,7 @@ class BenchModuleAccuracy:
 
         Returns
         -------
-        bool - whether all tests were completed.
+        bool - True if test failed at some point. False if test did not crash and ran to completion.
         """
         crash = False  # Whether an algorithm crashed
 
@@ -341,7 +341,7 @@ class BenchModuleAccuracy:
         # Saves image with circles and, if enabled, center
         if self.draw_circles or self.draw_center:
             path = os.path.join(self.OUTPUT_IMGS_DIR, filename)
-            tester.location.saveImage(
+            tester.location.save_img(
                 file=path, draw_circles=self.draw_circles, draw_center=self.draw_center
             )
 

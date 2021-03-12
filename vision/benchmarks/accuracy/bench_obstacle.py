@@ -150,7 +150,7 @@ class BenchObstacleAccuracy:
 
         Returns
         -------
-        bool - whether all tests were completed.
+        bool - True if test failed at some point. False if test did not crash and ran to completion.
         """
         crash = False
         output_bounding = open(
@@ -185,6 +185,7 @@ class BenchObstacleAccuracy:
                 waittime=0,
                 saveImg=self.plot_obs,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
+                quiet_output=True
             )
 
         # obstacle tracking
@@ -211,6 +212,7 @@ class BenchObstacleAccuracy:
                 waittime=0,
                 saveImg=self.plot_obs,
                 path=os.path.join(self.OUTPUT_TRACK_DIR, filename),
+                quiet_output=True
             )
 
         output_bounding.close()

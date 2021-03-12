@@ -13,8 +13,9 @@ def plot_box(
     boxes: list,
     image: np.ndarray,
     waittime: int = 0,
-    saveImg: bool = False,
+    save_img: bool = False,
     path: str = "plot_imgs",
+    quiet_output: bool = False
 ) -> None:
     """
     Display BoundingBoxes on image.
@@ -27,10 +28,10 @@ def plot_box(
         image to detect obstacles in
     waittime: int, default=0
         cv2.waitKey parameter, number of seconds to show window 0=inf.
-    saveImg: bool
+    save_img: bool
         Whether to save the image with the boxes plotted.
     path: str
-        Where to save image to if saveImg is True. Should include filename and extension.
+        Where to save image to if save_img is True. Should include filename and extension.
     """
     if not isinstance(boxes, list):
         raise ValueError(f"Expected list of BoundingBox, got {type(boxes)} instead")
@@ -57,10 +58,13 @@ def plot_box(
             output, (min(X), min(Y)), (max(X), max(Y)), BBOX_COLOR, BBOX_THICKNESS
         )
 
-        # print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+        if not quiet_output:
+            print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+
+        # visualize keypoints
         # output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    if not saveImg:
+    if not save_img:
         cv2.imshow("Obstacles", output)
         cv2.waitKey(waittime)
     else:

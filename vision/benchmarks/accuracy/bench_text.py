@@ -12,10 +12,11 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 
 import numpy as np
 
+from vision.common.box_plotter import plot_box
+
 from text.detect_words import TextDetector
 
 IMG_FOLDER = "text"
-
 
 class AccuracyRussianWord:
     """
@@ -39,7 +40,7 @@ class AccuracyRussianWord:
         self, color_image: np.ndarray, depth_image: np.ndarray
     ) -> list:
         """
-        Accuracy of detectRussianWord.
+        Accuracy of detect_russian_word.
 
         Returns
         -------
@@ -117,7 +118,7 @@ class BenchTextAccuracy:
 
         Returns
         -------
-        bool - whether all tests were completed.
+        bool - True if test failed at some point. False if test did not crash and ran to completion.
         """
         crash = False
 
@@ -148,6 +149,7 @@ class BenchTextAccuracy:
                 waittime=0,
                 saveImg=self.plot_text,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
+                quiet_output=True
             )
 
         return crash

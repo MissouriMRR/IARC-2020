@@ -1,5 +1,7 @@
 """
 benchmarks/time __init__.
+
+Used to identify benchmarks as package in order to import submodules.
 """
 
 import __init__
@@ -15,7 +17,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir, gggparent_dir]
 try:
     modules = []
 
-    for filename in os.listdir("vision/benchmarks/times"):
+    for filename in os.listdir(os.path.join("vision", "benchmarks", "times")):
         if filename == "runall.py":
             continue
 

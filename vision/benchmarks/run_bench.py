@@ -66,19 +66,19 @@ def run_set(
         For text and obstacle benchmarks. Whether to save images with bounding boxes plotted.
     """
 
-    benchmark = 0  # benchmark runner
-    tester = 0  # benchmark class to run
+    benchmark = 0  # benchmark runner class
+    tester = 0  # benchmark class
     if bench_name == "module":
-        benchmark = BenchModuleAccuracy(
+        benchmark: BenchModuleAccuracy = BenchModuleAccuracy(
             draw_circles=save_circles, draw_center=save_centers
         )
-        tester = AccuracyModule()
+        tester: AccuracyModule = AccuracyModule()
         file_output.write(
             "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
         )
     elif bench_name == "obstacle":
-        benchmark = BenchObstacleAccuracy(plot_obs=plot_boxes)
-        tester = AccuracyObstacle()
+        benchmark: BenchObstacleAccuracy = BenchObstacleAccuracy(plot_obs=plot_boxes)
+        tester: AccuracyObstacle = AccuracyObstacle()
         file_output.write(
             "image,read color,read depth,find(),track(),exec time (s),total image time (s)\n"
         )
@@ -87,18 +87,18 @@ def run_set(
     ):  ## NOTE: pylon algorithm not in use, so benchmark not implemented
         return
     elif bench_name == "text":
-        benchmark = BenchTextAccuracy(plot_text=plot_boxes)
-        tester = AccuracyRussianWord()
+        benchmark: BenchTextAccuracy = BenchTextAccuracy(plot_text=plot_boxes)
+        tester: AccuracyRussianWord = AccuracyRussianWord()
         file_output.write(
             "image,read color,read depth,detect_russian_word(),exec time (s),total image time (s)\n"
         )
     else:
         raise RuntimeError("Invalid benchmark")
 
-    total_imgs = sum(".jpg" in s for s in os.listdir(folder))
-    total_algorithms_time = 0  # total time to execute the algorithms
-    total_time = 0  # total time to read in images and execute algorithms
-    file_counter = 0
+    total_imgs: int = sum(".jpg" in s for s in os.listdir(folder))
+    total_algorithms_time: float = 0  # total time to execute the algorithms
+    total_time: float = 0  # total time to read in images and execute algorithms
+    file_counter: int = 0
 
     # Iterate through the images
     for root, _, files in os.walk(folder):
@@ -141,7 +141,7 @@ def run_set(
                 # Run test if image read successfully
                 if not crash:  # image read successfully
                     start_exec_time = time.time()
-                    crash = benchmark.bench_accuracy(
+                    crash: bool = benchmark.bench_accuracy(
                         file_output=file_output,
                         tester=tester,
                         image=image,
@@ -236,36 +236,36 @@ def run_bag_stream(
     if not os.path.isdir(SAVED_FRAMES_DIR):
         os.mkdir(SAVED_FRAMES_DIR)
 
-    benchmark = 0  # benchmark runner
+    benchmark = 0  # benchmark runner class
     tester = 0  # benchmark class to run
     if bench_name == "module":
-        benchmark = BenchModuleAccuracy(
+        benchmark: BenchModuleAccuracy = BenchModuleAccuracy(
             draw_circles=save_circles, draw_center=save_centers
         )
-        tester = AccuracyModule()
+        tester: AccuracyModule = AccuracyModule()
         file_output.write(
             "image,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
         )
     elif bench_name == "obstacle":
-        benchmark = BenchObstacleAccuracy(plot_obs=plot_boxes)
-        tester = AccuracyObstacle()
+        benchmark: BenchObstacleAccuracy = BenchObstacleAccuracy(plot_obs=plot_boxes)
+        tester: AccuracyObstacle = AccuracyObstacle()
         file_output.write("image,find(),track(),exec time (s)\n")
     elif (
         bench_name == "pylon"
     ):  ## NOTE: pylon algorithm not in use, so benchmark not implemented
         return
     elif bench_name == "text":
-        benchmark = BenchTextAccuracy(plot_text=plot_boxes)
-        tester = AccuracyRussianWord()
+        benchmark: BenchTextAccuracy = BenchTextAccuracy(plot_text=plot_boxes)
+        tester: AccuracyRussianWord = AccuracyRussianWord()
         file_output.write("image,detect_russian_word(),exec time (s)\n")
     else:
         raise RuntimeError("Invalid benchmark")
 
-    total_time = 0  # total time to execute algorithms
-    file_counter = 0
+    total_time: float = 0  # total time to execute algorithms
+    file_counter: int = 0
 
     # Initialize stream from bag file
-    stream = BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT)
+    stream: BagFile = BagFile(SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, filename, REPEAT)
 
     # Iterate through the stream
     for depth, image in stream:
@@ -282,7 +282,7 @@ def run_bag_stream(
         if save_frames:
             cv2.imwrite(os.path.join(SAVED_FRAMES_DIR, file), image)
 
-        crash = benchmark.bench_accuracy(
+        crash: bool = benchmark.bench_accuracy(
             file_output=file_output,
             tester=tester,
             image=image,
@@ -377,6 +377,7 @@ def run_bag_set(
     if not quiet_output:
         print("DATASET CREATED")
 
+    # Run the benchmark on the new dataset
     run_set(
         bench_name=bench_name,
         folder=IMAGE_FOLDER,

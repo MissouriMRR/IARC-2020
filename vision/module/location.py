@@ -215,13 +215,13 @@ class ModuleLocation:
         self.upper_bound = np.amax(self.slopes)
         self.lower_bound = np.amin(self.slopes)
 
-        interquartile_range = np.percentile(self.slopes, 75) - np.percentile(
+        interquartile_range: np.float64 = np.percentile(self.slopes, 75) - np.percentile(
             self.slopes, 25
         )
-        bucket_width = (2 * interquartile_range) / (
+        bucket_width: np.float64 = (2 * interquartile_range) / (
             NUM_SLOPES ** (1 / 3)
         )  # Freedman–Diaconis rule
-        self.num_buckets = int(
+        self.num_buckets: int = int(
             round((self.upper_bound - self.lower_bound) / bucket_width)
         )
 
@@ -397,7 +397,7 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def saveImage(
+    def save_img(
         self, file: str, draw_circles: bool = False, draw_center: bool = False
     ) -> None:
         """

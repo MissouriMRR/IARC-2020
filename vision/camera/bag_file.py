@@ -170,7 +170,7 @@ class BagFile(Camera):
         -------
         None.
         """
-        DIRECTORY = os.path.join(folder_name)
+        DIRECTORY = folder_name
         if not os.path.isdir(DIRECTORY):
             os.mkdir(DIRECTORY)
 
