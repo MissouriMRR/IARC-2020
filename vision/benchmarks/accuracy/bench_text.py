@@ -18,6 +18,7 @@ from text.detect_words import TextDetector
 
 IMG_FOLDER = "text"
 
+
 class AccuracyRussianWord:
     """
     Measuring accuracy of the text detector.
@@ -149,7 +150,7 @@ class BenchTextAccuracy:
                 waittime=0,
                 saveImg=self.plot_text,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
-                quiet_output=True
+                quiet_output=True,
             )
 
         return crash

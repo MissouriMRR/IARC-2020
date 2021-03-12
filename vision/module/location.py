@@ -215,9 +215,9 @@ class ModuleLocation:
         self.upper_bound = np.amax(self.slopes)
         self.lower_bound = np.amin(self.slopes)
 
-        interquartile_range: np.float64 = np.percentile(self.slopes, 75) - np.percentile(
-            self.slopes, 25
-        )
+        interquartile_range: np.float64 = np.percentile(
+            self.slopes, 75
+        ) - np.percentile(self.slopes, 25)
         bucket_width: np.float64 = (2 * interquartile_range) / (
             NUM_SLOPES ** (1 / 3)
         )  # Freedman–Diaconis rule
@@ -374,7 +374,9 @@ class ModuleLocation:
         -------
         None
         """
-        cv2.imshow("Module Depth Image", np.uint8((self.depth / np.amax(self.depth)) * 255))
+        cv2.imshow(
+            "Module Depth Image", np.uint8((self.depth / np.amax(self.depth)) * 255)
+        )
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 

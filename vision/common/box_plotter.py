@@ -15,7 +15,7 @@ def plot_box(
     waittime: int = 0,
     save_img: bool = False,
     path: str = "plot_imgs",
-    quiet_output: bool = False
+    quiet_output: bool = False,
 ) -> None:
     """
     Display BoundingBoxes on image.
@@ -59,7 +59,7 @@ def plot_box(
         )
 
         if not quiet_output:
-            print('\tKeypoint:', bbox.pt[0], bbox.pt[1])
+            print("\tKeypoint:", bbox.pt[0], bbox.pt[1])
 
         # visualize keypoints
         # output = cv2.drawKeypoints(image, keypoints, outImage=np.array([]), color=(255, 0, 255), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)

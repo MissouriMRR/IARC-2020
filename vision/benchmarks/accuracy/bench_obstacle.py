@@ -185,7 +185,7 @@ class BenchObstacleAccuracy:
                 waittime=0,
                 saveImg=self.plot_obs,
                 path=os.path.join(self.OUTPUT_FIND_DIR, filename),
-                quiet_output=True
+                quiet_output=True,
             )
 
         # obstacle tracking
@@ -212,7 +212,7 @@ class BenchObstacleAccuracy:
                 waittime=0,
                 saveImg=self.plot_obs,
                 path=os.path.join(self.OUTPUT_TRACK_DIR, filename),
-                quiet_output=True
+                quiet_output=True,
             )
 
         output_bounding.close()
