@@ -22,9 +22,11 @@ UPPER_RED = np.array([255, 255, 120])
 RED_THRESHOLD = 50
 
 
-def detect_red(color_image, depth_image):
+def detect_red(color_image: np.ndarray, depth_image: np.ndarray) -> list:
     """
     Counts the number of red(ish) pixels in an image.
+
+    NOTE: No current plans to use in competition.
 
     Parameters
     ----------
@@ -52,11 +54,16 @@ def detect_red(color_image, depth_image):
 
     # Return if the pylon was detected or not
     if red_pixels >= RED_THRESHOLD:
-        return [BoundingBox((0, 0, np.shape(color_image)[0], np.shape(color_image)[1]), ObjectType.PYLON)]
+        return [
+            BoundingBox(
+                (0, 0, np.shape(color_image)[0], np.shape(color_image)[1]),
+                ObjectType.PYLON,
+            )
+        ]
     else:
         return []
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     image = cv2.imread("sim_pylon.png")
     print(detect_red(image, None))
