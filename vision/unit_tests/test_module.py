@@ -15,9 +15,7 @@ import cv2
 from vision.module.in_frame import ModuleInFrame as mif
 from vision.module.location import ModuleLocation
 from vision.module.region_of_interest import region_of_interest
-from vision.module.module_orientation import *
-from vision.module.module_bounding import getModuleBounds
-from vision.module.get_module_depth import *
+from vision.module.module_orientation import get_module_roll,get_module_orientation
 
 
 class TestModuleInFrame(unittest.TestCase):
@@ -119,7 +117,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -143,7 +141,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -159,7 +157,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -174,7 +172,7 @@ class TestModuleLocation(unittest.TestCase):
 
         locator = ModuleLocation()
         locator.img, locator.depth = color_parameter, depth_parameter
-        result = locator.getCenter()
+        result = locator.get_center()
 
         np.testing.assert_array_equal(color_image, color_parameter)
         np.testing.assert_array_equal(depth_image, depth_parameter)
@@ -194,7 +192,7 @@ class TestModuleOrientation(unittest.TestCase):
         roi: ndarray
             module region of interest calculated by region_of_interest
         """
-        IMAGE_SIZE = [1920, 1080]
+        IMAGE_SIZE = [1080, 1920, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
@@ -234,7 +232,7 @@ class TestModuleOrientation(unittest.TestCase):
             # get center
             # loc = ModuleLocation()
             # loc.setImg(current_color, current_depth)
-            # current_center = loc.getCenter(); #BROKEN
+            # current_center = loc.get_center(); #BROKEN
             current_center = estimates[current_file][0]
 
             # get region of interest
@@ -266,7 +264,7 @@ class TestModuleOrientation(unittest.TestCase):
         -------
         tuple
         """
-        IMAGE_SIZE = [1920, 1080]
+        IMAGE_SIZE = [1080, 1920, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
@@ -398,45 +396,36 @@ class TestModuleRoll(unittest.TestCase):
     def test_module_roll(self):
         img_dir = os.path.join(gparent_dir, "vision_images/module/Feb29")
         files = os.listdir(img_dir)
-        loc = ModuleLocation()
 
         estimates = {
-            # FORMAT: "name_of_file" : estimated float // COULD BE WILDLY OFF, just guesses as of right now
-            "2020-02-29_15.36.15.167565": 13.5,
-            "2020-02-29_15.40.46.652448": 14,
-            "2020-02-29_15.40.48.862847": 13,
-            "2020-02-29_15.40.40.444538": 9,
-            "2020-02-29_15.40.54.564617": 10,
+            # FORMAT: "name_of_file" : [estimated float, (estimated center)]
+            "2020-02-29_15.36.15.167565": [20,(1180,300)],
+            "2020-02-29_15.40.46.652448": [14,(700,550)],
+            "2020-02-29_15.40.48.862847": [10,(1300,630)],
+            "2020-02-29_15.40.40.444538": [5,(830,670)],
+            "2020-02-29_15.40.54.564617": [8,(435,650)],
         }
 
         for current_file in estimates.keys():
-            IMAGE_SIZE = [1920, 1080]
-            # grabs and loads image file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
+            # Selects image
             current_image_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
             current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
-            # loads images
-            current_image_file = cv2.imread(current_image_file)
-            current_depth_file = np.load(current_depth_file)
+            # Loads images
+            colorImage = cv2.imread(current_image_file)
+            depthImage = np.load(current_depth_file)
 
-            # sets images to get center, depth_val, and bounds
-            # works given the center value is correct from ModuleLocation()
-            loc.setImg(current_image_file, current_depth_file)
-            center = loc.getCenter()
-            depth_val = get_module_depth(current_depth_file, center)
-            bounds = getModuleBounds(IMAGE_SIZE, center, depth_val)
-            current_image_file = current_image_file[
-                bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
-            ]
+            center = estimates[current_file][1]
 
-            calculated_degrees = estimates[current_file]
-            estimated_degrees = get_module_roll(current_image_file)
+            # Sets a rough boundary around the module (angles are similar using get_module_bounds)
+            bound = [center[1]- 250, center[1] + 250, center[0] - 180, center[0] + 180]
+            colorImage = colorImage[bound[0] : bound[1], bound[2] : bound[3], :]
 
-            LOW_BOUNDS = estimated_degrees * 0.9
-            HIGH_BOUNDS = estimated_degrees * 1.1
+            estimated_degrees = get_module_roll(colorImage)
+            calculated_degrees = estimates[current_file][0]
 
             self.assertTrue(
-                LOW_BOUNDS <= calculated_degrees <= HIGH_BOUNDS
-            )  # within ±10%
+                estimated_degrees * 0.8 <= calculated_degrees <= estimated_degrees * 1.2
+            )  # within ±20%
 
     def test_return(self):
         """
