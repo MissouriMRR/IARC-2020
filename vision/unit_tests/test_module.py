@@ -398,7 +398,7 @@ class TestModuleRoll(unittest.TestCase):
         files = os.listdir(img_dir)
 
         estimates = {
-            # FORMAT: "name_of_file" : [estimated float, (estimated center)]
+            # FORMAT: "name_of_file" : [estimated degrees (roll value), (estimated center)]
             "2020-02-29_15.36.15.167565": [20, (1180, 300)],
             "2020-02-29_15.40.46.652448": [14, (700, 550)],
             "2020-02-29_15.40.48.862847": [10, (1300, 630)],
@@ -408,24 +408,24 @@ class TestModuleRoll(unittest.TestCase):
 
         for current_file in estimates.keys():
             # Selects image
-            current_image_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
-            current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
+            color_image = os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            depth_image = os.path.join(img_dir, current_file) + "-depthImage.npy"
             # Loads images
-            colorImage = cv2.imread(current_image_file)
-            depthImage = np.load(current_depth_file)
+            colorImage = cv2.imread(color_image)
+            depthImage = np.load(depth_image)
 
             center = estimates[current_file][1]
 
             # Sets a rough boundary around the module (angles are similar using get_module_bounds)
             bound = [center[1] - 250, center[1] + 250, center[0] - 180, center[0] + 180]
-            colorImage = colorImage[bound[0] : bound[1], bound[2] : bound[3], :]
+            bounded_image = colorImage[bound[0] : bound[1], bound[2] : bound[3], :]
 
-            estimated_degrees = get_module_roll(colorImage)
-            calculated_degrees = estimates[current_file][0]
+            calculated_degrees = get_module_roll(bounded_image)
+            estimated_degrees = estimates[current_file][0]
 
             self.assertTrue(
-                estimated_degrees * 0.8 <= calculated_degrees <= estimated_degrees * 1.2
-            )  # within ±20%
+                estimated_degrees * 0.9 <= calculated_degrees <= estimated_degrees * 1.1
+            )  # within ±10%
 
     def test_return(self):
         """

@@ -39,12 +39,14 @@ class AccuracyModule:
     ) -> bool:
         """
         Measuring accuracy of is_in_frame() from ModuleLocation class.
+
         Parameters
         ----------
         color_image: ndarray
             The color image.
         depth_image: ndarray
             The depth image.
+
         Returns
         -------
         bool - whether the module was detected in color_image.
@@ -57,6 +59,7 @@ class AccuracyModule:
     ) -> tuple:
         """
         Measuring accuracy of get_center() from ModuleLocation class.
+
         Parameters
         ----------
         color_image: ndarray
@@ -66,6 +69,7 @@ class AccuracyModule:
         set_img: bool
             Whether or not to set the image in the location class.
             Defaults to False, which assumes image has already been set when is_in_frame was benchmarked.
+
         Returns
         -------
         tuple - (x, y) coordinates of the center of the module in color_image.
@@ -80,12 +84,14 @@ class AccuracyModule:
     ) -> float:
         """
         Measuring accuracy of get_module_depth().
+
         Parameters
         ----------
         depth_image: ndarray
             The depth image.
         center: tuple
             (x, y) coordinates of the center of the module.
+
         Returns
         -------
         float: Depth value at the center of the module in millimeters.
@@ -97,6 +103,7 @@ class AccuracyModule:
     ) -> np.ndarray:
         """
         Measuring accuracy of region_of_interest().
+
         Parameters
         ----------
         depth_image: ndarray
@@ -105,6 +112,7 @@ class AccuracyModule:
             Measured value of the depth of the module.
         center: tuple
             (x, y) coordinates of the center of the module.
+
         Returns
         -------
         ndarray - Region of depth image.
@@ -114,10 +122,12 @@ class AccuracyModule:
     def accuracy_get_module_orientation(self, roi: np.ndarray) -> tuple:
         """
         Measuring accuracy of get_module_orientation().
+
         Parameters
         ----------
         roi: ndarray
             The module region of interest calculated by region_of_interest().
+
         Returns
         -------
         tuple - (x_tilt, y_tilt) orientation of module
@@ -129,6 +139,7 @@ class AccuracyModule:
     ) -> list:
         """
         Measuring accuracy of get_module_bounds.
+
         Parameters
         ----------
         dimensions: tuple
@@ -137,6 +148,7 @@ class AccuracyModule:
             (x, y) coordinates of center of module.
         depth: float
             Depth value at center of module.
+
         Returns
         -------
         list<tuple> - list of four (x, y) vertices around padded module.
@@ -146,10 +158,12 @@ class AccuracyModule:
     def accuracy_get_module_roll(self, region: np.ndarray) -> float:
         """
         Measuring accuracy of get_module_roll().
+
         Parameters
         ----------
         region: ndarray
             Padded region of image with module.
+
         Returns
         -------
         float - module roll with respect to positive y-axis.
@@ -160,6 +174,7 @@ class AccuracyModule:
 class BenchModuleAccuracy:
     """
     Object for storing parameters of and running the module accuracy benchmark.
+
     Parameters
     ----------
     draw_circles: bool
@@ -184,12 +199,14 @@ class BenchModuleAccuracy:
     ) -> None:
         """
         Sets the parameters for running the benchmark.
+
         Parameters
         ----------
         draw_circles: bool
             Whether to save an image with the circles found by location class.
         draw_centers: bool
             Whether to save an image with the center found by the get_center function from the location class.
+
         Returns
         -------
         None
@@ -208,6 +225,7 @@ class BenchModuleAccuracy:
     ) -> bool:
         """
         Runs all module accuracy benchmarks on an image. Outputs results to csv file.
+
         Parameters
         ----------
         file_output: IO
@@ -220,6 +238,7 @@ class BenchModuleAccuracy:
             The depth image from the frame.
         filename: str
             The name of the image file.
+
         Returns
         -------
         bool - True if test failed at some point. False if test did not crash and ran to completion.
@@ -310,7 +329,7 @@ class BenchModuleAccuracy:
         if depth_val != 0 and not crash:
             try:
                 bound_region = image[
-                    bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                    bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
                 ]
                 roll = tester.accuracy_get_module_roll(bound_region)
                 file_output.write(str(roll))
