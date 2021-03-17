@@ -192,7 +192,7 @@ class TestModuleOrientation(unittest.TestCase):
         roi: ndarray
             module region of interest calculated by region_of_interest
         """
-        IMAGE_SIZE = [1080, 1920, 3]
+        IMAGE_SIZE = [1920, 1080, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
@@ -264,7 +264,7 @@ class TestModuleOrientation(unittest.TestCase):
         -------
         tuple
         """
-        IMAGE_SIZE = [1080, 1920, 3]
+        IMAGE_SIZE = [1920, 1080, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
