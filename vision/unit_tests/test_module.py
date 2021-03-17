@@ -324,9 +324,7 @@ class TestRegionOfInterest(unittest.TestCase):
 
         for current_file in estimates.keys():
             # grabs and loads depth file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-            current_depth_file = (
-                os.path.join(img_dir, current_file) + "-depthImage.npy"
-            )
+            current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
             current_depth_image = np.load(current_depth_file)
 
             # get center
@@ -365,9 +363,12 @@ class TestRegionOfInterest(unittest.TestCase):
         #   and arbitrary center value
         depth_image = np.zeros(IMAGE_SIZE, dtype=int)
         arbitrary_value = 300
-        roi = region_of_interest(depth_image, arbitrary_value, (arbitrary_value, arbitrary_value))
+        roi = region_of_interest(
+            depth_image, arbitrary_value, (arbitrary_value, arbitrary_value)
+        )
 
         self.assertIs(type(roi), np.ndarray)
+
 
 class TestModuleRoll(unittest.TestCase):
     """
@@ -403,19 +404,14 @@ class TestModuleRoll(unittest.TestCase):
             # FORMAT: "name_of_file" : estimated float // COULD BE WILDLY OFF, just guesses as of right now
             "2020-02-29_15.36.15.167565": 13.5,
             "2020-02-29_15.40.46.652448": 14,
-            "2020-02-29_15.40.48.862847": 13
-
+            "2020-02-29_15.40.48.862847": 13,
         }
 
         for current_file in estimates.keys():
             IMAGE_SIZE = [1920, 1080]
             # grabs and loads image file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
-            current_image_file = (
-                os.path.join(img_dir, current_file) + "-colorImage.jpg"
-            )
-            current_depth_file = (
-                os.path.join(img_dir, current_file) + "-depthImage.npy"
-            )
+            current_image_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
             # loads images
             current_image_file = cv2.imread(current_image_file)
             current_depth_file = np.load(current_depth_file)
@@ -425,13 +421,15 @@ class TestModuleRoll(unittest.TestCase):
             center = loc.getCenter()
             depth_val = get_module_depth(current_depth_file, center)
             bounds = getModuleBounds(IMAGE_SIZE, center, depth_val)
-            current_image_file = current_image_file[bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :]
+            current_image_file = current_image_file[
+                bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+            ]
 
             calculated_degrees = estimates[current_file]
             estimated_degrees = get_module_roll(current_image_file)
 
-            LOW_BOUNDS = (estimated_degrees * .9)
-            HIGH_BOUNDS = (estimated_degrees * 1.1)
+            LOW_BOUNDS = estimated_degrees * 0.9
+            HIGH_BOUNDS = estimated_degrees * 1.1
 
             self.assertTrue(
                 LOW_BOUNDS <= calculated_degrees <= HIGH_BOUNDS
@@ -451,6 +449,7 @@ class TestModuleRoll(unittest.TestCase):
         module_roll = get_module_roll(enclosing_region)
 
         self.assertIs(type(module_roll), np.float64)
+
 
 if __name__ == "__main__":
     unittest.main()
