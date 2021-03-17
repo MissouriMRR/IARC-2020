@@ -15,7 +15,9 @@ import cv2
 from vision.module.in_frame import ModuleInFrame as mif
 from vision.module.location import ModuleLocation
 from vision.module.region_of_interest import region_of_interest
-from vision.module.module_orientation import get_module_orientation
+from vision.module.module_orientation import *
+from vision.module.module_bounding import getModuleBounds
+from vision.module.get_module_depth import *
 
 
 class TestModuleInFrame(unittest.TestCase):
@@ -367,6 +369,88 @@ class TestRegionOfInterest(unittest.TestCase):
 
         self.assertIs(type(roi), np.ndarray)
 
+class TestModuleRoll(unittest.TestCase):
+    """
+    Testing module.get_module_roll for validity.
+    """
+
+    def test_params(self):
+        """
+        Verify can handle input types
+
+        Parameters
+        ----------
+        enclosing_region: ndarray
+            The depth image.
+        module_roll: np.float64
+            Calculated float angle.
+        """
+
+        IMAGE_SIZE = [1080, 1920, 3]
+
+        enclosing_region = np.zeros(IMAGE_SIZE, dtype=np.uint8)
+        module_roll = get_module_roll(enclosing_region)
+
+        self.assertIs(type(enclosing_region), np.ndarray)
+        self.assertIs(type(module_roll), np.float64)
+
+    def test_module_roll(self):
+        img_dir = os.path.join(gparent_dir, "vision_images/module/Feb29")
+        files = os.listdir(img_dir)
+        loc = ModuleLocation()
+
+        estimates = {
+            # FORMAT: "name_of_file" : estimated float // COULD BE WILDLY OFF, just guesses as of right now
+            "2020-02-29_15.36.15.167565": 13.5,
+            "2020-02-29_15.40.46.652448": 14,
+            "2020-02-29_15.40.48.862847": 13
+
+        }
+
+        for current_file in estimates.keys():
+            IMAGE_SIZE = [1920, 1080]
+            # grabs and loads image file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
+            current_image_file = (
+                os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            )
+            current_depth_file = (
+                os.path.join(img_dir, current_file) + "-depthImage.npy"
+            )
+            # loads images
+            current_image_file = cv2.imread(current_image_file)
+            current_depth_file = np.load(current_depth_file)
+
+            # sets images to get center, depth_val, and bounds
+            loc.setImg(current_image_file, current_depth_file)
+            center = loc.getCenter()
+            depth_val = get_module_depth(current_depth_file, center)
+            bounds = getModuleBounds(IMAGE_SIZE, center, depth_val)
+            current_image_file = current_image_file[bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :]
+
+            calculated_degrees = estimates[current_file]
+            estimated_degrees = get_module_roll(current_image_file)
+
+            LOW_BOUNDS = (estimated_degrees * .9)
+            HIGH_BOUNDS = (estimated_degrees * 1.1)
+
+            self.assertTrue(
+                LOW_BOUNDS <= calculated_degrees <= HIGH_BOUNDS
+            )  # within ±10%
+
+    def test_return(self):
+        """
+        Verify returns only expected output
+
+        Returns
+        -------
+        np.float64
+        """
+        IMAGE_SIZE = [1080, 1920, 3]
+
+        enclosing_region = np.zeros(IMAGE_SIZE, dtype=np.uint8)
+        module_roll = get_module_roll(enclosing_region)
+
+        self.assertIs(type(module_roll), np.float64)
 
 if __name__ == "__main__":
     unittest.main()
