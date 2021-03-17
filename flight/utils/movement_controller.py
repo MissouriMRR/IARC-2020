@@ -18,8 +18,8 @@ class MovementController:
         """
         Function to calculate movement velocity:
         Parameters:
-            Drone(System): Our drone object
-            Pylon(LatLon): Targets for the drone found using GPS Latitude and Longitude
+            drone(System): Our drone object
+            pylon(LatLon): Targets for the drone found using GPS Latitude and Longitude
         Return:
             bool: True or false if the target is within range
             None: If we don't reach the target
@@ -141,7 +141,7 @@ class MovementController:
 
         return
 
-    async def move_to_takeoff(self, drone: System, takeoff_location: LatLon) -> None:
+    async def move_to_takeoff(self, drone: System, takeoff_location: LatLon) -> bool:
         """
         Similar to move_to function, but heights are changed so drone only descends when moving
         Parameters:
@@ -171,9 +171,9 @@ class MovementController:
             lon: float = round(gps.longitude_deg, 8)
             current: float = LatLon(lat, lon)  # you are here
 
-            # distance we have to go in order to get to the offset point
+            # distance we have to go in order to get to takeoff location
             dist: float = current.distance(takeoff_location)
-            # degrees needed to change to get to offset position
+            # degrees needed to change to get to takeoff  location
             deg: float = current.heading_initial(takeoff_location)
 
             # East, West
@@ -204,10 +204,11 @@ class MovementController:
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
             if (
-                abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
-                and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
+                abs(x) <= reference_x * 0.15
+                and abs(y) <= reference_y * 0.15
             ):
                 return True
+            count += 1
 
     async def manual_land(self, drone: System) -> None:
         """
@@ -218,7 +219,7 @@ class MovementController:
             None
         """
         # Lands the drone using manual velocity values
-        logging.info("Landing the drone")
+        logging.info("Landing the drone...")
         async for position in drone.telemetry.position():
             current_altitude: float = round(position.relative_altitude_m, 3)
             if current_altitude > 1.0:
