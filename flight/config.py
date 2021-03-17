@@ -35,15 +35,21 @@ pylon2: LatLon = LatLon(lat2, lon2)
 takeoff_pos = LatLon
 
 # Position for the mast
-MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # 37.948056
-MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)  # -91.784722
+MAST_LAT: Latitude = Latitude(
+    37.9486054
+)  # degree=37, minute=56, second=53.0)  # 37.948056 placeholder
+MAST_LON: Longitude = Longitude(
+    -91.7843514
+)  # degree=-91, minute=-47, second=-5.0)  # -91.784722
 MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
+# flight test lat: 37.9486054, lon: -91.7843514
 
 
 OFFSET_RIGHT = {"KM": 0.005, "DEG": 90}
 OFFSET_LEFT = {"KM": 0.005, "DEG": -90}
 OFFSET_BACK = {"KM": 0.005, "DEG": 180}
 OFFSET_FRONT = {"KM": 0.005, "DEG": 0}
+OFFSET_NONE = {"KM": 0, "DEG": 0}
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0

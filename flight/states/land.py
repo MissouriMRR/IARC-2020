@@ -31,7 +31,9 @@ class Land(State):
         )
 
         # await asyncio.sleep(config.THINK_FOR_S)
-        await mover.move_to(drone, config.takeoff_pos, config.OFFSET_BACK, 2)
+
+        # change config.OFFSET_ depending on what physical drone does
+        await mover.move_to(drone, config.takeoff_pos, config.OFFSET_FRONT, 2)
         await asyncio.sleep(config.THINK_FOR_S)
         logging.info("Preparing to land")
         await mover.manual_land(drone)
