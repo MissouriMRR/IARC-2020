@@ -408,17 +408,17 @@ class TestModuleRoll(unittest.TestCase):
 
         for current_file in estimates.keys():
             # Selects image
-            color_image = os.path.join(img_dir, current_file) + "-colorImage.jpg"
-            depth_image = os.path.join(img_dir, current_file) + "-depthImage.npy"
+            color_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
             # Loads images
-            colorImage = cv2.imread(color_image)
-            depthImage = np.load(depth_image)
+            color_image = cv2.imread(color_file)
+            depth_image = np.load(depth_file)
 
             center = estimates[current_file][1]
 
             # Sets a rough boundary around the module (angles are similar using get_module_bounds)
             bound = [center[1] - 250, center[1] + 250, center[0] - 180, center[0] + 180]
-            bounded_image = colorImage[bound[0] : bound[1], bound[2] : bound[3], :]
+            bounded_image = color_image[bound[0] : bound[1], bound[2] : bound[3], :]
 
             calculated_degrees = get_module_roll(bounded_image)
             estimated_degrees = estimates[current_file][0]
