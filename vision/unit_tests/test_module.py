@@ -409,10 +409,8 @@ class TestModuleRoll(unittest.TestCase):
         for current_file in estimates.keys():
             # Selects image
             color_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
-            depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
             # Loads images
             color_image = cv2.imread(color_file)
-            depth_image = np.load(depth_file)
 
             center = estimates[current_file][1]
 
