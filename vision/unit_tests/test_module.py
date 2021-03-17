@@ -15,7 +15,7 @@ import cv2
 from vision.module.in_frame import ModuleInFrame as mif
 from vision.module.location import ModuleLocation
 from vision.module.region_of_interest import region_of_interest
-from vision.module.module_orientation import get_module_roll,get_module_orientation
+from vision.module.module_orientation import get_module_roll, get_module_orientation
 
 
 class TestModuleInFrame(unittest.TestCase):
@@ -399,11 +399,11 @@ class TestModuleRoll(unittest.TestCase):
 
         estimates = {
             # FORMAT: "name_of_file" : [estimated float, (estimated center)]
-            "2020-02-29_15.36.15.167565": [20,(1180,300)],
-            "2020-02-29_15.40.46.652448": [14,(700,550)],
-            "2020-02-29_15.40.48.862847": [10,(1300,630)],
-            "2020-02-29_15.40.40.444538": [5,(830,670)],
-            "2020-02-29_15.40.54.564617": [8,(435,650)],
+            "2020-02-29_15.36.15.167565": [20, (1180, 300)],
+            "2020-02-29_15.40.46.652448": [14, (700, 550)],
+            "2020-02-29_15.40.48.862847": [10, (1300, 630)],
+            "2020-02-29_15.40.40.444538": [5, (830, 670)],
+            "2020-02-29_15.40.54.564617": [8, (435, 650)],
         }
 
         for current_file in estimates.keys():
@@ -417,7 +417,7 @@ class TestModuleRoll(unittest.TestCase):
             center = estimates[current_file][1]
 
             # Sets a rough boundary around the module (angles are similar using get_module_bounds)
-            bound = [center[1]- 250, center[1] + 250, center[0] - 180, center[0] + 180]
+            bound = [center[1] - 250, center[1] + 250, center[0] - 180, center[0] + 180]
             colorImage = colorImage[bound[0] : bound[1], bound[2] : bound[3], :]
 
             estimated_degrees = get_module_roll(colorImage)
