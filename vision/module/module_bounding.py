@@ -34,7 +34,8 @@ def getModuleBounds(dimensions, center, depth):
     x, y = center
     vert_res, horiz_res = dimensions
 
-    vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
+    # switched height and width so it worked while testing
+    vert_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth))
     horiz_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
 
     vert_ratio = vert_angle / (VERTICAL_FOV / 2)

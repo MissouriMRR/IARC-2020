@@ -405,6 +405,8 @@ class TestModuleRoll(unittest.TestCase):
             "2020-02-29_15.36.15.167565": 13.5,
             "2020-02-29_15.40.46.652448": 14,
             "2020-02-29_15.40.48.862847": 13,
+            "2020-02-29_15.40.40.444538": 9,
+            "2020-02-29_15.40.54.564617": 10
         }
 
         for current_file in estimates.keys():
@@ -417,6 +419,7 @@ class TestModuleRoll(unittest.TestCase):
             current_depth_file = np.load(current_depth_file)
 
             # sets images to get center, depth_val, and bounds
+            # works given the center value is correct from ModuleLocation()
             loc.setImg(current_image_file, current_depth_file)
             center = loc.getCenter()
             depth_val = get_module_depth(current_depth_file, center)

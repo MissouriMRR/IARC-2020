@@ -123,8 +123,8 @@ class Pipeline:
                 )  # overestimate of bounds
                 roll = get_module_roll(
                     color_image[
-                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
-                    ]
+                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+                    ] # Fixed bounds?
                 )  # roll of module
 
                 # construct boundingbox for the module
