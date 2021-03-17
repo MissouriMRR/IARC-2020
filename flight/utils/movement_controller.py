@@ -203,10 +203,7 @@ class MovementController:
             # if the x and y values are close enough (2m) to the original position * precision
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
-            if (
-                abs(x) <= reference_x * 0.15
-                and abs(y) <= reference_y * 0.15
-            ):
+            if abs(x) <= reference_x * 0.15 and abs(y) <= reference_y * 0.15:
                 return True
             count += 1
 
