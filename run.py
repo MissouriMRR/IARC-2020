@@ -61,7 +61,7 @@ def run_threads(sim: bool) -> None:
                 logging.error("Flight process terminated, restarting")
                 flight_process: Process = init_flight(flight_args)
                 flight_process.start()
-    except KeyboardInterrupt or AttributeError:
+    except (KeyboardInterrupt, AttributeError) as error:
         # Ctrl-C was pressed
         # TODO send a message to the flight process to land instead of
         # basically overwriting the process
@@ -77,8 +77,8 @@ def run_threads(sim: bool) -> None:
             comm_obj.set_state("land")
             flight_process: Process = init_flight(flight_args)
             flight_process.start()
-        except TimeoutError or flight.DroneNotFoundError:
-            logging.info("Drone timed out, cannot connect")
+        except (TimeoutError, flight.DroneNotFoundError) as connection_issue:
+            logging.info(connection_issue, ", cannot connect")
 
     # Join flight process before exiting function
     flight_process.join()
