@@ -11,7 +11,7 @@ import argparse
 SEARCH_RADIUS = 20
 
 
-def get_module_depth(depth_image, coordinates):
+def get_module_depth(depth_image: np.ndarray, coordinates: tuple) -> float:
     """
     Finds relative depth of the module
 
@@ -24,16 +24,43 @@ def get_module_depth(depth_image, coordinates):
 
     Returns
     -------
-    float: Depth at the center (in millimeters).
+    float: Depth of the module (in millimeters).
     """
     x_pos, y_pos = coordinates
 
-    depth_values_in_radius = depth_image[y_pos - SEARCH_RADIUS:y_pos + SEARCH_RADIUS, x_pos - SEARCH_RADIUS: x_pos + SEARCH_RADIUS]
+    direct_center_depth = depth_image[y_pos][x_pos]
+
+    search_radius = SEARCH_RADIUS
+
+    if direct_center_depth != 0:
+        # 750 chosen as a rough median for depth values
+        search_radius_multipler = direct_center_depth / 750
+
+        # inverted because higher depth values means further away
+        if search_radius_multipler > 2:
+            search_radius_multipler = 0.01
+        elif search_radius_multipler > 1:
+            search_radius_multipler = 1 - (search_radius_multipler - 1)
+        else:
+            search_radius_multipler = 1 + (1 - search_radius_multipler)
+
+        search_radius = int(round(SEARCH_RADIUS * search_radius_multipler))
+
+        if search_radius < 10:
+            search_radius = 10
+
+    depth_values_in_radius = depth_image[
+        y_pos - search_radius : y_pos + search_radius,
+        x_pos - search_radius : x_pos + search_radius,
+    ]
 
     # Gets rid of 0 depth values
     depth_values_in_radius = depth_values_in_radius[depth_values_in_radius != 0]
 
-    return np.mean(depth_values_in_radius)
+    avg = np.mean(depth_values_in_radius)
+    if np.isnan(avg):
+        return 0
+    return avg
 
 
 if __name__ == "__main__":
@@ -45,8 +72,10 @@ if __name__ == "__main__":
     or a path must be specified
     """
     # # Create object for parsing command-line options
-    parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
-                                            To read a .npy file, type \"python get_module_depth.py --i (image name).npy)\"")
+    parser = argparse.ArgumentParser(
+        description='Read .npy file and test for get_module_depth.\
+                                            To read a .npy file, type "python get_module_depth.py --i (image name).npy)"'
+    )
     # # Add argument which takes path to a bag file as an input
     parser.add_argument("-i", "--input", type=str, help="Path to the .npy file")
     # # Parse the command line arguments to an object
@@ -55,10 +84,12 @@ if __name__ == "__main__":
     if args.input:
         depthNpy = args.input
     else:
-        raise FileNotFoundError("No input parameter has been given. For help type --help")
+        raise FileNotFoundError(
+            "No input parameter has been given. For help type --help"
+        )
 
     depthImage = np.load(depthNpy)
 
     # Hard code the x and y coordinates as of now, until the module center detection is complete
-    print("Depth of module: " + str(get_module_depth(depthImage, (650, 650))))
-    print("Depth at center parameter: " + str(depthImage[650][650]))
+    print("Depth of module: " + str(get_module_depth(depthImage, (886, 823))))
+    print("Depth at center parameter: " + str(depthImage[886][823]))

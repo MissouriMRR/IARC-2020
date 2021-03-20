@@ -3,6 +3,7 @@ from mavsdk import System
 
 from .state import State
 from .takeoff import Takeoff
+from .simple_takeoff import SimpleTakeoff
 
 
 class Start(State):
@@ -10,4 +11,7 @@ class Start(State):
 
     async def run(self, drone: System) -> State:
         """Begins the state machine and returns the takeoff state"""
+        if self.state_settings.simple_takeoff:
+            return SimpleTakeoff(self.state_settings)
+
         return Takeoff(self.state_settings)
