@@ -25,23 +25,47 @@ class DetectModule(State):
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
             )
 
-            logging.info("Starting module detection...")
-
-            logging.info("Initiating Realsense")
+            logging.info("Initializing Realsense...")
             camera: Realsense = Realsense(0, 0, config.REALSENSE_FRAMERATE)
             camera.display_in_window()
+            logging.info("Realsense set up successfully")
 
-            logging.info("Starting vision pipeline")
+            logging.info("Starting vision pipeline...")
             pipeline: Pipeline = Pipeline(Queue(), Queue(), camera)
+            logging.info("Pipeline set up successfully")
 
-            logging.info("Running module detection")
-            pipeline.run("module_detection")
+            # Run module detection if set in the state settings
+            if self.state_settings.vision_test_type == "module":
 
-            await asyncio.sleep(10)
+                logging.info("Preparing to run module detection...")
+                pipeline.run("module_detection")
+                logging.info("Running module detection")
 
-            logging.info("Detection results:")
-            logging.info(pipeline.vision_communication)
+                await asyncio.sleep(10)
 
-            await asyncio.sleep(5)
+                logging.info("Module detection results:")
+                logging.info(pipeline.vision_communication)
 
+                await asyncio.sleep(5)
+            # Run mast text detection if set in the state settings
+            elif self.state_settings.vision_test_type == "text":
+
+                logging.info("Preparing to run mast text detection...")
+                pipeline.run("text_detection")
+                logging.info("Running text detection")
+
+                await asyncio.sleep(10)
+
+                logging.info("Text detection results:")
+                logging.info(pipeline.vision_communication)
+
+                await asyncio.sleep(5)
+            # Otherwise, no test was set
+            else:
+                if self.state_settings.vision_test_type == "":
+                    logging.warning("Provided vision test is empty")
+                else:
+                    logging.warning(f"Invalid vision test specified: {self.state_settings.vision_test_type}")
+
+        logging.info("DetectModule state finished")
         return Land(self.state_settings)
