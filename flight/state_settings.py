@@ -1,6 +1,6 @@
 """Class to contain setters and getters for settings in various flight states"""
 
-DEFAULT_EARLY_LAPS: int = 4
+DEFAULT_EARLY_LAPS: int = 2
 
 
 class StateSettings:

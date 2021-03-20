@@ -2,8 +2,8 @@
 """Segment test for running module detection directly from takeoff"""
 
 import logging
-from .flight_manager import FlightManager
-from .flight.state_settings import StateSettings
+from flight_manager import FlightManager
+from flight.state_settings import StateSettings
 
 
 if __name__ == "__main__":

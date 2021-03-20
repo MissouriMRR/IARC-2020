@@ -13,6 +13,11 @@ from .land import Land
 from vision.camera.realsense import Realsense
 from vision.pipeline import Pipeline
 
+async def arange(count):
+    """Asynchronous range"""
+    for i in range(count):
+        yield i
+
 
 class DetectModule(State):
     """Detects the module using computer vision"""
@@ -27,7 +32,6 @@ class DetectModule(State):
 
             logging.info("Initializing Realsense...")
             camera: Realsense = Realsense(0, 0, config.REALSENSE_FRAMERATE)
-            camera.display_in_window()
             logging.info("Realsense set up successfully")
 
             logging.info("Starting vision pipeline...")
@@ -41,10 +45,12 @@ class DetectModule(State):
                 pipeline.run("module_detection")
                 logging.info("Running module detection")
 
-                await asyncio.sleep(10)
+                await asyncio.sleep(5)
 
                 logging.info("Module detection results:")
-                logging.info(pipeline.vision_communication)
+               	async for i in arange(10):
+                    logging.info(pipeline.vision_communication.get())
+                    asyncio.sleep(0.3)
 
                 await asyncio.sleep(5)
             # Run mast text detection if set in the state settings
@@ -54,10 +60,10 @@ class DetectModule(State):
                 pipeline.run("text_detection")
                 logging.info("Running text detection")
 
-                await asyncio.sleep(10)
+                await asyncio.sleep(5)
 
                 logging.info("Text detection results:")
-                logging.info(pipeline.vision_communication)
+                logging.info(pipeline.vision_communication.get())
 
                 await asyncio.sleep(5)
             # Otherwise, no test was set
