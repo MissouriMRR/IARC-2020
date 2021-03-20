@@ -32,7 +32,6 @@ from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import get_module_bounds
 
 
-
 class Pipeline:
     """
     Pipeline to carry information from the cameras through
