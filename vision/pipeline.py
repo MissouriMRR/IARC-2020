@@ -29,7 +29,8 @@ from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
-from vision.module.module_bounding import getModuleBounds
+from vision.module.module_bounding import get_module_bounds
+
 
 
 class Pipeline:
@@ -102,11 +103,11 @@ class Pipeline:
             bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
 
         elif state == "module_detection":  # locating module
-            self.module_location.setImg(color_image, depth_image)
+            self.module_location.set_img(color_image, depth_image)
 
             # only do more calculation if module is in the image
-            if self.module_location.isInFrame():
-                center = self.module_location.getCenter()  # center of module in image
+            if self.module_location.is_in_frame():
+                center = self.module_location.get_center()  # center of module in image
                 depth = get_module_depth(
                     depth_image, center
                 )  # depth of center of module
@@ -118,7 +119,7 @@ class Pipeline:
                     region, center
                 )  # x and y tilt of module
 
-                bounds = getModuleBounds(
+                bounds = get_module_bounds(
                     color_image, center, depth
                 )  # overestimate of bounds
                 roll = get_module_roll(
