@@ -65,7 +65,9 @@ class DetectModule(State):
                 if self.state_settings.vision_test_type == "":
                     logging.warning("Provided vision test is empty")
                 else:
-                    logging.warning(f"Invalid vision test specified: {self.state_settings.vision_test_type}")
+                    logging.warning(
+                        f"Invalid vision test specified: {self.state_settings.vision_test_type}"
+                    )
 
         logging.info("DetectModule state finished")
         return Land(self.state_settings)
