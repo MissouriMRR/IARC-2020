@@ -96,26 +96,29 @@ class MovementController:
                 return True
             count += 1
 
-    async def turn(self, drone: System, degrees_turned = 180: int, left_turn = True: bool, time = 3.5: float) -> bool:
+    async def turn(self, drone: System, degrees_turned: int = 180, left_turn: bool = True, time: float = 3.5) -> bool:
         """
         Turns the drone around the pylon it is currently at
         Parameters:
-            Drone(System): Our drone object
+            drone(System): Our drone object
+            degrees_turned(int): The number of degrees to turn
+            left_turn(bool): Direction of the turn; left if True, right if False
+            time(float): Amount of time to complete the turn
         """
         # counts the number of data points read/sent to the drone per turn
         count: int = 0
 
         # Gets the velocity of the drone going into the turn
         async for tel in drone.telemetry.position_velocity_ned():
-            current_vel : double = (tel.velocity.north_m_s**2 + tel.velocity.east_m_s**2)**.5
+            current_vel: float = (tel.velocity.north_m_s**2 + tel.velocity.east_m_s**2)**.5
             break
 
         # Constant time
-        yawspeed_d_s = ((-1 * left_turn) * degrees_turned)/time
+        yawspeed_d_s: float = ((-1 * left_turn) * degrees_turned)/time
 
-        forward_m_s = 0
-        right_m_s = 0
-        down_m_s = 0
+        forward_m_s: float = 0
+        right_m_s: float = 0
+        down_m_s: float = 0
 
         async for tel in drone.telemetry.attitude_euler():
             # EulerAngle: [roll_deg, pitch_deg, yaw_deg]
@@ -123,8 +126,8 @@ class MovementController:
             current: float = (360 + round(tel.yaw_deg)) % 360
             # Calculate the angle required to turn 180 deg on the first data point
             if count == 0:
-                temp = (current + ((-1 * left_turn) * degrees_turned)) % 360
-                midpoint = (current + ((-1 * left_turn) * degrees_turned / 2)) % 360
+                temp: float = (current + ((-1 * left_turn) * degrees_turned)) % 360
+                midpoint: float = (current + ((-1 * left_turn) * degrees_turned / 2)) % 360
 
             # VelocityBodyYawspeed(forward m/s, right m/s, down m/s, yawspeed deg/s)
             # Sends signal to the drone to turn. **No need to send this multiple times
@@ -134,8 +137,8 @@ class MovementController:
             )
             # await asyncio.sleep(config.FAST_THINK_S)
             # Finds the difference between the current angle and desired angle
-            val = abs(current - temp)
-            mid_val = abs(current - midpoint)
+            val: float = abs(current - temp)
+            mid_val: float = abs(current - midpoint)
 
             if mid_val < 15:
                 forward_m_s = current_vel
