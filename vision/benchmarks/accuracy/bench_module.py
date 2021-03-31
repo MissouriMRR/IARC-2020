@@ -329,7 +329,7 @@ class BenchModuleAccuracy:
         if depth_val != 0 and not crash:
             try:
                 bound_region = image[
-                    bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                    bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
                 ]
                 roll = tester.accuracy_get_module_roll(bound_region)
                 file_output.write(str(roll))

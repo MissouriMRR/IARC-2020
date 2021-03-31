@@ -35,7 +35,7 @@ def get_module_bounds(dimensions, center, depth):
     vert_res, horiz_res = dimensions
 
     vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
-    horiz_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
+    horiz_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth))
 
     vert_ratio = vert_angle / (VERTICAL_FOV / 2)
     horiz_ratio = horiz_angle / (HORIZONTAL_FOV / 2)
