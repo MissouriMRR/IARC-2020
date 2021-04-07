@@ -80,13 +80,21 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     #     cv2.drawContours(colorImage, [box], 0, (0, 0, 255), 2)
 
     np_rectangles = np.asarray(rectangles)
-    angles = np_rectangles[:, 2]
 
-    # if the angle is absurd, it won't be taken
-    #   if the module is truly rolled at over 45 degrees, minAreaRect
-    #   should simply choose a different rectangle or axis
-    mask = np.where(abs(angles) < 45)
-    roll = np.mean(angles[mask])
+    try:
+        angles = np_rectangles[:, 2]
+
+        # if the angle is absurd, it won't be taken
+        #   if the module is truly rolled at over 45 degrees, minAreaRect
+        #   should simply choose a different rectangle or axis
+        # mask = np.where(abs(angles) < 45)
+        # NOTE: the above claim was not the case. Angles with an absolute value
+        #       above 45 are common, and should probably be used to not get a 0
+        #       value in most cases
+        
+        roll = np.mean(angles)
+    except:
+        roll = 0
 
     return roll
 

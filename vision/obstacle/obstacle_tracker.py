@@ -94,8 +94,8 @@ class ObstacleTracker:
         new_obstacles = np.array([])
 
         # transform the list of bounding boxes into an array of Obstacles
-        for i in np.arange(new_obstacle_boxes.size):
-            new_obstacles[i] = Obstacle(new_obstacle_boxes[i])
+        for i in np.arange(len(new_obstacle_boxes)):
+            np.append(new_obstacles, Obstacle(new_obstacle_boxes[i]))
 
         if not self.obstacles:
             self.obstacles = new_obstacles

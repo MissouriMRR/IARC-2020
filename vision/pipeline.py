@@ -88,15 +88,17 @@ class Pipeline:
             state = self.flight_communication.get_nowait()
         except Empty:
             state = prev_state
-
         ##
+
         bboxes = []
+
+        state = "module_detection"
 
         if state == "early_laps":  # navigation around the pylons
             bboxes = self.obstacle_finder.find(color_image, depth_image)
 
-            obstacle_tracker.update(bboxes)
-            bboxes = obstacle_tracker.getPersistentObstacles()
+            self.obstacle_tracker.update(bboxes)
+            bboxes = self.obstacle_tracker.getPersistentObstacles()
 
         elif state == "text_detection":  # approaching mast
             bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
@@ -115,7 +117,7 @@ class Pipeline:
                     depth_image, depth, center
                 )  # depth image sliced on underestimate bounds
                 orientation = get_module_orientation(
-                    region, center
+                    region
                 )  # x and y tilt of module
 
                 bounds = getModuleBounds(
@@ -123,7 +125,7 @@ class Pipeline:
                 )  # overestimate of bounds
                 roll = get_module_roll(
                     color_image[
-                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
+                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
                     ]
                 )  # roll of module
 
