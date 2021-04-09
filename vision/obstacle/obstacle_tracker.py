@@ -95,20 +95,23 @@ class ObstacleTracker:
 
         # transform the list of bounding boxes into an array of Obstacles
         for i in np.arange(len(new_obstacle_boxes)):
-            np.append(new_obstacles, Obstacle(new_obstacle_boxes[i]))
+            new_obstacles = np.append(new_obstacles, Obstacle(new_obstacle_boxes[i]))
 
-        if not self.obstacles:
+        # no previous obstacles
+        if self.obstacles.size:
             self.obstacles = new_obstacles
             return
 
-        # create an array of obstacles that existed in the previous (buffer) frame and replace the buffer with it
+        # compare new obstacles with previous buffer to find repeat obstacles
         for i in np.arange(new_obstacles.size):
-            if self._isSameObstacle(
-                new_obstacles[i], self.obstacles[i]
-            ):  # if new obj is within MVMT_TOLERANCE of old obj
-                new_obstacles[i].frame_persisted = (
-                    self.obstacles[i].frames_persisted + 1
-                )
+            for j in np.arange(self.obstacles.size):
+                if self._isSameObstacle(
+                    new_obstacles[i], self.obstacles[j]
+                ):  # if new obj is within MVMT_TOLERANCE of old obj
+                    new_obstacles[i].frame_persisted = (
+                        self.obstacles[j].frames_persisted + 1
+                    )
+                    break  # Found obstacle in old buffer, so don't need to check more obstacles
 
         # update buffer
         self.obstacles = new_obstacles

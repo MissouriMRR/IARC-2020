@@ -29,7 +29,7 @@ from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
-from vision.module.module_bounding import getModuleBounds
+from vision.module.module_bounding import get_module_bounds
 
 from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
