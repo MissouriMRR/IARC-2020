@@ -4,6 +4,11 @@ Takes information from the camera and gives it to vision
 
 import os
 import sys
+import asyncio
+import inspect
+import time
+
+start_time = time.time()
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -31,13 +36,17 @@ from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import get_module_bounds
 
+from vision.failure_flags import ObstacleDetectionFlags
+from vision.failure_flags import TextDetectionFlags
+from vision.failure_flags import ModuleDetectionFlags
+
 
 class Pipeline:
     """
     Pipeline to carry information from the cameras through
     the various vision algorithms out to flight.
-
     Parameters
+
     -------------
     vision_communication: multiprocessing Queue
         Interface to share vision information with flight.
@@ -73,11 +82,13 @@ class Pipeline:
 
         self.module_location = ModuleLocation()
 
+        self.vision_flags = []
+
     @property
     def picture(self):
         return next(self.camera)
 
-    def run(self, prev_state):
+    async def run(self, prev_state):
         """
         Process current camera frame.
         """
@@ -92,49 +103,102 @@ class Pipeline:
         ##
         bboxes = []
 
-        if state == "early_laps":  # navigation around the pylons
-            bboxes = self.obstacle_finder.find(color_image, depth_image)
+        flags = {}
 
-            obstacle_tracker.update(bboxes)
-            bboxes = obstacle_tracker.getPersistentObstacles()
+        state = "module_detection"
+        if state == "early_laps":  # navigation around the pylons
+            flags = ObstacleDetectionFlags()
+
+            try:
+                bboxes = await self.obstacle_finder.find(color_image, depth_image)
+                await self.obstacle_tracker.update(bboxes)
+            except:
+                flags.obstacle_finder = False
+
+            try:
+                bboxes = await self.obstacle_tracker.getPersistentObstacles()
+            except:
+                flags.obstacle_tracker = False
 
         elif state == "text_detection":  # approaching mast
-            bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
+            flags = TextDetectionFlags()
+
+            try:
+                bboxes = await self.text_detector.detect_russian_word(
+                    color_image, depth_image
+                )
+            except:
+                flags.detect_russian_word = False
 
         elif state == "module_detection":  # locating module
-            self.module_location.set_img(color_image, depth_image)
+            flags = ModuleDetectionFlags()
+            try:
+                await self.module_location.setImg(color_image, depth_image)
+            except:
+                flags.setImg = False
+
+            try:
+                inFrame = await self.module_location.isInFrame()
+            except:
+                inFrame = False
+                flags.isInFrame = False
 
             # only do more calculation if module is in the image
-            if self.module_location.is_in_frame():
-                center = self.module_location.get_center()  # center of module in image
-                depth = get_module_depth(
-                    depth_image, center
-                )  # depth of center of module
+            if inFrame:
+                try:
+                    center = await (
+                        self.module_location.getCenter()
+                    )  # center of module in image
+                except:
+                    flags.getCenter = False
 
-                region = region_of_interest(
-                    depth_image, depth, center
-                )  # depth image sliced on underestimate bounds
-                orientation = get_module_orientation(
-                    region, center
-                )  # x and y tilt of module
+                try:
+                    depth = await get_module_depth(
+                        depth_image, center
+                    )  # depth of center of module
+                except:
+                    flags.get_module_depth = False
 
-                bounds = get_module_bounds(
-                    color_image, center, depth
-                )  # overestimate of bounds
-                roll = get_module_roll(
-                    color_image[
-                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
-                    ]
-                )  # roll of module
+                try:
+                    egion = await region_of_interest(
+                        depth_image, depth, center
+                    )  # depth image sliced on underestimate bounds
+                except:
+                    flags.region_of_interest = False
+
+                try:
+                    orientation = await get_module_orientation(
+                        region
+                    )  # x and y tilt of module
+                except:
+                    flags.get_module_orientation = False
+
+                try:
+                    bounds = await getModuleBounds(
+                        color_image, center, depth
+                    )  # overestimate of bounds
+                except:
+                    flags.getModuleBounds = False
+
+                try:
+                    roll = await get_module_roll(
+                        color_image[
+                            bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+                        ]
+                    )  # roll of module
+                except:
+                    flags.get_module_roll = False
 
                 # construct boundingbox for the module
-                box = BoundingBox(bounds, ObjectType.MODULE)
+                box = await BoundingBox(bounds, ObjectType.MODULE)
                 box.module_depth = depth  # float
                 box.orientation = orientation + (roll,)  # x, y, z tilt
-                bboxes.append(box)
+                await bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
+
+        self.vision_flags.append(flags)
 
         ##
         self.vision_communication.put(
@@ -144,11 +208,10 @@ class Pipeline:
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
-
         return state
 
 
-def init_vision(vision_comm, flight_comm, video, runtime=100):
+async def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
     Alex, call this function - not run.
     """
@@ -158,7 +221,10 @@ def init_vision(vision_comm, flight_comm, video, runtime=100):
 
     for _ in range(runtime):
         state = pipeline.run(state)
+        asyncio.gather(state)
 
+    for flag in pipeline.vision_flags:
+        print(flag)
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
@@ -173,11 +239,17 @@ if __name__ == "__main__":
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    init_vision(vision_comm, flight_comm, video)
+    asyncio.run(init_vision(vision_comm, flight_comm, video))
 
     from time import sleep
 
     sleep(2)  # allow queue to close
 
+    # print(inspect.iscoroutinefunction(init_vision))
+    # print(inspect.iscoroutinefunction(Pipeline.__init__))
+    # print(inspect.iscoroutinefunction(Pipeline.picture))
+    # print(inspect.iscoroutinefunction(Pipeline.run))
+
     vision_comm.close()
     flight_comm.close()
+    print("--- %s seconds ---" % (time.time() - start_time))
