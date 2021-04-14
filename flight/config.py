@@ -44,7 +44,7 @@ MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
-NUM_LAPS: int = 2
+NUM_LAPS: int = 2 # FOR TESTING TURN TIMES
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
