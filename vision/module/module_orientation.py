@@ -81,16 +81,11 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
 
     np_rectangles = np.asarray(rectangles)
 
+    # NOTE: this try block exists such that the [:, 2] slice of
+    #         np_rectangles can be attempted without risking
+    #         crashing the algorithm and logging the failure flag
     try:
         angles = np_rectangles[:, 2]
-
-        # if the angle is absurd, it won't be taken
-        #   if the module is truly rolled at over 45 degrees, minAreaRect
-        #   should simply choose a different rectangle or axis
-        # mask = np.where(abs(angles) < 45)
-        # NOTE: the above claim was not the case. Angles with an absolute value
-        #       above 45 are common, and should probably be used to not get a 0
-        #       value in most cases
         
         roll = np.mean(angles)
     except:

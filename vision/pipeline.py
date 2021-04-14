@@ -106,12 +106,12 @@ class Pipeline:
 
             try:
                 bboxes = self.obstacle_finder.find(color_image, depth_image)
-                self.obstacle_tracker.update(bboxes)
             except:
                 flags.obstacle_finder = False
 
             if flags.obstacle_finder:
                 try:
+                    self.obstacle_tracker.update(bboxes)
                     bboxes = self.obstacle_tracker.getPersistentObstacles()
                 except:
                     flags.obstacle_tracker = False
@@ -133,13 +133,13 @@ class Pipeline:
 
             if flags.set_img:
                 try:
-                    inFrame = self.module_location.is_in_frame()
+                    in_frame = self.module_location.is_in_frame()
                 except:
-                    inFrame = False
+                    in_frame = False
                     flags.is_in_frame = False
 
                 # only do more calculation if module is in the image
-                if inFrame:
+                if in_frame:
                     # default values for bounding box construction
                     center = (0, 0)
                     roll = 0
@@ -152,15 +152,6 @@ class Pipeline:
                         center = self.module_location.get_center()  # center of module in image
                     except:
                         flags.get_center = False
-
-                    try:
-                        roll = get_module_roll(
-                            color_image[
-                                bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
-                            ]
-                        )  # roll of module
-                    except:
-                        flags.get_module_roll = False
 
                     if flags.get_center:
                         try:
@@ -194,11 +185,21 @@ class Pipeline:
                                 flags.get_module_bounds = False
 
                             if flags.get_module_bounds:
-                                # construct boundingbox for the module
-                                box = BoundingBox(bounds, ObjectType.MODULE)
-                                box.module_depth = depth  # float
-                                box.orientation = orientation + (roll,)  # x, y, z tilt
-                                bboxes.append(box)
+                                try:
+                                    roll = get_module_roll(
+                                        color_image[
+                                            bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+                                        ]
+                                    )  # roll of module
+                                except:
+                                    flags.get_module_roll = False
+                                
+                                if flags.get_module_roll:
+                                    # construct boundingbox for the module
+                                    box = BoundingBox(bounds, ObjectType.MODULE)
+                                    box.module_depth = depth  # float
+                                    box.orientation = orientation + (roll,)  # x, y, z tilt
+                                    bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
