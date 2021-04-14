@@ -226,6 +226,7 @@ async def init_vision(vision_comm, flight_comm, video, runtime=100):
     for flag in pipeline.vision_flags:
         print(flag)
 
+
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
 
