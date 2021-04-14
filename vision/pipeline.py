@@ -4,6 +4,7 @@ Takes information from the camera and gives it to vision
 
 import os
 import sys
+import numpy as np
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -29,8 +30,9 @@ from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
-from vision.module.module_bounding import getModuleBounds
+from vision.module.module_bounding import get_module_bounds
 
+from vision.failure_flags import FailureFlags
 from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
 from vision.failure_flags import ModuleDetectionFlags
@@ -97,9 +99,7 @@ class Pipeline:
 
         bboxes = []
 
-        flags = {}
-
-        state = "module_detection"
+        flags = FailureFlags()
 
         if state == "early_laps":  # navigation around the pylons
             flags = ObstacleDetectionFlags()
@@ -110,10 +110,11 @@ class Pipeline:
             except:
                 flags.obstacle_finder = False
 
-            try:
-                bboxes = self.obstacle_tracker.getPersistentObstacles()
-            except:
-                flags.obstacle_tracker = False
+            if flags.obstacle_finder:
+                try:
+                    bboxes = self.obstacle_tracker.getPersistentObstacles()
+                except:
+                    flags.obstacle_tracker = False
 
         elif state == "text_detection":  # approaching mast
             flags = TextDetectionFlags()
@@ -128,63 +129,76 @@ class Pipeline:
             try:
                 self.module_location.setImg(color_image, depth_image)
             except:
-                flags.setImg = False
+                flags.set_img = False
 
-            try:
-                inFrame = self.module_location.isInFrame()
-            except:
-                inFrame = False
-                flags.isInFrame = False
-
-            # only do more calculation if module is in the image
-            if inFrame:
+            if flags.set_img:
                 try:
-                    center = self.module_location.getCenter()  # center of module in image
+                    inFrame = self.module_location.is_in_frame()
                 except:
-                    flags.getCenter = False
+                    inFrame = False
+                    flags.is_in_frame = False
 
-                try:
-                    depth = get_module_depth(
-                        depth_image, center
-                    )  # depth of center of module
-                except:
-                    flags.get_module_depth = False
+                # only do more calculation if module is in the image
+                if inFrame:
+                    # default values for bounding box construction
+                    center = (0, 0)
+                    roll = 0
+                    depth = 0
+                    region = np.empty(1)
+                    orientation = (0, 0)
+                    bounds = np.empty(1)
 
-                try:
-                    region = region_of_interest(
-                        depth_image, depth, center
-                    )  # depth image sliced on underestimate bounds
-                except:
-                    flags.region_of_interest = False
-                
-                try:
-                    orientation = get_module_orientation(
-                        region
-                    )  # x and y tilt of module
-                except:
-                    flags.get_module_orientation = False
+                    try:
+                        center = self.module_location.get_center()  # center of module in image
+                    except:
+                        flags.get_center = False
 
-                try:
-                    bounds = getModuleBounds(
-                        color_image, center, depth
-                    )  # overestimate of bounds
-                except:
-                    flags.getModuleBounds = False
+                    try:
+                        roll = get_module_roll(
+                            color_image[
+                                bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+                            ]
+                        )  # roll of module
+                    except:
+                        flags.get_module_roll = False
 
-                try:
-                    roll = get_module_roll(
-                        color_image[
-                            bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
-                        ]
-                    )  # roll of module
-                except:
-                    flags.get_module_roll = False
+                    if flags.get_center:
+                        try:
+                            depth = get_module_depth(
+                                depth_image, center
+                            )  # depth of center of module
+                        except:
+                            flags.get_module_depth = False
 
-                # construct boundingbox for the module
-                box = BoundingBox(bounds, ObjectType.MODULE)
-                box.module_depth = depth  # float
-                box.orientation = orientation + (roll,)  # x, y, z tilt
-                bboxes.append(box)
+                        if flags.get_module_depth:
+                            try:
+                                region = region_of_interest(
+                                    depth_image, depth, center
+                                )  # depth image sliced on underestimate bounds
+                            except:
+                                flags.region_of_interest = False
+                            
+                            if flags.region_of_interest:
+                                try:
+                                    orientation = get_module_orientation(
+                                        region
+                                    )  # x and y tilt of module
+                                except:
+                                    flags.get_module_orientation = False
+
+                            try:
+                                bounds = get_module_bounds(
+                                    np.shape(color_image)[:2], center, depth
+                                )  # overestimate of bounds
+                            except:
+                                flags.get_module_bounds = False
+
+                            if flags.get_module_bounds:
+                                # construct boundingbox for the module
+                                box = BoundingBox(bounds, ObjectType.MODULE)
+                                box.module_depth = depth  # float
+                                box.orientation = orientation + (roll,)  # x, y, z tilt
+                                bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")

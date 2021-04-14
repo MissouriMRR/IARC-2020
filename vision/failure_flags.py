@@ -7,6 +7,8 @@ class FailureFlags:
     For each attribute, a value of True signals that the algorithm
     ran to completion without any problems
     """
+    def __init__(self):
+        pass
     
 class ObstacleDetectionFlags(FailureFlags):
     """
@@ -38,21 +40,21 @@ class ModuleDetectionFlags(FailureFlags):
     in the event of the program crashing during module detection
     """
     def __init__(self):
-        self.setImg = True
-        self.isInFrame = True
-        self.getCenter = True
+        self.set_img = True
+        self.is_in_frame = True
+        self.get_center = True
         self.get_module_depth = True
         self.region_of_interest = True
         self.get_module_orientation = True
-        self.getModuleBounds = True
+        self.get_module_bounds = True
         self.get_module_roll = True
 
     def __str__(self):
-        return ("setImg: " + ("OK" if self.setImg else "ERROR") +
-               ", isInFrame: " + ("OK" if self.isInFrame else "ERROR") +
-               ", getCenter: " + ("OK" if self.getCenter else "ERROR") +
+        return ("setImg: " + ("OK" if self.set_img else "ERROR") +
+               ", is_in_frame: " + ("OK" if self.is_in_frame else "ERROR") +
+               ", get_center: " + ("OK" if self.get_center else "ERROR") +
                ", get_module_depth: " + ("OK" if self.get_module_depth else "ERROR") +
                ", region_of_interest: " + ("OK" if self.region_of_interest else "ERROR") +
                ", get_module_orientation: " + ("OK" if self.get_module_orientation else "ERROR") +
-               ", getModuleBounds: " + ("OK" if self.getModuleBounds else "ERROR") +
+               ", get_module_bounds: " + ("OK" if self.get_module_bounds else "ERROR") +
                ", get_module_roll: " + ("OK" if self.get_module_roll else "ERROR"))

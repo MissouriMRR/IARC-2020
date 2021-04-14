@@ -32,7 +32,7 @@ def getModuleBounds(dimensions, center, depth):
     list - list of the four tuple vertices.
     """
     x, y = center
-    vert_res, horiz_res, channels = np.shape(dimensions)
+    vert_res, horiz_res = dimensions
 
     vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
     horiz_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
