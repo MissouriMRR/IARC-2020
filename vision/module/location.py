@@ -23,6 +23,10 @@ class ModuleLocation:
         self.depth = np.array(0)  # Depth image input
 
         self.circles = np.array(0)  # Array of circles detected in color image
+        self.clusters = []  # list of grouped circles that are near each other
+        self.best_cluster = np.array(
+            []
+        )  # the ideal group of circles with the most parallel slopes
 
         self.center = np.arange(2)  # x, y coordinates of center
         self.holes = np.zeros(
@@ -32,6 +36,9 @@ class ModuleLocation:
         self.slopes = np.array(0)  # Slopes between detected circles
         self.slope_heights = np.array(0)  # Histogram of slopes
         self.slope_bounds = np.array(0)  # Bounds of slope histogram
+        self.best_slopes = np.array(
+            []
+        )  # Histogram w/ greatest number of parallel slopes
 
         self.upper_bound = np.array(0)  # upper bound of slopes
         self.lower_bound = np.array(0)  # lower bound of slopes
@@ -54,12 +61,15 @@ class ModuleLocation:
         MIN_SLOPES_IN_BUCKET = (
             4  # Minimum number of slopes per bucket to identify the module
         )
-        MAX_CIRCLES = 500  # maximum number of circles that are allowed to be detected before in_frame fails
+        MAX_CIRCLES = 200  # maximum number of circles that are allowed to be detected before in_frame fails
         MIN_CIRCLES = 4  # minimum number of circles needed to perform calculations
+        MIN_PARALLELS = (
+            4  # minimum number of main parallel required for holes to be detected
+        )
 
         if self.needs_recalc:
-            # Circle Detection
-            self._circle_detection()
+            self._circle_detection()  # Detect circles on color image
+            self._cluster_circles()  # Group circles that are near each other
 
         # Only perform more calculations if there are a reasonable number of circles
         if (
@@ -67,14 +77,23 @@ class ModuleLocation:
             and np.shape(self.circles)[0] >= MIN_CIRCLES
         ):  # not too little and not too many circles found
             if self.needs_recalc:
-                # Get slopes and group parallel slopes
-                self._get_slopes()
-                self._group_slopes()
-                self.needs_recalc = False
+                num_parallels = 0
+                for cluster in self.clusters:
+                    # Attempt Slopes and Parallels with current cluster
+                    self._get_slopes(cluster)
+                    self._group_slopes(cluster)
+
+                    new_parallels = np.max(self.slope_heights)
+                    if new_parallels > num_parallels and new_parallels > MIN_PARALLELS:
+                        num_parallels = new_parallels
+                        self.best_slopes = self.slope_heights
+                        self.best_cluster = cluster
+
+                    self.needs_recalc = False
         else:
             return False
 
-        return any(self.slope_heights > MIN_SLOPES_IN_BUCKET)
+        return any(self.best_slopes > MIN_SLOPES_IN_BUCKET)
 
     ## Finding the Center
 
@@ -88,10 +107,13 @@ class ModuleLocation:
         """
         MAX_CIRCLES = 200  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
+        MIN_PARALLELS = (
+            8  # minimum number of main parallel required for holes to be detected
+        )
 
         if self.needs_recalc:
-            # Circle detection
-            self._circle_detection()
+            self._circle_detection()  # Detect circles on color image
+            self._cluster_circles()  # Group circles that are near each other
 
         # Only perform more calculations if there are a reasonable number of circles
         if (
@@ -99,13 +121,22 @@ class ModuleLocation:
             and np.shape(self.circles)[0] >= MIN_CIRCLES
         ):
             if self.needs_recalc:
-                # Get Slopes and Parallels
-                self._get_slopes()
-                self._group_slopes()
-                self.needs_recalc = False
+                num_parallels = 0
+                for cluster in self.clusters:
+                    # Attempt Slopes and Parallels with current cluster
+                    self._get_slopes(cluster)
+                    self._group_slopes(cluster)
+
+                    new_parallels = np.max(self.slope_heights)
+                    if new_parallels > num_parallels and new_parallels > MIN_PARALLELS:
+                        num_parallels = new_parallels
+                        self.best_slopes = self.slope_heights
+                        self.best_cluster = cluster
+
+                    self.needs_recalc = False
 
             # Find the Holes
-            self._get_hole_locations()
+            self._get_hole_locations(self.best_cluster)
 
             # Coordinates of the center of the front face of the module
             self.center = np.arange(0, 2)
@@ -126,7 +157,7 @@ class ModuleLocation:
         # or the previous center if no slope calculations were performed
         return tuple(self.center)
 
-    def _get_hole_locations(self) -> np.ndarray:
+    def _get_hole_locations(self, circles) -> np.ndarray:
         """
         Finds the locations of the 4 holes on the front face of the module.
 
@@ -134,7 +165,7 @@ class ModuleLocation:
         -------
         ndarray - locations of the 4 holes
         """
-        NUM_CIRCLES = np.shape(self.circles)[0]  # The number of circles
+        NUM_CIRCLES = np.shape(circles)[0]  # The number of circles
 
         sep = (self.upper_bound - self.lower_bound) / (
             self.num_buckets
@@ -157,11 +188,11 @@ class ModuleLocation:
                 y += int(y >= x)
 
                 if hole_idx == 0:
-                    self.holes = np.array(self.circles[x])
+                    self.holes = np.array(circles[x])
                 else:
-                    self.holes = np.append(self.holes, self.circles[x])
+                    self.holes = np.append(self.holes, circles[x])
 
-                self.holes = np.append(self.holes, self.circles[y])
+                self.holes = np.append(self.holes, circles[y])
                 hole_idx += 1
             idx += 1
 
@@ -169,7 +200,7 @@ class ModuleLocation:
         self.holes = np.unique(self.holes, axis=0)  # remove duplicates
         return self.holes
 
-    def _group_slopes(self) -> None:
+    def _group_slopes(self, circles) -> None:
         """
         Bucket sort slopes to find parallels.
 
@@ -177,8 +208,8 @@ class ModuleLocation:
         -------
         None
         """
-        BUCKET_MODIFIER = 0.5  # Changes how many buckets are in the range
-        NUM_CIRCLES = np.shape(self.circles)[0]  # The number of circles
+        BUCKET_MODIFIER = 2  # Changes how many buckets are in the range
+        NUM_CIRCLES = np.shape(circles)[0]  # The number of circles
         NUM_SLOPES = np.shape(self.slopes)[0]  # The number of slopes
 
         # Get parameters for bucket sorting
@@ -191,8 +222,9 @@ class ModuleLocation:
         bucket_width: np.float64 = (2 * interquartile_range) / (
             NUM_SLOPES ** (1 / 3)
         )  # Freedman–Diaconis rule
-        self.num_buckets: int = int(
-            round((self.upper_bound - self.lower_bound) / bucket_width)
+        self.num_buckets: int = (
+            int(round((self.upper_bound - self.lower_bound) / bucket_width))
+            + BUCKET_MODIFIER
         )
 
         # Bucket sort
@@ -200,7 +232,7 @@ class ModuleLocation:
             self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound)
         )
 
-    def _get_slopes(self) -> None:
+    def _get_slopes(self, circles) -> None:
         """
         Finds slopes between detected circles
 
@@ -209,8 +241,8 @@ class ModuleLocation:
         None
         """
         self.slopes = np.array([])
-        for x, y, _ in self.circles:
-            for iX, iY, _ in self.circles:
+        for x, y, _ in circles:
+            for iX, iY, _ in circles:
                 m = (iY - y) / (iX - x)
                 # slope must be non-infinite and can't be between the same circle
                 if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
@@ -326,61 +358,63 @@ class ModuleLocation:
 
         self.circles = np.delete(self.circles, circle_filter, axis=0)
 
-    def _cluster_circles(self) -> list:
+    def _cluster_circles(self) -> None:
         """
         Groups circles that are near each other, and filters/removes ones that are and not near other circles
 
         Returns
         -------
-        list[list[int]] - list of grouped circles that are near each other
+        None
         """
-        CRITERIA = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-        COMPACT_THRESH = (
-            50000  # NOTE: May need increase for higher res, only tested with 480p data
-        )
+        MIN_CIRCLES = 5  # minimum number of total circles to require clusting
+        CLSTR_CRITERIA = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        COMPACT_THRESH = 40000  # NOTE: May need scaling up for higher res, only tested with 480p data
         MAX_CLUSTERS = 30
 
-        if self.circles.shape[0] < 4:  # not enough circles for clustering
+        if self.circles.shape[0] < 5:  # not enough circles for clustering
             return self.circles
-        elif self.circles.shape[0] == 4:
-            num_clusters = 1
-        else:
-            num_clusters = 2
 
+        num_clusters = 2
         compactness = COMPACT_THRESH + 1  # init compactness to enter while loop
         while compactness > COMPACT_THRESH:  # ensure low variance within clusters
             compactness, labels, _ = cv2.kmeans(
                 data=self.circles.astype(np.float32),  # kmeans requires float32
                 K=num_clusters,
                 bestLabels=None,
-                criteria=CRITERIA,
+                criteria=CLSTR_CRITERIA,
                 attempts=30,
                 flags=cv2.KMEANS_PP_CENTERS,
             )
-
             if num_clusters > MAX_CLUSTERS:
                 return self.circles
-
             num_clusters += 1  # try higher K value
         num_clusters -= 1  # decrement extra post-increment
         labels = np.ravel(labels)  # flatten column vector
 
         # Organize circles into a list of clusters
-        clusters = [[] for x in np.arange(num_clusters)]
+        self.clusters = [[] for x in np.arange(num_clusters)]
         for i in np.arange(labels.shape[0]):
             cluster_index = labels[i]
-            clusters[cluster_index].append(list(self.circles[i]))
+            self.clusters[cluster_index].append(list(self.circles[i]))
 
-        # Remove clusters w/ <4 circles
-        i = 0
-        while i < num_clusters:
-            if len(clusters[i]) < 4:
-                del clusters[i]
-                num_clusters -= 1
-                i -= 1
-            i += 1
+        self._filter_small_clusters()  # remove clusters w/ < MIN_CIRCLES circles
 
-        return clusters
+    def _filter_small_clusters(self) -> None:
+        """
+        Filters out clusters with less than 4 circles in them
+
+        Returns
+        -------
+        None
+        """
+        MIN_CLUSTERS = 4  # minimum number of clusters to identify group as the module
+
+        i = 0  # cluster index counter
+        while i < len(self.clusters):
+            if len(self.clusters[i]) < MIN_CLUSTERS:
+                del self.clusters[i]
+            else:
+                i += 1
 
     def _circle_detection(self) -> np.ndarray:
         """
@@ -391,6 +425,7 @@ class ModuleLocation:
         ndarray - circles detected in image.
         """
         BLUR_SIZE = 5  # Size of the blur kernel
+        # NOTE: May need increase w/ higher resolution, only tested on 480p data set
         BRIGHTNESS_OFFSET = 42  # offset for brightness magnitude calculation
         DEPTH_THRESH = 5000  # (in mm), tolerated dist. to filter circles
 
@@ -434,18 +469,12 @@ class ModuleLocation:
         # Resize circles into 2d array
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
 
-        ## Post-processing circle filters ##
-        # Removes circles that aren't directly below text
+        ## Post-Processing: Circle filtering and grouping ##
+        # Remove circles that aren't directly below text
         self._filter_text_circles()
 
         # Remove circles that are farther than DEPTH_THRESHOLD millimeters away
         self._filter_distant_circles(DEPTH_THRESH)
-
-        # Filter out circles that are spread out
-        clusters = self._cluster_circles()
-        self.circles = np.array(
-            [circle for cluster in clusters for circle in cluster]
-        )  # flatten list of clusters back into circles
 
         return self.circles
 
@@ -466,23 +495,106 @@ class ModuleLocation:
         -------
         None
         """
+        # Set depth and color images
         self.depth = depth
         self.img = color
+
+        # Re-initialize all important values to zero/empty
         self.circles = np.array([])
+        self.clusters = []
+        self.best_cluster = np.array([])
+
+        self.best_slopes = np.array([])
+
         self.center = np.arange(2)
+        self.holes = np.zeros((4, 3), dtype=np.uint16)
+
         self.needs_recalc = True
 
     ## Visualization Functions
 
-    def show_img(self) -> None:
+    def show_img(self, draw_circles: bool = False, draw_center: bool = False) -> None:
         """
-        Shows the initial input image.
+        Displays color image, with color-coded circles and/or center if desired.
+
+        Circle color-coding:
+        -   White & filled in: The best_cluster of circles used for center & in_frame calculation
+        -   Green w/ orange center square: Circles in clusters that have less than 4 circles
+        -   Other colors: Unused clusters that didn't have as many parallel slopes as best_cluster
+
+        Parameters
+        ----------
+        draw_circles: bool
+            Whether to draw detected circles on the image.
+        draw_center: bool
+            Whether to draw the calculated center on the image.
 
         Returns
         -------
         None
         """
-        cv2.imshow("Module Location Image", self.img)
+        circle_img = np.copy(self.img)
+
+        if draw_circles:
+            self.get_center()
+
+            # draw all circles
+            for x, y, r in self.circles:
+                cv2.circle(circle_img, (x, y), r, (0, 255, 0), 1)  # green outer circle
+                cv2.rectangle(
+                    circle_img, (x - 1, y - 1), (x + 1, y + 1), (0, 128, 255), 1
+                )  # center orange rectangle
+
+            # draw clusters over self.circles
+            for cluster in self.clusters:
+                color = np.random.choice(range(256), size=3)
+                color = (int(color[0]), int(color[1]), int(color[2]))
+                thickness = 1
+                if (
+                    cluster == self.best_cluster
+                ):  # make the best_cluster white and filled in
+                    color = (255, 255, 255)
+                    thickness = -1
+                for x, y, r in cluster:
+                    cv2.circle(
+                        img=circle_img,
+                        center=(x, y),
+                        radius=r,
+                        color=color,
+                        thickness=thickness,
+                    )
+                    cv2.rectangle(
+                        img=circle_img,
+                        pt1=(x - 1, y - 1),
+                        pt2=(x + 1, y + 1),
+                        color=color,
+                        thickness=-1,
+                    )
+
+        if draw_center:
+            self.get_center()
+
+            cv2.circle(
+                img=circle_img,
+                center=(self.center[0], self.center[1]),
+                radius=20,
+                color=(0, 0, 255),
+                thickness=3,
+            )  # outer circle
+            cv2.circle(
+                img=circle_img,
+                center=(self.center[0], self.center[1]),
+                radius=1,
+                color=(0, 0, 255),
+                thickness=2,
+            )  # center dot
+
+        draw_circ_title = " w/ Clustered Hough Circles" if draw_circles else ""
+        draw_cent_title = " w/ Module Center" if draw_center else ""
+
+        cv2.imshow(
+            "Module Location Image" + draw_circ_title + draw_cent_title, circle_img
+        )
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -500,30 +612,16 @@ class ModuleLocation:
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-    def show_circles(self) -> None:
-        """
-        Shows an image of detected circles.
-
-        Returns
-        -------
-        None
-        """
-
-        circle_img = np.copy(self.img)
-
-        for x, y, r in self.circles:
-            cv2.circle(circle_img, (x, y), r, (0, 255, 0), 4)
-            cv2.rectangle(circle_img, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-
-        cv2.imshow("Module Circles", circle_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
     def save_img(
         self, file: str, draw_circles: bool = False, draw_center: bool = False
     ) -> None:
         """
-        Saves image, with circles or center if desired, in folder circles.
+        Saves image, with color-coded circles and/or center if desired, to file.
+
+        Circle color-coding:
+        -   White & filled in: The best_cluster of circles used for center & in_frame calculation
+        -   Green w/ orange center square: Circles in clusters that have less than 4 circles
+        -   Other colors: Unused clusters that didn't have as many parallel slopes as best_cluster
 
         Parameters
         ----------
@@ -541,11 +639,38 @@ class ModuleLocation:
         circle_img = np.copy(self.img)
 
         if draw_circles:
+            # draw all circles
             for x, y, r in self.circles:
-                cv2.circle(circle_img, (x, y), r, (0, 255, 0), 1)
+                cv2.circle(circle_img, (x, y), r, (0, 255, 0), 1)  # green outer circle
                 cv2.rectangle(
-                    circle_img, (x - 1, y - 1), (x + 1, y + 1), (0, 128, 255), -1
-                )
+                    circle_img, (x - 1, y - 1), (x + 1, y + 1), (0, 128, 255), 1
+                )  # center orange rectangle
+
+            # draw clusters over self.circles
+            for cluster in self.clusters:
+                color = np.random.choice(range(256), size=3)
+                color = (int(color[0]), int(color[1]), int(color[2]))
+                thickness = 1
+                if (
+                    cluster == self.best_cluster
+                ):  # make the best_cluster white and filled in
+                    color = (255, 255, 255)
+                    thickness = -1
+                for x, y, r in cluster:
+                    cv2.circle(
+                        img=circle_img,
+                        center=(x, y),
+                        radius=r,
+                        color=color,
+                        thickness=thickness,
+                    )
+                    cv2.rectangle(
+                        img=circle_img,
+                        pt1=(x - 1, y - 1),
+                        pt2=(x + 1, y + 1),
+                        color=color,
+                        thickness=-1,
+                    )
 
         if draw_center:
             cv2.circle(
@@ -564,37 +689,6 @@ class ModuleLocation:
             )  # center dot
 
         cv2.imwrite(file, circle_img)
-
-    def show_center(self) -> None:
-        """
-        Shows the image with detected holes and center.
-
-        Returns
-        -------
-        None
-        """
-
-        center_img = np.copy(self.img)
-        for x, y, r in self.holes:
-            cv2.circle(
-                img=center_img,
-                center=(int(x), int(y)),
-                radius=int(r),
-                color=(0, 0, 255),
-                thickness=-1,
-            )
-
-        cv2.circle(
-            img=center_img,
-            center=(self.center[0], self.center[1]),
-            radius=10,
-            color=(0, 255, 0),
-            thickness=-1,
-        )
-
-        cv2.imshow("Module Location Center", center_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
