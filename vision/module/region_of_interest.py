@@ -73,4 +73,6 @@ if __name__ == "__main__":
     depthImage = np.clip(depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90))
 
     # test values, should be replaced with values found using other vision tools
-    region_of_interest(depthImage, depthImage[560][650], (650, 560))
+    roi = region_of_interest(depthImage, depthImage[690][830], (830, 690))
+
+    print(roi.shape)

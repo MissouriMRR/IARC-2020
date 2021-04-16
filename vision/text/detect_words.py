@@ -41,7 +41,7 @@ class TextDetector:
         A list of bounding box objects that contain desired text
             Note that there may be different bounding boxes for each word
         """
-        sliced_rotated_image = self._get_rotated_min_area_rect(color_image, depth_image)
+        sliced_rotated_image, x_ul, y_ul = self._get_rotated_min_area_rect(color_image, depth_image)
 
         if len(sliced_rotated_image) == 0:
             return []
@@ -60,8 +60,8 @@ class TextDetector:
                 for j in contents[i]:
                     if j in self.text:
                         (x, y, w, h) = (
-                            tessdata["left"][i],
-                            tessdata["top"][i],
+                            tessdata["left"][i] + x_ul,
+                            tessdata["top"][i] + y_ul,
                             tessdata["width"][i],
                             tessdata["height"][i],
                         )
@@ -129,6 +129,9 @@ class TextDetector:
         rect = cv2.minAreaRect(largestContour)
 
         center, size, theta = rect
+        
+        x_ul = center[0] - (size[0] / 2)
+        y_ul = center[1] - (size[1] / 2)
 
         # adjust angle so the image isn't corrected to a 90 degree angle
         if abs(theta) > 45:
@@ -150,7 +153,7 @@ class TextDetector:
             points[1][1] : points[0][1], points[1][0] : points[2][0]
         ]
 
-        return sliced_rotated_image
+        return sliced_rotated_image, x_ul, y_ul
 
     def visualize_min_area_rect(
         self, color_image: np.ndarray, depth_image: np.ndarray
@@ -169,7 +172,7 @@ class TextDetector:
         -----
         None
         """
-        sliced_rotated_image = self._get_rotated_min_area_rect(color_image, depth_image)
+        sliced_rotated_image, _, __ = self._get_rotated_min_area_rect(color_image, depth_image)
 
         cv2.imshow("MinAreaRect", sliced_rotated_image)
         cv2.waitKey(0)
@@ -207,4 +210,4 @@ if __name__ == "__main__":
     result = detector.detect_russian_word(color_image, depth_image)
     print(result)
 
-    # box_plotter.plot_box(result, mask_image)
+    # box_plotter.plot_box(result, color_image)
