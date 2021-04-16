@@ -13,6 +13,7 @@ from .land import Land
 from vision.camera.realsense import Realsense
 from vision.pipeline import Pipeline
 
+
 async def arange(count):
     """Asynchronous range"""
     for i in range(count):
@@ -48,9 +49,9 @@ class DetectModule(State):
                 await asyncio.sleep(5)
 
                 logging.info("Module detection results:")
-               	async for i in arange(10):
+                async for i in arange(10):
                     logging.info(pipeline.vision_communication.get())
-                    asyncio.sleep(0.3)
+                    await asyncio.sleep(0.3)
 
                 await asyncio.sleep(5)
             # Run mast text detection if set in the state settings

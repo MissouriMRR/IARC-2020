@@ -24,6 +24,9 @@ if __name__ == "__main__":
         state_settings.enable_to_mast(False)
         state_settings.enable_module_detection(False)
 
+        state_settings.set_run_title("Pylon Laps Test")
+        state_settings.set_run_description("Perform all 8 laps during early laps")
+
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()
     except:

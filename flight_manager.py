@@ -57,6 +57,9 @@ class FlightManager:
         flight_process.start()
         logging.debug("Flight process with id %d started", flight_process.pid)
 
+        logging.debug(f"Title: {self.state_settings.run_title}")
+        logging.debug(f"Description: {self.state_settings.run_description}")
+
         try:
             while comm_obj.get_state() != "final":
                 # If the process is no longer alive,

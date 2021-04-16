@@ -24,6 +24,9 @@ if __name__ == "__main__":
         state_settings.enable_to_mast(True)
         state_settings.enable_module_detection(True)
 
+        state_settings.set_run_title("Module Detection Test")
+        state_settings.set_run_description("Early laps, then going to the mast, then running module detection")
+
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()
     except:

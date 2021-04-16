@@ -3,6 +3,8 @@
 DEFAULT_EARLY_LAPS: int = 2
 DEFAULT_RETURN_LAPS: int = 2
 DEFAULT_VISION_TEST: str = "module"
+DEFAULT_RUN_TITLE: str = "N/A"
+DEFAULT_RUN_DESCRIPTION: str = "N/A"
 
 
 class StateSettings:
@@ -27,6 +29,10 @@ class StateSettings:
         # ReturnLaps settings
         self.do_return_laps: bool = False
         self.num_return_laps: int = DEFAULT_RETURN_LAPS
+
+        # Other settings
+        self.run_title: str = DEFAULT_RUN_TITLE
+        self.run_description: str = DEFAULT_RUN_DESCRIPTION
 
     # ---- Takeoff settings ---- #
 
@@ -83,3 +89,13 @@ class StateSettings:
     def set_number_of_return_laps(self, num_laps: int) -> None:
         """Setter for how many return laps to do"""
         self.num_return_laps = num_laps
+
+    # ---- Other settings ---- #
+
+    def set_run_title(self, title: str) -> None:
+        """Set a title for the run/test to be output in logging"""
+        self.run_title = title
+
+    def set_run_description(self, description: str) -> None:
+        """Set a description for the run/test to be output in logging"""
+        self.run_description = description
