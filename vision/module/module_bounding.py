@@ -14,9 +14,9 @@ HORIZONTAL_FOV = 86  # degrees
 PADDING_CONSTANT = 1.15
 
 
-def getModuleBounds(dimensions, center, depth):
+def get_module_bounds(dimensions, center, depth):
     """
-    getModuleBounds will find four coordinates within the module that will be used to create a BoundingBox.
+    get_module_bounds will find four coordinates within the module that will be used to create a BoundingBox.
 
     Parameters
     ----------
@@ -35,7 +35,7 @@ def getModuleBounds(dimensions, center, depth):
     vert_res, horiz_res = dimensions
 
     vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
-    horiz_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
+    horiz_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth))
 
     vert_ratio = vert_angle / (VERTICAL_FOV / 2)
     horiz_ratio = horiz_angle / (HORIZONTAL_FOV / 2)
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90)
     )
 
-    tl, tr, br, bl = getModuleBounds((1080, 1920), (995, 600), depthImage[600][995])
+    tl, tr, br, bl = get_module_bounds((1080, 1920), (995, 600), depthImage[600][995])
     colorImage = colorImage[tl[1] : bl[1], bl[0] : br[0]]
 
     cv2.imshow("Module Bounding", colorImage)
