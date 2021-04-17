@@ -2,6 +2,7 @@ class FailureFlags:
     """
     Abstract class used by the pipeline to track which algorithm failed
     in the event of the program crashing
+
     For each attribute, a value of True signals that the algorithm
     ran to completion without any problems
     """

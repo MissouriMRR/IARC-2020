@@ -169,7 +169,7 @@ class Pipeline:
                     try:
                         center = (
                             self.module_location.get_center()
-                        )  # center of module in image
+                        )  # center of module in image]
                     except:
                         flags.get_center = False
 
@@ -223,6 +223,7 @@ class Pipeline:
                                     box.orientation = orientation + (
                                         roll,
                                     )  # x, y, z tilt
+
                                     bboxes.append(box)
 
         else:

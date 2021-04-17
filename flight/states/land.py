@@ -30,8 +30,8 @@ class Land(State):
             sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
         )
 
-        await asyncio.sleep(config.THINK_FOR_S)
-        await mover.move_to_takeoff(drone, config.takeoff_pos)
+        #await asyncio.sleep(config.THINK_FOR_S)
+        #await mover.move_to_takeoff(drone, config.takeoff_pos)
         await asyncio.sleep(config.THINK_FOR_S)
         logging.info("Preparing to land")
         await mover.manual_land(drone)
@@ -44,4 +44,4 @@ class Land(State):
             )
         logging.info("Disarming the drone")
         await drone.action.kill()
-        return Final()
+        return Final(self.state_settings)
