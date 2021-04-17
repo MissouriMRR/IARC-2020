@@ -7,6 +7,7 @@ import mavsdk as sdk
 
 from .states import STATES, State
 from . import config
+from .state_settings import StateSettings
 
 # from vision.camera.realsense import Realsense
 
@@ -87,18 +88,22 @@ async def wait_for_drone(drone: System) -> None:
             return
 
 
-def flight(comm, sim: bool, log_queue, worker_configurer) -> None:
+def flight(
+    comm, sim: bool, log_queue, worker_configurer, state_settings: StateSettings
+) -> None:
     """Starts the asyncronous event loop for the flight code"""
     worker_configurer(log_queue)
     logging.debug("Flight process started")
-    asyncio.get_event_loop().run_until_complete(init_and_begin(comm, sim))
+    asyncio.get_event_loop().run_until_complete(
+        init_and_begin(comm, sim, state_settings)
+    )
 
 
-async def init_and_begin(comm, sim: bool) -> None:
+async def init_and_begin(comm, sim: bool, state_settings: StateSettings) -> None:
     """Creates drone object and passes it to start_flight"""
     try:
         drone: System = await init_drone(sim)
-        await start_flight(comm, drone)
+        await start_flight(comm, drone, state_settings)
     except DroneNotFoundError:
         logging.exception("Drone was not found")
         return
@@ -124,7 +129,7 @@ async def init_drone(sim: bool) -> System:
     return drone
 
 
-async def start_flight(comm, drone: System):
+async def start_flight(comm, drone: System, state_settings: StateSettings):
     """Creates the state machine and watches for exceptions"""
     # Continuously log flight mode changes
     flight_mode_task = asyncio.ensure_future(log_flight_mode(drone))
@@ -133,7 +138,8 @@ async def start_flight(comm, drone: System):
 
     try:
         # Initialize the state machine at the current state
-        state_machine: StateMachine = StateMachine(STATES[comm.get_state()](), drone)
+        initial_state: State = STATES[comm.get_state()](state_settings)
+        state_machine: StateMachine = StateMachine(initial_state, drone)
         await state_machine.run()
     except Exception:
         logging.exception("Exception occurred in state machine")
