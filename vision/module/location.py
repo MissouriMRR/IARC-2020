@@ -34,16 +34,10 @@ class ModuleLocation:
             (4, 3), dtype=np.uint16
         )  # Set of (x, y, r) coordinates, location of the holes
 
-        self.slopes = np.array(0)  # Slopes between detected circles
-        self.slope_heights = np.array(0)  # Histogram of slopes
-        self.slope_bounds = np.array(0)  # Bounds of slope histogram
         self.best_slopes = np.array(
-            []
-        )  # Histogram w/ greatest number of parallel slopes
-
-        self.upper_bound = np.array(0)  # upper bound of slopes
-        self.lower_bound = np.array(0)  # lower bound of slopes
-        self.num_buckets = np.array(0)  # number of buckets applied to slopes
+            0
+        )  # Slopes between detected circles of the identified module
+        self.best_grouped_slopes = ()  # Histogram & bucket width of group of slopes that are most likely the modules'
 
         self.needs_recalc = (
             True  # Prevents recalculation of circles, slopes, and slope grouping
@@ -64,7 +58,6 @@ class ModuleLocation:
         )
         MAX_CIRCLES = 200  # maximum number of circles that are allowed to be detected before in_frame fails
         MIN_CIRCLES = 4  # minimum number of circles needed to perform calculations
-        MIN_PARALLELS = 4  # minimum number of main parallel slopes required for holes to be detected
 
         if self.needs_recalc:
             self._circle_detection()  # Detect circles on color image
@@ -75,27 +68,14 @@ class ModuleLocation:
                 np.shape(self.circles)[0] <= MAX_CIRCLES
                 and np.shape(self.circles)[0] >= MIN_CIRCLES
             ):  # not too little and not too many circles found
-                if self.needs_recalc:
-                    max_parallels = 0
-                    for cluster in self.clusters:
-                        # Attempt Slopes and Parallels with current cluster
-                        self._get_slopes(cluster)
-                        self._group_slopes(cluster)
-
-                        new_parallels = np.max(self.slope_heights)
-                        if (
-                            new_parallels > max_parallels
-                            and new_parallels >= MIN_PARALLELS
-                        ):
-                            max_parallels = new_parallels
-                            self.best_slopes = self.slope_heights
-                            self.best_cluster = cluster
-
-                        self.needs_recalc = False
+                self.best_cluster = self._find_best_cluster()
+                self.needs_recalc = False
             else:
                 return False
 
-        return any(self.best_slopes > MIN_SLOPES_IN_BUCKET)
+        best_slope_heights = self.best_grouped_slopes[0]
+
+        return np.any(best_slope_heights > MIN_SLOPES_IN_BUCKET)
 
     ## Finding the Center
 
@@ -109,7 +89,9 @@ class ModuleLocation:
         """
         MAX_CIRCLES = 200  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
-        MIN_PARALLELS = 4  # minimum number of main parallel slopes required for holes to be detected
+
+        # Coordinates of the center of the front face of the module
+        self.center = np.arange(0, 2)  # default center value (0, 1)
 
         if self.needs_recalc:
             self._circle_detection()  # Detect circles on color image
@@ -119,79 +101,96 @@ class ModuleLocation:
             if (
                 np.shape(self.circles)[0] <= MAX_CIRCLES
                 and np.shape(self.circles)[0] >= MIN_CIRCLES
-            ):
-                max_parallels = 0
-                for cluster in self.clusters:
-                    # Attempt Slopes and Parallels with current cluster
-                    self._get_slopes(cluster)
-                    self._group_slopes(cluster)
+            ):  # not too little and not too many circles found
+                self.best_cluster = self._find_best_cluster()
+                self.needs_recalc = False
+            else:
+                return tuple(self.center)  # returns, no center found
 
-                    new_parallels = np.max(self.slope_heights)
-                    if new_parallels > max_parallels and new_parallels >= MIN_PARALLELS:
-                        max_parallels = new_parallels
-                        self.best_slopes = self.slope_heights
-                        self.best_cluster = cluster
+        # Find the Holes
+        self._get_hole_locations()
 
-                    self.needs_recalc = False
+        # Average hole coordinates to find center coordinates
+        x_total = 0
+        y_total = 0
+        num_holes = 0
+        for x, y, _ in self.holes:
+            x_total += x
+            y_total += y
+            num_holes += 1
 
-            # Find the Holes
-            self._get_hole_locations(self.best_cluster)
-
-            # Coordinates of the center of the front face of the module
-            self.center = np.arange(0, 2)
-
-            # Average hole coordinates to find center coordinates
-            x_total = 0
-            y_total = 0
-            num_holes = 0
-            for x, y, _ in self.holes:
-                x_total += x
-                y_total += y
-                num_holes += 1
-
-            self.center[0] = x_total // num_holes
-            self.center[1] = y_total // num_holes
+        self.center[0] = x_total // num_holes
+        self.center[1] = y_total // num_holes
 
         # Returns either the center in the current image
-        # or the previous center if no slope calculations were performed
+        # or the center (0, 1) if no center was found
         return tuple(self.center)
 
-    def _get_hole_locations(self, circles) -> np.ndarray:
+    def _find_best_cluster(self) -> np.ndarray:
         """
-        Finds the locations of the 4 holes on the front face of the module.
+        Finds the cluster with the greatest amount of parallel slopes
+
+        Returns
+        -------
+        np.ndarray - the group of circles with the most parallel slopes
+        """
+        MIN_PARALLELS = 4  # minimum number of main parallel slopes required for holes to be detected
+
+        best_cluster = np.array([])
+
+        max_parallels = 0
+        for cluster in self.clusters:
+            # Attempt Slopes and Parallels with current cluster
+            slopes = self._get_slopes(cluster)  # slopes between circles
+            grouped_slopes = self._group_slopes(slopes)  # bucket sorted slopes
+            slope_heights = grouped_slopes[0]  # slope histogram heights
+
+            # If this cluster returned more main parallel slopes, make it the new best_cluster
+            new_parallels = np.max(slope_heights)  # just-calculated main parallels
+            if new_parallels > max_parallels and new_parallels >= MIN_PARALLELS:
+                max_parallels = new_parallels
+                self.best_slopes = slopes
+                self.best_grouped_slopes = grouped_slopes
+                best_cluster = np.array(cluster)
+
+        return best_cluster
+
+    def _get_hole_locations(self) -> np.ndarray:
+        """
+        Finds the locations of the 4 holes on the front face of the module
+        based on best_cluster, best_slopes, and best_grouped_slopes
 
         Returns
         -------
         ndarray - locations of the 4 holes
         """
-        NUM_CIRCLES = np.shape(circles)[0]  # The number of circles
-
-        sep = (self.upper_bound - self.lower_bound) / (
-            self.num_buckets
-        )  # seperation from main parallel, width of a bucket
+        SLOPE_HEIGHTS = self.best_grouped_slopes[0]  # best histogram slope heights
+        SLOPE_BOUNDS = self.best_grouped_slopes[1]  # best histogram slope bounds
+        SEPARATION = self.best_grouped_slopes[2]  # best histogram's bucket width
+        NUM_CIRCLES = np.shape(self.best_cluster)[0]  # The number of circles
 
         # Find Slope with Most Parallels
-        bucket_ind = np.argmax(self.slope_heights)  # highest segment of histogram
-        parallel = self.slope_bounds[bucket_ind] - (
-            sep / 2
+        bucket_ind = np.argmax(SLOPE_HEIGHTS)  # highest segment of histogram
+        parallel = SLOPE_BOUNDS[bucket_ind] - (
+            SEPARATION / 2
         )  # slope at highest segment minus half bucket width is main parallel
 
         # Find Holes Associated with parallels
         idx = 0
         hole_idx = 0
-        for slope in self.slopes:
-            if np.abs(slope - parallel) <= sep:
+        for slope in self.best_slopes:
+            if np.abs(slope - parallel) <= SEPARATION:
                 # x and y are the indexes of 2 circles corresponding to a slope
                 x = idx // (NUM_CIRCLES - 1)
                 y = idx % (NUM_CIRCLES - 1)
                 y += int(y >= x)
 
                 if hole_idx == 0:
-                    self.holes = np.array(circles[x])
+                    self.holes = np.array(self.best_cluster[x])
                 else:
-                    self.holes = np.append(self.holes, circles[x])
+                    self.holes = np.append(self.holes, self.best_cluster[x])
 
-                self.holes = np.append(self.holes, circles[y])
+                self.holes = np.append(self.holes, self.best_cluster[y])
                 hole_idx += 1
             idx += 1
 
@@ -199,56 +198,72 @@ class ModuleLocation:
         self.holes = np.unique(self.holes, axis=0)  # remove duplicates
         return self.holes
 
-    def _group_slopes(self, circles) -> None:
+    def _group_slopes(self, slopes: np.ndarray) -> np.ndarray:
         """
         Bucket sort slopes to find parallels.
 
+        Parameters
+        ----------
+        slopes: np.ndarray
+            Slopes to use for bucket sorting
+
         Returns
         -------
-        None
+        tuple - (slope_heights, slope_bounds, bucket_width) - histogram of slopes with bucket width
         """
         BUCKET_MODIFIER = 2  # Changes how many buckets are in the range
-        NUM_CIRCLES = np.shape(circles)[0]  # The number of circles
-        NUM_SLOPES = np.shape(self.slopes)[0]  # The number of slopes
+        NUM_SLOPES = np.shape(slopes)[0]  # The number of slopes
 
         # Get parameters for bucket sorting
-        self.upper_bound = np.amax(self.slopes)
-        self.lower_bound = np.amin(self.slopes)
+        upper_bound = np.amax(slopes)
+        lower_bound = np.amin(slopes)
 
-        interquartile_range: np.float64 = np.percentile(
-            self.slopes, 75
-        ) - np.percentile(self.slopes, 25)
+        interquartile_range: np.float64 = np.percentile(slopes, 75) - np.percentile(
+            slopes, 25
+        )
         bucket_width: np.float64 = (2 * interquartile_range) / (
             NUM_SLOPES ** (1 / 3)
         )  # Freedman–Diaconis rule
-        self.num_buckets: int = (
-            int(round((self.upper_bound - self.lower_bound) / bucket_width))
-            + BUCKET_MODIFIER
+        num_buckets: int = (
+            int(round((upper_bound - lower_bound) / bucket_width)) + BUCKET_MODIFIER
         )
 
         # Bucket sort
-        self.slope_heights, self.slope_bounds = np.histogram(
-            self.slopes, self.num_buckets, (self.lower_bound, self.upper_bound)
+        slope_heights, slope_bounds = np.histogram(
+            slopes, num_buckets, (lower_bound, upper_bound)
         )
 
-    def _get_slopes(self, circles) -> None:
+        result_bucket_width = (upper_bound - lower_bound) / (
+            num_buckets
+        )  # width of a bucket
+
+        return (slope_heights, slope_bounds, result_bucket_width)
+
+    def _get_slopes(self, circles: np.ndarray) -> np.ndarray:
         """
-        Finds slopes between detected circles
+        Finds slopes between circles.
+
+        Parameters
+        ----------
+        circles: np.ndarray
+            Array of circles to get the slopes of
 
         Returns
         -------
-        None
+        np.ndarray - Array of calculated slopes between circles
         """
-        self.slopes = np.array([])
+        slopes = np.array([])
         for x, y, _ in circles:
             for iX, iY, _ in circles:
                 m = (iY - y) / (iX - x)
                 # slope must be non-infinite and can't be between the same circle
                 if (not np.isnan(m)) and (not np.isinf(m)) and (x != iX and y != iY):
-                    self.slopes = np.append(self.slopes, m)
+                    slopes = np.append(slopes, m)
 
         # Convert slopes to degrees
-        self.slopes = np.degrees(np.arctan(self.slopes))
+        slopes = np.degrees(np.arctan(slopes))
+
+        return slopes
 
     ## Image Processing
 
@@ -267,9 +282,13 @@ class ModuleLocation:
         """
         # Get gray scale of color image
         gray = cv2.cvtColor(src=self.img, code=cv2.COLOR_RGB2GRAY)
+        median_brightness = np.median(gray)  # median brightness of gray scale image
+
+        if not median_brightness:  # prevent divide by zero
+            median_brightness = 1
 
         # Calculate magnitude of brightness based on median + offset
-        alpha_value = (128 + offset) / (np.median(gray))
+        alpha_value = (128 + offset) / median_brightness
 
         # Brighten image
         brightened_image = cv2.addWeighted(
@@ -284,7 +303,7 @@ class ModuleLocation:
 
         Returns
         -------
-        None
+        np.ndarray - filtered array of circles
         """
         # Return if no text boxes
         if not self.text_boxes:
@@ -297,31 +316,22 @@ class ModuleLocation:
         axes_vals = vertices.transpose()  # axis_vals[0] = x, axis_vals[1] = y
 
         # Find max and min values for each axis
-        max_x = np.max(axes_vals[0])
-        min_x = np.min(axes_vals[0])
-        max_y = np.max(axes_vals[1])
-        min_y = np.min(axes_vals[1])
-
-        # Create rectangle that encompasses all detected text boxes
-        # ul_bound = (min_x, min_y) # upper left corner #NOTE: not needed
-        # ur_bound = (max_x, min_y) # upper right corner #NOTE: not needed
-        ll_bound = (min_x, max_y)  # lower left corner
-        lr_bound = (max_x, max_y)  # lower right corner
+        x_ubound = np.max(axes_vals[0])  # horizontal upper bound of text
+        x_lbound = np.min(axes_vals[0])  # horizontal lower bound of text
+        y_lbound = np.max(axes_vals[1])  # vertical lower bound of text
 
         # Filter out rectangles that are not directly below text
         circle_filter = np.array(
             [], dtype=np.uint16
         )  # array of indices of circles out of bounds
 
-        i = 0
-        for x, y, _ in self.circles:
-            if y <= lr_bound[1]:  # remove if above lower bound of text
+        for i, (x, y, _) in enumerate(self.circles):
+            if y <= y_lbound:  # remove if above lower bound of text
                 circle_filter = np.append(circle_filter, i)
             elif (
-                x <= ll_bound[0] or x >= lr_bound[0]
+                x <= x_lbound or x >= x_ubound
             ):  # remove if horizontally outside text bounds
                 circle_filter = np.append(circle_filter, i)
-            i += 1
 
         self.circles = np.delete(self.circles, circle_filter, axis=0)
 
@@ -336,20 +346,18 @@ class ModuleLocation:
 
         Returns
         -------
-        None
+        np.ndarray - filtered array of circles
         """
         # Create filter of far away circles based on depth image
         circle_filter = np.array(
             [], dtype=np.uint16
         )  # array of indices of distant circles
 
-        i = 0
-        for x, y, _ in self.circles:
+        for i, (x, y, _) in enumerate(self.circles):
             if (
                 self.depth[y][x] > depth_threshold
             ):  # if too far away, remove (add index to filter)
                 circle_filter = np.append(circle_filter, i)
-            i += 1
 
         self.circles = np.delete(self.circles, circle_filter, axis=0)
 
@@ -369,11 +377,13 @@ class ModuleLocation:
         if self.circles.shape[0] < 5:  # not enough circles for clustering
             return self.circles
 
+        kmeans_circles = self.circles.astype(np.float32)  # kmeans requires float32 data
+
         num_clusters = 2
         compactness = COMPACT_THRESH + 1  # init compactness to enter while loop
         while compactness > COMPACT_THRESH:  # ensure low variance within clusters
             compactness, labels, _ = cv2.kmeans(
-                data=self.circles.astype(np.float32),  # kmeans requires float32
+                data=kmeans_circles,
                 K=num_clusters,
                 bestLabels=None,
                 criteria=CLSTR_CRITERIA,
@@ -500,13 +510,14 @@ class ModuleLocation:
         self.best_cluster = np.array([])
 
         self.best_slopes = np.array([])
+        self.best_grouped_slopes = (np.array([0]), np.array([0]), 0)
 
         self.center = np.arange(2)
         self.holes = np.zeros((4, 3), dtype=np.uint16)
 
         self.needs_recalc = True
 
-    def set_text(self, text_boxes: BoundingBox):
+    def set_text(self, text_boxes: BoundingBox) -> None:
         """
         Sets the BoundingBoxes of the text in the image.
 
@@ -559,7 +570,7 @@ class ModuleLocation:
                 color = np.random.choice(range(256), size=3)
                 color = (int(color[0]), int(color[1]), int(color[2]))
                 thickness = 1
-                if (
+                if np.all(
                     cluster == self.best_cluster
                 ):  # make the best_cluster white and filled in
                     color = (255, 255, 255)
@@ -658,7 +669,7 @@ class ModuleLocation:
                 color = np.random.choice(range(256), size=3)
                 color = (int(color[0]), int(color[1]), int(color[2]))
                 thickness = 1
-                if (
+                if np.all(
                     cluster == self.best_cluster
                 ):  # make the best_cluster white and filled in
                     color = (255, 255, 255)
