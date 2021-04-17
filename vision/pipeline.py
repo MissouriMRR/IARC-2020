@@ -139,13 +139,13 @@ class Pipeline:
                     text_bboxes = self.text_detector.detect_russian_word(
                         color_image, depth_image
                     )
+                    bboxes.append(text_bboxes)
                 except:
-                    text_bboxes = []
                     flags.detect_russian_word = False
 
             if flags.detect_russian_word:
                 try:
-                    self.module_location.set_text(text_bboxes)
+                    self.module_location.set_text(bboxes)
                 except:
                     flags.set_text = False
 

@@ -82,6 +82,7 @@ class ModuleLocation:
     def get_center(self) -> tuple:
         """
         Find the center of the front face of the module.
+        Returns (0, 1) if no center was found.
 
         Returns
         -------
@@ -89,9 +90,6 @@ class ModuleLocation:
         """
         MAX_CIRCLES = 200  # slope calculations are not performed if there are more than MAX_CIRCLES circles
         MIN_CIRCLES = 4  # minimum number of circles to perform more calculations
-
-        # Coordinates of the center of the front face of the module
-        self.center = np.arange(0, 2)  # default center value (0, 1)
 
         if self.needs_recalc:
             self._circle_detection()  # Detect circles on color image
@@ -198,14 +196,14 @@ class ModuleLocation:
         self.holes = np.unique(self.holes, axis=0)  # remove duplicates
         return self.holes
 
-    def _group_slopes(self, slopes: np.ndarray) -> np.ndarray:
+    def _group_slopes(self, slopes: np.ndarray) -> tuple:
         """
         Bucket sort slopes to find parallels.
 
         Parameters
         ----------
         slopes: np.ndarray
-            Slopes to use for bucket sorting
+            Slopes data to use for bucket sorting
 
         Returns
         -------
@@ -515,16 +513,18 @@ class ModuleLocation:
         self.center = np.arange(2)
         self.holes = np.zeros((4, 3), dtype=np.uint16)
 
+        self.text_boxes = []
+
         self.needs_recalc = True
 
-    def set_text(self, text_boxes: BoundingBox) -> None:
+    def set_text(self, text_boxes: list) -> None:
         """
         Sets the BoundingBoxes of the text in the image.
 
         Parameters
         ----------
         text_boxes: list[BoundingBox]
-            The BoundingBoxes around the text in the image.
+            The BoundingBoxes of the text in the image.
 
         Returns
         -------
