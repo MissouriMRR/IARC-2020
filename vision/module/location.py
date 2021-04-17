@@ -5,7 +5,6 @@ This file contains the ModuleLocation class to find the location of the center o
 import cv2
 import numpy as np
 
-from vision.text.detect_words import TextDetector
 from vision.bounding_box import ObjectType, BoundingBox
 
 
@@ -21,6 +20,8 @@ class ModuleLocation:
 
         self.img = np.array(0)  # Color image input
         self.depth = np.array(0)  # Depth image input
+
+        self.text_boxes = []  # list of BoundingBoxes of the text in the image
 
         self.circles = np.array(0)  # Array of circles detected in color image
         self.clusters = []  # list of grouped circles that are near each other
@@ -285,17 +286,13 @@ class ModuleLocation:
         -------
         None
         """
-        # Detect text
-        detector = TextDetector()
-        text_boxes = detector.detect_russian_word(self.img, self.depth)
-
-        # Return if text detection fails
-        if not text_boxes:
+        # Return if no text boxes
+        if not self.text_boxes:
             return self.circles
 
         # Convert BoundingBoxes to list of values per axis
         vertices = np.array(
-            [vertex for bbox in text_boxes for vertex in bbox.vertices]
+            [vertex for bbox in self.text_boxes for vertex in bbox.vertices]
         )  # unravel into list of vertices
         axes_vals = vertices.transpose()  # axis_vals[0] = x, axis_vals[1] = y
 
@@ -322,7 +319,7 @@ class ModuleLocation:
                 circle_filter = np.append(circle_filter, i)
             elif (
                 x <= ll_bound[0] or x >= lr_bound[0]
-            ):  # remove if horizontally outside text
+            ):  # remove if horizontally outside text bounds
                 circle_filter = np.append(circle_filter, i)
             i += 1
 
@@ -508,6 +505,22 @@ class ModuleLocation:
         self.holes = np.zeros((4, 3), dtype=np.uint16)
 
         self.needs_recalc = True
+
+    def set_text(self, text_boxes: BoundingBox):
+        """
+        Sets the BoundingBoxes of the text in the image.
+
+        Parameters
+        ----------
+        text_boxes: list[BoundingBox]
+            The BoundingBoxes around the text in the image.
+
+        Returns
+        -------
+        None
+        """
+        # Set text boxes
+        self.text_boxes = text_boxes
 
     ## Visualization Functions
 

@@ -38,7 +38,7 @@ class ObstacleTracker:
 
         self.obstacles = np.array([])  # buffer that stores current Obstacles in view
 
-    def _isSameObstacle(self, obj1: Obstacle, obj2: Obstacle) -> bool:
+    def _is_same_obstacle(self, obj1: Obstacle, obj2: Obstacle) -> bool:
         """
         Returns True if the position of obj1 is within self.MVMT_TOLERANCE of obj2
 
@@ -54,7 +54,7 @@ class ObstacleTracker:
         bool
             The result of whether or not obj1 and obj2 are the same object
         """
-        isSame = True  # presume they're the same obstacle
+        is_same = True  # presume they're the same obstacle
 
         # horizontal check
         if obj1.center[0] >= (
@@ -64,7 +64,7 @@ class ObstacleTracker:
         ] <= (
             obj2.center[0] - MVMT_TOLERANCE
         ):  # less than lower bound
-            isSame = False
+            is_same = False
 
         # vertical check
         if obj1.center[1] >= (
@@ -74,9 +74,9 @@ class ObstacleTracker:
         ] <= (
             obj2.center[1] - MVMT_TOLERANCE
         ):  # less than lower bound
-            isSame = False
+            is_same = False
 
-        return isSame
+        return is_same
 
     def update(self, new_obstacle_boxes: list) -> None:
         """
@@ -105,7 +105,7 @@ class ObstacleTracker:
         # compare new obstacles with previous buffer to find repeat obstacles
         for i in np.arange(new_obstacles.size):
             for j in np.arange(self.obstacles.size):
-                if self._isSameObstacle(
+                if self._is_same_obstacle(
                     new_obstacles[i], self.obstacles[j]
                 ):  # if new obj is within MVMT_TOLERANCE of old obj
                     new_obstacles[i].frame_persisted = (
@@ -116,7 +116,7 @@ class ObstacleTracker:
         # update buffer
         self.obstacles = new_obstacles
 
-    def getPersistentObstacles(self) -> list:
+    def get_persistent_obstacles(self) -> list:
         """
         returns a list of bounding boxes that have been persistent for PERSISTENCE_THRESHOLD amount of frames
 

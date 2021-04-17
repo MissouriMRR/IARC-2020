@@ -4,6 +4,7 @@ Takes information from the camera and gives it to vision
 
 import os
 import sys
+import numpy as np
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -30,6 +31,11 @@ from vision.module.region_of_interest import region_of_interest
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
 from vision.module.module_bounding import get_module_bounds
+
+from vision.failure_flags import FailureFlags
+from vision.failure_flags import ObstacleDetectionFlags
+from vision.failure_flags import TextDetectionFlags
+from vision.failure_flags import ModuleDetectionFlags
 
 
 class Pipeline:
@@ -73,6 +79,8 @@ class Pipeline:
 
         self.module_location = ModuleLocation()
 
+        self.vision_flags = []
+
     @property
     def picture(self):
         return next(self.camera)
@@ -88,53 +96,139 @@ class Pipeline:
             state = self.flight_communication.get_nowait()
         except Empty:
             state = prev_state
-
         ##
+
         bboxes = []
 
-        if state == "early_laps":  # navigation around the pylons
-            bboxes = self.obstacle_finder.find(color_image, depth_image)
+        flags = FailureFlags()
 
-            obstacle_tracker.update(bboxes)
-            bboxes = obstacle_tracker.getPersistentObstacles()
+        if state == "early_laps":  # navigation around the pylons
+            flags = ObstacleDetectionFlags()
+
+            try:
+                bboxes = self.obstacle_finder.find(color_image, depth_image)
+            except:
+                flags.obstacle_finder = False
+
+            if flags.obstacle_finder:
+                try:
+                    self.obstacle_tracker.update(bboxes)
+                    bboxes = self.obstacle_tracker.get_persistent_obstacles()
+                except:
+                    flags.obstacle_tracker = False
 
         elif state == "text_detection":  # approaching mast
-            bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
+            flags = TextDetectionFlags()
+
+            try:
+                bboxes = self.text_detector.detect_russian_word(
+                    color_image, depth_image
+                )
+            except:
+                flags.detect_russian_word = False
 
         elif state == "module_detection":  # locating module
-            self.module_location.set_img(color_image, depth_image)
+            flags = ModuleDetectionFlags()
+            try:
+                self.module_location.set_img(color_image, depth_image)
+            except:
+                flags.set_img = False
 
-            # only do more calculation if module is in the image
-            if self.module_location.is_in_frame():
-                center = self.module_location.get_center()  # center of module in image
-                depth = get_module_depth(
-                    depth_image, center
-                )  # depth of center of module
+            if flags.set_img:
+                try:
+                    text_bboxes = self.text_detector.detect_russian_word(
+                        color_image, depth_image
+                    )
+                except:
+                    text_bboxes = []
+                    flags.detect_russian_word = False
 
-                region = region_of_interest(
-                    depth_image, depth, center
-                )  # depth image sliced on underestimate bounds
-                orientation = get_module_orientation(
-                    region, center
-                )  # x and y tilt of module
+            if flags.detect_russian_word:
+                try:
+                    self.module_location.set_text(text_bboxes)
+                except:
+                    flags.set_text = False
 
-                bounds = get_module_bounds(
-                    color_image, center, depth
-                )  # overestimate of bounds
-                roll = get_module_roll(
-                    color_image[
-                        bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[3][0], :
-                    ]
-                )  # roll of module
+            if flags.set_img:
+                try:
+                    in_frame = self.module_location.is_in_frame()
+                except:
+                    in_frame = False
+                    flags.is_in_frame = False
 
-                # construct boundingbox for the module
-                box = BoundingBox(bounds, ObjectType.MODULE)
-                box.module_depth = depth  # float
-                box.orientation = orientation + (roll,)  # x, y, z tilt
-                bboxes.append(box)
+                # only do more calculation if module is in the image
+                if in_frame:
+                    # default values for bounding box construction
+                    center = (0, 0)
+                    roll = 0
+                    depth = 0
+                    region = np.empty(1)
+                    orientation = (0, 0)
+                    bounds = np.empty(1)
+
+                    try:
+                        center = (
+                            self.module_location.get_center()
+                        )  # center of module in image
+                    except:
+                        flags.get_center = False
+
+                    if flags.get_center:
+                        try:
+                            depth = get_module_depth(
+                                depth_image, center
+                            )  # depth of center of module
+                        except:
+                            flags.get_module_depth = False
+
+                        if flags.get_module_depth:
+                            try:
+                                region = region_of_interest(
+                                    depth_image, depth, center
+                                )  # depth image sliced on underestimate bounds
+                            except:
+                                flags.region_of_interest = False
+
+                            if flags.region_of_interest:
+                                try:
+                                    orientation = get_module_orientation(
+                                        region
+                                    )  # x and y tilt of module
+                                except:
+                                    flags.get_module_orientation = False
+
+                            try:
+                                bounds = get_module_bounds(
+                                    np.shape(color_image)[:2], center, depth
+                                )  # overestimate of bounds
+                            except:
+                                flags.get_module_bounds = False
+
+                            if flags.get_module_bounds:
+                                try:
+                                    roll = get_module_roll(
+                                        color_image[
+                                            bounds[0][1] : bounds[3][1],
+                                            bounds[0][0] : bounds[2][0],
+                                            :,
+                                        ]
+                                    )  # roll of module
+                                except:
+                                    flags.get_module_roll = False
+
+                                if flags.get_module_roll:
+                                    # construct boundingbox for the module
+                                    box = BoundingBox(bounds, ObjectType.MODULE)
+                                    box.module_depth = depth  # float
+                                    box.orientation = orientation + (
+                                        roll,
+                                    )  # x, y, z tilt
+                                    bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
+
+        self.vision_flags.append(flags)
 
         ##
         self.vision_communication.put(
