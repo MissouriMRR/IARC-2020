@@ -15,7 +15,7 @@ from flight import config
 class Takeoff(State):
     """The state that takes off the drone"""
 
-    async def run(self, drone: System) -> None:
+    async def run(self, drone: System):
         """Sets takeoff location"""
         async for gps in drone.telemetry.position():
             config.takeoff_pos = LatLon(
@@ -53,4 +53,4 @@ class Takeoff(State):
         await mover.takeoff(drone)
         # Takes off vertically until a desired altitude constant TAKEOFF_ALT
         # Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
-        return EarlyLaps()  # Return the next state, EarlyLaps
+        return EarlyLaps(self.state_settings)  # Return the next state, EarlyLaps

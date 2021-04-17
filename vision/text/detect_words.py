@@ -132,7 +132,7 @@ class TextDetector:
         
         x_ul = center[0] - (size[0] / 2)
         y_ul = center[1] - (size[1] / 2)
-        
+
         # adjust angle so the image isn't corrected to a 90 degree angle
         if abs(theta) > 45:
             if theta < 0:
