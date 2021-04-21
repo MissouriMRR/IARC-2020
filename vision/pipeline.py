@@ -37,6 +37,7 @@ from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
 from vision.failure_flags import ModuleDetectionFlags
 
+
 class Pipeline:
     """
     Pipeline to carry information from the cameras through
@@ -112,7 +113,7 @@ class Pipeline:
             if flags.obstacle_finder:
                 try:
                     self.obstacle_tracker.update(bboxes)
-                    bboxes = self.obstacle_tracker.getPersistentObstacles()
+                    bboxes = self.obstacle_tracker.get_persistent_obstacles()
                 except:
                     flags.obstacle_tracker = False
 
@@ -120,16 +121,32 @@ class Pipeline:
             flags = TextDetectionFlags()
 
             try:
-                bboxes = self.text_detector.detect_russian_word(color_image, depth_image)
+                bboxes = self.text_detector.detect_russian_word(
+                    color_image, depth_image
+                )
             except:
                 flags.detect_russian_word = False
 
         elif state == "module_detection":  # locating module
             flags = ModuleDetectionFlags()
             try:
-                self.module_location.setImg(color_image, depth_image)
+                self.module_location.set_img(color_image, depth_image)
             except:
                 flags.set_img = False
+
+            if flags.set_img:
+                try:
+                    bboxes.extend(
+                        self.text_detector.detect_russian_word(color_image, depth_image)
+                    )
+                except:
+                    flags.detect_russian_word = False
+
+            if flags.detect_russian_word:
+                try:
+                    self.module_location.set_text(bboxes)
+                except:
+                    flags.set_text = False
 
             if flags.set_img:
                 try:
@@ -149,7 +166,9 @@ class Pipeline:
                     bounds = np.empty(1)
 
                     try:
-                        center = self.module_location.get_center()  # center of module in image
+                        center = (
+                            self.module_location.get_center()
+                        )  # center of module in image]
                     except:
                         flags.get_center = False
 
@@ -168,7 +187,7 @@ class Pipeline:
                                 )  # depth image sliced on underestimate bounds
                             except:
                                 flags.region_of_interest = False
-                            
+
                             if flags.region_of_interest:
                                 try:
                                     orientation = get_module_orientation(
@@ -188,17 +207,22 @@ class Pipeline:
                                 try:
                                     roll = get_module_roll(
                                         color_image[
-                                            bounds[0][1] : bounds[3][1], bounds[0][0] : bounds[2][0], :
+                                            bounds[0][1] : bounds[3][1],
+                                            bounds[0][0] : bounds[2][0],
+                                            :,
                                         ]
                                     )  # roll of module
                                 except:
                                     flags.get_module_roll = False
-                                
+
                                 if flags.get_module_roll:
                                     # construct boundingbox for the module
                                     box = BoundingBox(bounds, ObjectType.MODULE)
                                     box.module_depth = depth  # float
-                                    box.orientation = orientation + (roll,)  # x, y, z tilt
+                                    box.orientation = orientation + (
+                                        roll,
+                                    )  # x, y, z tilt
+
                                     bboxes.append(box)
 
         else:
