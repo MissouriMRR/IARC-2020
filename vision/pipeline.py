@@ -6,11 +6,11 @@ import os
 import sys
 import numpy as np
 import asyncio
-import time
 import warnings
-warnings.filterwarnings("ignore")
 
-start_time = time.time()
+warnings.filterwarnings("ignore")
+# import time
+# start_time = time.time()
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -288,4 +288,4 @@ if __name__ == "__main__":
 
     vision_comm.close()
     flight_comm.close()
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # print("--- %s seconds ---" % (time.time() - start_time))
