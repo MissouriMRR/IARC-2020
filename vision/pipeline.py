@@ -5,6 +5,12 @@ Takes information from the camera and gives it to vision
 import os
 import sys
 import numpy as np
+import asyncio
+import warnings
+
+warnings.filterwarnings("ignore")
+# import time
+# start_time = time.time()
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -79,13 +85,13 @@ class Pipeline:
 
         self.module_location = ModuleLocation()
 
-        self.vision_flags = []
+        self.vision_flags = Queue()
 
     @property
     def picture(self):
         return next(self.camera)
 
-    def run(self, prev_state):
+    async def run(self, prev_state):
         """
         Process current camera frame.
         """
@@ -171,7 +177,6 @@ class Pipeline:
                         )  # center of module in image]
                     except:
                         flags.get_center = False
-
                     if flags.get_center:
                         try:
                             depth = get_module_depth(
@@ -222,37 +227,43 @@ class Pipeline:
                                     box.orientation = orientation + (
                                         roll,
                                     )  # x, y, z tilt
-
                                     bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
-        self.vision_flags.append(flags)
-
+        self.vision_flags.put(
+            (datetime.datetime.now(), flags), self.PUT_TIMEOUT
+        )
+        await asyncio.sleep(0.01)
         ##
         self.vision_communication.put(
             (datetime.datetime.now(), bboxes), self.PUT_TIMEOUT
         )
-
+        await asyncio.sleep(0.01)
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
 
+        # print(self.vision_flags.get()[1])
+
         return state
 
 
-def init_vision(vision_comm, flight_comm, video, runtime=100):
+async def init_vision(vision_comm, flight_comm, video, runtime=100):
     """
     Alex, call this function - not run.
     """
     pipeline = Pipeline(vision_comm, flight_comm, video)
 
-    state = "start"
+    state = "module_detection"
 
-    for _ in range(runtime):
-        state = pipeline.run(state)
+    async for _ in arange(runtime):
+        await pipeline.run(state)
 
+async def arange(count):
+    for i in range(count):
+        yield(i)
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
@@ -267,7 +278,9 @@ if __name__ == "__main__":
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    init_vision(vision_comm, flight_comm, video)
+    loop = asyncio.get_event_loop()
+
+    asyncio.run(init_vision(vision_comm, flight_comm, video))
 
     from time import sleep
 
@@ -275,3 +288,4 @@ if __name__ == "__main__":
 
     vision_comm.close()
     flight_comm.close()
+    # print("--- %s seconds ---" % (time.time() - start_time))
