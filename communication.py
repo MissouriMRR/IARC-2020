@@ -10,6 +10,7 @@ class Communication:
         get_state: Returns the name of the current state
         set_state: Sets the name of the current state
     """
+
     def __init__(self):
         """
         Default constructor; initialize to start
