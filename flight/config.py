@@ -3,19 +3,20 @@ from flight.utils.latlon import LatLon, Latitude, Longitude
 
 from mavsdk import System
 
-
+"""Constants for Calculations"""
 MAX_SPEED: float = 6.352  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
 TAKEOFF_ALT: float = 1.0  # m
 FLYING_ALT: float = 6.0  # m
-# What percentage of the hight can we loos/gain before unsafe
+# What percentage of the height can we loos/gain before unsafe
 ALT_PERCENT_ACCURACY: float = 0.15
 ALT_RANGE_MAX: float = FLYING_ALT + (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
 ALT_RANGE_MIN: float = FLYING_ALT - (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
 
 POINT_PERCENT_ACCURACY: float = 0.2
 
+"""Position (LatLon) Coordinates"""
 # Position for pylon 1
 # lat1: Latitude = Latitude(37.9497800)
 # lon1: Longitude = Longitude(-92.7854470)
@@ -37,10 +38,11 @@ pylon2: LatLon = LatLon(lat2, lon2)
 takeoff_pos = LatLon
 
 # Position for the mast
-MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder postion
+MAST_LAT: Latitude = Latitude(degree=37, minute=56, second=53.0)  # placeholder position
 MAST_LON: Longitude = Longitude(degree=-91, minute=-47, second=-5.0)
 MAST_LOCATION: LatLon = LatLon(MAST_LAT, MAST_LON)
 
+"""Operational Constants"""
 OFFSET: float = 0.005  # km
 DEG_OFFSET: int = 90  # deg
 
@@ -52,7 +54,17 @@ FAST_THINK_S: float = 1.0
 run_states = {"early_laps": True, "to_mast": True}
 
 
-async def config_params(drone: System):
+async def config_params(drone: System) -> None:
+    """
+    Configuration of drone parameters
+
+    Parameters:
+        drone(System): Our drone object
+    Return:
+        None
+    Logging:
+        None
+    """
     await drone.action.set_maximum_speed(MAX_SPEED)
     await drone.param.set_param_float("MIS_TAKEOFF_ALT", TAKEOFF_ALT)
     await drone.action.set_maximum_speed(MAX_SPEED)

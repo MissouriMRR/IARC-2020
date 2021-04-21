@@ -11,10 +11,27 @@ from .state import State
 
 
 class ToMast(State):
-    """ Sends the drone from the first pylon to the mast """
+    """
+    Sends the drone from the first pylon to the mast
 
-    async def run(self, drone):
-        """Sends the drone from the first pylon to the mast"""
+    Attributes:
+        N/A
+    Functions:
+        run: Performs movement actions for the drone; maneuvers the drone to the mast
+    """
+
+    async def run(self, drone) -> State:
+        """
+        Sends the drone from the first pylon to the mast
+
+        Parameters:
+            drone (System): Our drone object
+        Return:
+            Land(): flight moves to next state, Land
+        Logging:
+            To info; confirms movement to mast
+                     confirms arrival at mast
+        """
         if config.run_states["to_mast"]:
             mover: MovementController = MovementController()
             # Go to the mast

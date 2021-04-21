@@ -14,14 +14,26 @@ from .final import Final
 
 class Land(State):
     """
-    Contains the functions needed to halt and land the drone, and turns off
-    offboard
+    Contains the functions needed to halt and land the drone, and turns off offboard
+
+    Attributes:
+        N/A
+    Functions:
+        run: Performs movement actions for drone; Vertically lands the drone with decreasing velocity
     """
 
     async def run(self, drone: System) -> State:
         """
-        Stops the drone by setting all movements to 0, then move to land
-        mode
+        Stops the drone by setting all movements to 0, then move to land mode
+
+        Parameters:
+            drone (System): Our drone object
+        Return:
+            Final(): flight moves to next state, Final()
+        Logging:
+            To info; beginning of land process
+                     moment when drone disarms
+            To exception; error code of failed offboard termination
         """
         mover: MovementController = MovementController()
         await drone.offboard.set_position_ned(sdk.offboard.PositionNedYaw(0, 0, 0, 0))

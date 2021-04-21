@@ -9,20 +9,32 @@ import math
 
 class MovementController:
     """
-    Params: Drone, Pylon
-    Return: Boolean or None
-    Calculates and uses gps coordinates of the drone to move to the location of the target pylon
+    Utilize GPS coordinates & position functions to perform specific movements; landing, takeoff, moving to
+    certain locations and turns
+
+    Attributes:
+        N/A
+    Functions:
+        move_to: Move the drone to a specific LatLon location passed
+        turn: Turn the drone around the nearest pylon
+        check_altitude: Check if drone's current altitude is at desired height
+        takeoff: Vertically move the drone upward
+        move_to_takeoff: Return drone to takeoff location
+        manual_land: Vertically move the drone slowly to final location
     """
 
     async def move_to(self, drone: System, pylon: LatLon) -> bool:
         """
         Function to calculate movement velocity:
+
         Parameters:
             drone(System): Our drone object
             pylon(LatLon): Targets for the drone found using GPS Latitude and Longitude
         Return:
             bool: True or false if the target is within range
             None: If we don't reach the target
+        Logging:
+            None
         """
 
         count: int = 0
@@ -98,8 +110,13 @@ class MovementController:
     async def turn(self, drone: System) -> bool:
         """
         Turns the drone around the pylon it is currently at
+
         Parameters:
-            Drone(System): Our drone object
+            drone(System): Our drone object
+        Return:
+            bool: True when turn is completed
+        Logging:
+            On completed turn
         """
         count: int = 0
         async for tel in drone.telemetry.attitude_euler():
@@ -121,16 +138,30 @@ class MovementController:
     async def check_altitude(self, drone: System) -> bool:
         """
         Checks the altitude of the drone to make sure that we are at our target
+
         Parameters:
-            Drone(System): Our drone object
+            drone(System): Our drone object
+        Return:
+            bool: True if the current altitude of the drone is greater than or equal to desired takeoff height
+        Logging:
+            None
         """
         async for position in drone.telemetry.position():
             altitude: float = round(position.relative_altitude_m, 2)
             if altitude >= config.TAKEOFF_ALT:
                 return True
 
-    async def takeoff(self, drone: System):
-        """Takes off vertically to a height defined by alt"""
+    async def takeoff(self, drone: System) -> None:
+        """
+        Takes off vertically to a height defined in config.py
+
+        Parameters:
+            drone(System): Our drone object
+        Return:
+            None; process moves to next objective in threads
+        Logging:
+            None
+        """
 
         await drone.offboard.set_velocity_ned(
             sdk.offboard.VelocityNedYaw(0.0, 0.0, -1.0, 0.0)
@@ -144,11 +175,15 @@ class MovementController:
     async def move_to_takeoff(self, drone: System, takeoff_location: LatLon) -> bool:
         """
         Similar to move_to function, but heights are changed so drone only descends when moving
+
         Parameters:
-                drone(System): our drone object
-                takeoff_location(LatLon): gives lat & lon of takeoff location
+            drone(System): our drone object
+            takeoff_location(LatLon): gives lat & lon of takeoff location
         Return:
-            None
+            bool: True if drone falls within acceptable region of target location
+            None: movement continues
+        Logging:
+            To info; confirmation of current action
         """
         # Moves drone to initial takeoff location
         logging.info("Moving to Takeoff location")
@@ -213,10 +248,13 @@ class MovementController:
     async def manual_land(self, drone: System) -> None:
         """
         Function to slowly land the drone vertically
+
         Parameters:
-                drone(System): our drone object
+            drone(System): our drone object
         Return:
-            None
+            None: successful land
+        Logging:
+            To info; confirmation of landing
         """
         # Lands the drone using manual velocity values
         logging.info("Landing the drone...")

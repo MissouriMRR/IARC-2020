@@ -13,10 +13,26 @@ from flight import config
 
 
 class Takeoff(State):
-    """The state that takes off the drone"""
+    """The state that takes off the drone
 
-    async def run(self, drone: System) -> None:
-        """Sets takeoff location"""
+    Attributes:
+        N/A
+    Functions:
+        run: Performs movement actions for the drone; vertically move the drone off the starting platform
+    """
+
+    async def run(self, drone: System) -> State:
+        """
+        Sets takeoff location
+
+        Parameters:
+            drone (System): Our drone object
+        Return:
+            None: drone lands if error in starting offboard
+            EarlyLaps(): flight passes to next state, EarlyLaps
+        Logging:
+            To info; confirms take off
+        """
         async for gps in drone.telemetry.position():
             config.takeoff_pos = LatLon(
                 round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)

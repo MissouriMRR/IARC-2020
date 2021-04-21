@@ -6,8 +6,24 @@ from .takeoff import Takeoff
 
 
 class Start(State):
-    """The starting state of the flight state machine"""
+    """
+    The starting state of the flight state machine
+
+    Attributes:
+        N/A
+    Functions:
+        run: Initiate the state machine and pass to takeoff state
+    """
 
     async def run(self, drone: System) -> State:
-        """Begins the state machine and returns the takeoff state"""
+        """
+        Begins the state machine and returns the takeoff state
+
+        Parameters:
+            drone (System): Our drone object
+        Return:
+            Takeoff(): flight moves to next state, Takeoff
+        Logging:
+            None
+        """
         return Takeoff()

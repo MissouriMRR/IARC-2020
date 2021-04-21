@@ -13,6 +13,16 @@ from flight.flight import flight
 
 
 def main() -> None:
+    """
+    Code that executes threads for flight
+
+    Parameters:
+        N/A
+    Return:
+        None
+    Logging:
+        To debug; Flag for if simulation is enabled
+    """
     parser: argparse.ArgumentParser = argparse.ArgumentParser()
     parser.add_argument(
         "-s", "--simulation", help="using the simulator", action="store_true"
@@ -22,11 +32,38 @@ def main() -> None:
     run_threads(args.simulation)
 
 
-def init_flight(flight_args):
+def init_flight(flight_args) -> Process:
+    """
+    Initialize flight process
+
+    Parameters:
+        flight_args: Arguments for args" in returned Process object
+    Return:
+        Process: multiprocessing object to hold attributes of current flight process
+    Logging:
+        N/A
+    """
     return Process(target=flight, name="flight", args=flight_args)
 
 
 def run_threads(sim: bool) -> None:
+    """
+    Begin flight processes and threads for code
+
+    Parameters:
+        sim (bool): Designates if current run is in a simulation
+    Return:
+        None
+    Logging:
+        To debug; returns start of flight process and its ID
+        To error; flight process becomes terminated and needs a restart
+        To info; marks the spawning of all processes
+                 Marks moment of Ctrl-C exit
+                 Existence of non-fatal attribute error
+                 EOF error and justification
+                 Error associated with a connection issue if it occurs
+                 Marks end of processes
+    """
     # Register Communication object to Base Manager
     BaseManager.register("Communication", Communication)
     # Create manager object

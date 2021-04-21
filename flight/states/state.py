@@ -8,7 +8,12 @@ class State:
     Base State class
 
     Attributes:
-        drone (System): The drone object; used for flight.
+        N/A
+    Functions:
+        __init__: Displays to logging information the name of the current state
+        run: Performs the actions for a specific state
+        _check_arm_or_disarm: Checks to see if drone is armed; if not, arms it
+        name: Returns the name of the current state
     """
 
     def __init__(self):
@@ -18,31 +23,25 @@ class State:
         """
         Does all of the operations for the state
 
-        Parameters
-        ----------
-        drone : System
-            The drone system; used for flight operations.
-
-        Returns
-        -------
-        State or None
-            Either the next State in the machine or None if the machine stops
-
-        Raises
-        ------
-        Exception
-            If this function hasn't been overloaded.
+        Parameters:
+            drone (System): The drone system; used for flight operations.
+        Return:
+            State or None: Either the next State in the machine or None if the machine stops
+        Raises:
+            Exception: If this function hasn't been overloaded.
         """
         raise Exception("Run not implemented for state")
 
-    async def _check_arm_or_arm(self, drone: System):
+    async def _check_arm_or_arm(self, drone: System) -> None:
         """
         Verifies that the drone is armed, if not armed, arms the drone
 
-        Parameters
-        ----------
-        drone : System
-            The drone system; used for flight operations.
+        Parameters:
+            drone (System): The drone system; used for flight operations.
+        Return:
+            None
+        Logging:
+            To debug; drone fails to arm, attempt to re-arm
         """
         async for is_armed in drone.telemetry.armed():
             if not is_armed:
@@ -53,6 +52,15 @@ class State:
                 break
 
     @property
-    def name(self):
-        """Returns the name of the class"""
+    def name(self) -> str:
+        """
+        Returns the name of the class
+
+        Parameters:
+            N/A
+        Return:
+            __name__: Name of current state
+        Logging:
+            None
+        """
         return type(self).__name__

@@ -12,10 +12,15 @@ LOG_FORMAT: str = "%(levelname)s | %(asctime)s @  %(processName)s:%(funcName)s >
 LOG_LEVEL = logging.DEBUG
 
 
-def init_logger(queue):
+def init_logger(queue) -> QueueListener:
     """
     Creates a QueueListener that will process all log messages throughout
     the application
+
+    Parameters:
+        queue (Queue): FIFO data structure
+    Return:
+        QueueListener: object that will process log messages
     """
     console_formatter: Formatter = ColoredFormatter(COLOR_LOG_FORMAT)
     file_formatter: Formatter = logging.Formatter(LOG_FORMAT)
@@ -29,10 +34,15 @@ def init_logger(queue):
     return QueueListener(queue, file, console)
 
 
-def worker_configurer(queue):
+def worker_configurer(queue) -> None:
     """
     When this is run, it configures the logger of this process to submit
     logs to the logging process (QueueListener)
+
+    Parameters:
+        queue (Queue): FIFO data structure
+    Return:
+        None
     """
     queue_handler: QueueHandler = QueueHandler(queue)  # Just the one handler needed
     root = logging.getLogger()

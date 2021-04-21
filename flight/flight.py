@@ -28,6 +28,9 @@ class StateMachine:
     Attributes:
         current_state (State): State that is currently being executed.
         drone (System): Our drone object; used for all flight functions.
+    Functions:
+        __init__: Initialize the state
+        run: Initiate and perform the tasks outlined by the specific state
     """
 
     def __init__(self, initial_state: State, drone: System) -> None:
@@ -35,8 +38,12 @@ class StateMachine:
         The constructor for StateMachine class.
 
         Parameters:
-            current_state (State): State that is currently being executed.
+            initial_state (State): State at which to start execution.
             drone (System): Our drone object; used for all flight functions.
+        Return:
+            None
+        Logging:
+            None
         """
         self.current_state: State = initial_state
         self.drone: System = drone
@@ -46,7 +53,14 @@ class StateMachine:
     async def run(self) -> None:
         """
         Runs the state machine by infinitely replacing current_state until a
-        state return None.
+        state returns None.
+
+        Parameters:
+            N/A
+        Return:
+            None: Waits for a separate state to return a value
+        Logging:
+            None
         """
         # camera.display_in_window()
         while self.current_state:
@@ -54,8 +68,16 @@ class StateMachine:
 
 
 async def log_flight_mode(drone: System) -> None:
-    """ Logs the flight mode when it changes """
+    """
+    Logs the flight mode when it changes
 
+    Parameters:
+        drone (System): Our drone object
+    Return:
+        None
+    Logging:
+        To debug; Current flight mode
+    """
     previous_flight_mode: str = None
 
     async for flight_mode in drone.telemetry.flight_mode():
@@ -65,11 +87,18 @@ async def log_flight_mode(drone: System) -> None:
 
 
 async def observe_is_in_air(drone: System, comm) -> None:
-    """Monitors whether the drone is flying or not and
-    returns after landing"""
+    """
+    Monitors whether the drone is flying or not and returns after landing
 
+    Parameters:
+        drone (System): Our drone object
+        comm: commander object
+    Return:
+        None: Continues after confirmation of successful land
+    Logging:
+        None
+    """
     was_in_air: bool = False
-
     async for is_in_air in drone.telemetry.in_air():
         if is_in_air:
             was_in_air: bool = is_in_air
@@ -80,7 +109,16 @@ async def observe_is_in_air(drone: System, comm) -> None:
 
 
 async def wait_for_drone(drone: System) -> None:
-    """Waits for the drone to be connected and returns"""
+    """
+    Waits for the drone to be connected and returns
+
+    Parameters:
+        drone (System): Our drone object
+    Return:
+        None: Continue if State properly connects
+    Logging:
+        To info; UUID
+    """
     async for state in drone.core.connection_state():
         if state.is_connected:
             logging.info("Connected to drone with UUID %s", state.uuid)
@@ -88,14 +126,36 @@ async def wait_for_drone(drone: System) -> None:
 
 
 def flight(comm, sim: bool, log_queue, worker_configurer) -> None:
-    """Starts the asyncronous event loop for the flight code"""
+    """
+    Starts the asyncronous event loop for the flight code
+
+    Parameters:
+        comm: commander object
+        sim (bool): If flight is being run as a simulation
+        log_queue:
+        worker_configurer:
+    Return:
+         None
+    Logging:
+        To debug; Confirmation of beginning of flight process
+    """
     worker_configurer(log_queue)
     logging.debug("Flight process started")
     asyncio.get_event_loop().run_until_complete(init_and_begin(comm, sim))
 
 
 async def init_and_begin(comm, sim: bool) -> None:
-    """Creates drone object and passes it to start_flight"""
+    """
+    Creates drone object and passes it to start_flight
+
+    Parameters:
+        comm: commander object
+        sim (bool): If flight is run as simulation
+    Return:
+        None: Initializes flight process
+    Logging:
+        To exception; Drone fails to connect or an uncaught error fails flight process
+    """
     try:
         drone: System = await init_drone(sim)
         await start_flight(comm, drone)
@@ -108,7 +168,16 @@ async def init_and_begin(comm, sim: bool) -> None:
 
 
 async def init_drone(sim: bool) -> System:
-    """Connects to the pixhawk or simulator and returns the drone"""
+    """
+    Connects to the pixhawk or simulator and returns the drone
+
+    Parameters:
+        sim (bool): If flight is run as simulation
+    Return:
+        System: returns drone object after complete initialization
+    Logging:
+        To debug: Signals wait for drone connection
+    """
     sys_addr: str = SIM_ADDR if sim else CONTROLLER_ADDR
     drone: System = System()
     await drone.connect(system_address=sys_addr)
@@ -124,8 +193,21 @@ async def init_drone(sim: bool) -> System:
     return drone
 
 
-async def start_flight(comm, drone: System):
-    """Creates the state machine and watches for exceptions"""
+async def start_flight(comm, drone: System) -> None:
+    """
+    Creates the state machine and watches for exceptions
+
+    Parameters:
+        comm: commander object
+        drone (System): Our drone object
+    Return:
+        None: enter final state and end
+    Logging:
+        To exception; State failed to initialize
+                      Error code for failed stop of offboard
+        To info; Confirmation on landing process
+        To error; No state is available when initialization fails
+    """
     # Continuously log flight mode changes
     flight_mode_task = asyncio.ensure_future(log_flight_mode(drone))
     # Will stop flight code if the drone lands

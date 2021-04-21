@@ -11,16 +11,42 @@ from .to_mast import ToMast
 
 
 async def arange(count):
-    """Needed to allows us to do a range asynchronously"""
+    """
+    Function to allow us to do a range asynchronously
+
+    Parameters:
+        count (int): max value of desired range
+    Return:
+        i: generator-type integer
+    Logging:
+        None
+    """
     for i in range(count):
         yield i
 
 
 class EarlyLaps(State):
-    """Handles getting the drone around the two pylons 8 times"""
+    """
+    Handles getting the drone around the two pylons 8 times
 
-    async def run(self, drone):
-        """Moves the drone to the first pylon, then begins the 8 laps"""
+    Attributes:
+        N/A
+    Functions:
+        run: Performs the movement actions for the state; movement to first pylon and first 8 laps
+    """
+
+    async def run(self, drone) -> State:
+        """
+        Moves the drone to the first pylon, then begins the 8 laps
+
+        Parameters:
+            drone (System): Our drone object
+        Return:
+            ToMast(): flight moves to next state, ToMast
+        Logging:
+            To info; displays lap number
+            To debug; displays section of current lap - straight or turn
+        """
         if config.run_states["early_laps"]:
             mover: MovementController = MovementController()
             # Go to pylon 1
