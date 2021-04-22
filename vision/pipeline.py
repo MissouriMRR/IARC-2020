@@ -8,10 +8,6 @@ import numpy as np
 import asyncio
 import warnings
 
-warnings.filterwarnings("ignore")
-# import time
-# start_time = time.time()
-
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -43,6 +39,17 @@ from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
 from vision.failure_flags import ModuleDetectionFlags
 
+async def arange(count: int) -> int:
+    """
+    Asynchronous loop to iterate over a count
+
+    Parameters
+    -------------
+    count: integer
+        Amount of times to asynchronously iterate
+    """
+    for i in range(count):
+        yield(i)
 
 class Pipeline:
     """
@@ -217,10 +224,6 @@ class Pipeline:
                                             :,
                                         ]
                                     )  # roll of module
-                                except:
-                                    flags.get_module_roll = False
-
-                                if flags.get_module_roll:
                                     # construct boundingbox for the module
                                     box = BoundingBox(bounds, ObjectType.MODULE)
                                     box.module_depth = depth  # float
@@ -228,42 +231,40 @@ class Pipeline:
                                         roll,
                                     )  # x, y, z tilt
                                     bboxes.append(box)
+                                except:
+                                    flags.get_module_roll = False
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
+        time = datetime.datetime.now()
+
+        # You need to index vision_flags to see output, "self.vision_flags.get()[1]"
         self.vision_flags.put(
-            (datetime.datetime.now(), flags), self.PUT_TIMEOUT
+            (time, flags), self.PUT_TIMEOUT
         )
         await asyncio.sleep(0.01)
         ##
         self.vision_communication.put(
-            (datetime.datetime.now(), bboxes), self.PUT_TIMEOUT
+            (time, bboxes), self.PUT_TIMEOUT
         )
         await asyncio.sleep(0.01)
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
 
-        # print(self.vision_flags.get()[1])
-
         return state
 
 
-async def init_vision(vision_comm, flight_comm, video, runtime=100):
+async def init_vision(vision_comm, flight_comm, camera, state, runtime=100):
     """
     Alex, call this function - not run.
     """
-    pipeline = Pipeline(vision_comm, flight_comm, video)
+    pipeline = Pipeline(vision_comm, flight_comm, camera)
 
-    state = "module_detection"
-
+    warnings.filterwarnings("ignore")
     async for _ in arange(runtime):
         await pipeline.run(state)
-
-async def arange(count):
-    for i in range(count):
-        yield(i)
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
@@ -278,9 +279,10 @@ if __name__ == "__main__":
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    loop = asyncio.get_event_loop()
+    state = "module_detection"
 
-    asyncio.run(init_vision(vision_comm, flight_comm, video))
+    loop = asyncio.get_event_loop()
+    asyncio.run(init_vision(vision_comm, flight_comm, video, state))
 
     from time import sleep
 
@@ -288,4 +290,3 @@ if __name__ == "__main__":
 
     vision_comm.close()
     flight_comm.close()
-    # print("--- %s seconds ---" % (time.time() - start_time))
