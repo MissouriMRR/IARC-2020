@@ -24,6 +24,7 @@ from queue import Empty
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.obstacle.obstacle_tracker import ObstacleTracker
 from vision.common.import_params import import_params
+from vision.camera.template import Camera
 
 from vision.text.detect_words import TextDetector
 
@@ -69,6 +70,7 @@ class Pipeline:
     PUT_TIMEOUT = 1  # Expected time for results to be irrelevant.
 
     def __init__(self, vision_communication, flight_communication, camera):
+        warnings.filterwarnings("ignore")
         ##
         self.vision_communication = vision_communication
         self.flight_communication = flight_communication
@@ -224,15 +226,15 @@ class Pipeline:
                                             :,
                                         ]
                                     )  # roll of module
-                                    # construct boundingbox for the module
-                                    box = BoundingBox(bounds, ObjectType.MODULE)
-                                    box.module_depth = depth  # float
-                                    box.orientation = orientation + (
-                                        roll,
-                                    )  # x, y, z tilt
-                                    bboxes.append(box)
                                 except:
                                     flags.get_module_roll = False
+                                # construct boundingbox for the module
+                                box = BoundingBox(bounds, ObjectType.MODULE)
+                                box.module_depth = depth  # float
+                                box.orientation = orientation + (
+                                    roll,
+                                )  # x, y, z tilt
+                                bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
@@ -256,13 +258,26 @@ class Pipeline:
         return state
 
 
-async def init_vision(vision_comm, flight_comm, camera, state, runtime=100):
+async def init_vision(vision_comm: Queue, flight_comm: Queue, camera: Camera, state: str, runtime: int = 100) -> None:
     """
-    Alex, call this function - not run.
+    Calls Pipeline().run to process a specific frame.
+
+    Parameters
+    -------------
+    vision_comm: multiprocessing Queue
+        Interface to share vision information with flight.
+    flight_comm: multiprocessing Queue
+        Interface to recieve flight state information from flight.
+    camera: Camera
+        Camera to pull image from.
+    state: string
+        Algorithm to run.
+    runtime: integer
+        Amount of frames to be processed.
     """
+
     pipeline = Pipeline(vision_comm, flight_comm, camera)
 
-    warnings.filterwarnings("ignore")
     async for _ in arange(runtime):
         await pipeline.run(state)
 
