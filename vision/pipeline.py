@@ -5,6 +5,8 @@ Takes information from the camera and gives it to vision
 import os
 import sys
 import numpy as np
+import asyncio
+import warnings
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -22,6 +24,7 @@ from queue import Empty
 from vision.obstacle.obstacle_finder import ObstacleFinder
 from vision.obstacle.obstacle_tracker import ObstacleTracker
 from vision.common.import_params import import_params
+from vision.camera.template import Camera
 
 from vision.text.detect_words import TextDetector
 
@@ -37,6 +40,17 @@ from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
 from vision.failure_flags import ModuleDetectionFlags
 
+async def arange(count: int) -> int:
+    """
+    Asynchronous loop to iterate over a count
+
+    Parameters
+    -------------
+    count: integer
+        Amount of times to asynchronously iterate
+    """
+    for i in range(count):
+        yield(i)
 
 class Pipeline:
     """
@@ -56,6 +70,7 @@ class Pipeline:
     PUT_TIMEOUT = 1  # Expected time for results to be irrelevant.
 
     def __init__(self, vision_communication, flight_communication, camera):
+        warnings.filterwarnings("ignore")
         ##
         self.vision_communication = vision_communication
         self.flight_communication = flight_communication
@@ -79,13 +94,13 @@ class Pipeline:
 
         self.module_location = ModuleLocation()
 
-        self.vision_flags = []
+        self.vision_flags = Queue()
 
     @property
     def picture(self):
         return next(self.camera)
 
-    def run(self, prev_state):
+    async def run(self, prev_state):
         """
         Process current camera frame.
         """
@@ -171,7 +186,6 @@ class Pipeline:
                         )  # center of module in image]
                     except:
                         flags.get_center = False
-
                     if flags.get_center:
                         try:
                             depth = get_module_depth(
@@ -214,27 +228,29 @@ class Pipeline:
                                     )  # roll of module
                                 except:
                                     flags.get_module_roll = False
-
-                                if flags.get_module_roll:
-                                    # construct boundingbox for the module
-                                    box = BoundingBox(bounds, ObjectType.MODULE)
-                                    box.module_depth = depth  # float
-                                    box.orientation = orientation + (
-                                        roll,
-                                    )  # x, y, z tilt
-
-                                    bboxes.append(box)
+                                # construct boundingbox for the module
+                                box = BoundingBox(bounds, ObjectType.MODULE)
+                                box.module_depth = depth  # float
+                                box.orientation = orientation + (
+                                    roll,
+                                )  # x, y, z tilt
+                                bboxes.append(box)
 
         else:
             pass  # raise AttributeError(f"Unrecognized state: {state}")
 
-        self.vision_flags.append(flags)
+        time = datetime.datetime.now()
 
+        # You need to index vision_flags to see output, "self.vision_flags.get()[1]"
+        self.vision_flags.put(
+            (time, flags), self.PUT_TIMEOUT
+        )
+        await asyncio.sleep(0.01)
         ##
         self.vision_communication.put(
-            (datetime.datetime.now(), bboxes), self.PUT_TIMEOUT
+            (time, bboxes), self.PUT_TIMEOUT
         )
-
+        await asyncio.sleep(0.01)
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
@@ -242,17 +258,28 @@ class Pipeline:
         return state
 
 
-def init_vision(vision_comm, flight_comm, video, runtime=100):
+async def init_vision(vision_comm: Queue, flight_comm: Queue, camera: Camera, state: str, runtime: int = 100) -> None:
     """
-    Alex, call this function - not run.
+    Calls Pipeline().run to process a specific frame.
+
+    Parameters
+    -------------
+    vision_comm: multiprocessing Queue
+        Interface to share vision information with flight.
+    flight_comm: multiprocessing Queue
+        Interface to recieve flight state information from flight.
+    camera: Camera
+        Camera to pull image from.
+    state: string
+        Algorithm to run.
+    runtime: integer
+        Amount of frames to be processed.
     """
-    pipeline = Pipeline(vision_comm, flight_comm, video)
 
-    state = "start"
+    pipeline = Pipeline(vision_comm, flight_comm, camera)
 
-    for _ in range(runtime):
-        state = pipeline.run(state)
-
+    async for _ in arange(runtime):
+        await pipeline.run(state)
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
@@ -267,7 +294,10 @@ if __name__ == "__main__":
     video_file = sys.argv[1]
     video = BagFile(100, 100, 60, video_file)
 
-    init_vision(vision_comm, flight_comm, video)
+    state = "module_detection"
+
+    loop = asyncio.get_event_loop()
+    asyncio.run(init_vision(vision_comm, flight_comm, video, state))
 
     from time import sleep
 
