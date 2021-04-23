@@ -5,7 +5,10 @@ import mavsdk as sdk
 from mavsdk import System
 
 from .state import State
-from .detect_module import DetectModule
+
+# from .detect_module import DetectModule
+# from .orbit_mast import OrbitMast
+from .to_mast import ToMast
 from flight.utils.latlon import LatLon
 from flight.utils.movement_controller import MovementController
 
@@ -32,14 +35,15 @@ class SimpleTakeoff(State):
         # Sets takeoff location
         async for gps in drone.telemetry.position():
             config.takeoff_pos = LatLon(
-                round(gps.latitude_deg, 8), round(gps.latitude_deg, 8)
+                round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)
             )
+            logging.info(config.takeoff_pos)
             break
 
         mover: MovementController = MovementController()
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
- 
+
         # (NSm/s, EWm/s, DUm/s, Ydeg)
         await drone.offboard.set_velocity_ned(
             sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
@@ -59,4 +63,4 @@ class SimpleTakeoff(State):
         await self.check_altitude(drone)
 
         # After reaching altitude, attempt module detection
-        return DetectModule(self.state_settings)
+        return ToMast(self.state_settings)

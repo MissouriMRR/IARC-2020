@@ -46,7 +46,7 @@ class FlightManager:
         logging_process = init_logger(log_queue)
         logging_process.start()
 
-        worker_configurer(log_queue)
+        # worker_configurer(log_queue)
 
         # Create new processes
         logging.info("Spawning Processes")

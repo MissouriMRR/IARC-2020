@@ -53,7 +53,7 @@ class MovementController:
                 # Creating a new position we need to go to
                 # Distance to the offset point from the pylon
                 offset_point: float = pylon.offset(
-                    deg_to_pylon + config.DEG_OFFSET, config.OFFSET
+                    deg_to_pylon + config.DEG_OFFSET, 0  # config.OFFSET
                 )
                 logging.debug(offset_point.to_string("d% %m% %S% %H"))  # you are here
             # distance we have to go in order to get to the offset point
@@ -204,10 +204,11 @@ class MovementController:
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
             if (
-                abs(x) <= reference_x * config.POINT_PERCENT_ACCURACY
-                and abs(y) <= reference_y * config.POINT_PERCENT_ACCURACY
+                abs(x) <= 1  # reference_x * config.POINT_PERCENT_ACCURACY
+                and abs(y) <= 1  # reference_y * config.POINT_PERCENT_ACCURACY
             ):
                 return True
+            count += 1
 
     async def manual_land(self, drone: System) -> None:
         """
@@ -237,3 +238,42 @@ class MovementController:
                     sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
                 )
                 return
+
+    async def orbit(self, drone, point, alt):
+        # counts the number of data points read/sent to the drone per turn
+        count: int = 0
+        forward_m = 0
+        right_m = -2
+
+        async for gps in drone.telemetry.position():
+            altitude: float = round(gps.relative_altitude_m, 2)
+
+            if altitude > alt:
+                alt_move = config.ALT_CORRECTION_SPEED  # go down m/s
+            elif altitude < alt:
+                alt_move = -config.ALT_CORRECTION_SPEED  # go up m/s
+            else:
+                alt_move = -0.15  # don't move
+
+            # Configure current position and store it
+            lat: float = round(gps.latitude_deg, 8)
+            lon: float = round(gps.longitude_deg, 8)
+            current: float = LatLon(lat, lon)  # you are here
+
+            dist: float = current.distance(point) * 1000
+
+            speed = 1.5
+            if dist > 3:
+                forward_m = speed
+            elif dist < 3:
+                forward_m = -speed
+            else:
+                forward_m = 0
+
+            await drone.offboard.set_velocity_body(
+                sdk.offboard.VelocityBodyYawspeed(forward_m, right_m, alt_move, 80)
+            )
+
+            if count == 500:
+                return True
+            count += 1

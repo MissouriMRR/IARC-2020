@@ -24,14 +24,14 @@ class Land(State):
         mode
         """
         mover: MovementController = MovementController()
-        await drone.offboard.set_position_ned(sdk.offboard.PositionNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_ned(sdk.offboard.VelocityNedYaw(0, 0, 0, 0))
         await drone.offboard.set_velocity_body(
             sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
         )
 
-        #await asyncio.sleep(config.THINK_FOR_S)
-        #await mover.move_to_takeoff(drone, config.takeoff_pos)
+        # await asyncio.sleep(config.THINK_FOR_S)
+        await mover.move_to_takeoff(drone, config.takeoff_pos)
+        await drone.offboard.set_velocity_ned(sdk.offboard.VelocityNedYaw(0, 0, 0, 0))
         await asyncio.sleep(config.THINK_FOR_S)
         logging.info("Preparing to land")
         await mover.manual_land(drone)

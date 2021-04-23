@@ -21,6 +21,7 @@ class Takeoff(State):
             config.takeoff_pos = LatLon(
                 round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)
             )
+            print(config.takeoff_pos)
             break
         """Arms and takes off the drone"""
         mover: MovementController = MovementController()

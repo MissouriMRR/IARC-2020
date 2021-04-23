@@ -12,14 +12,17 @@ class StateSettings:
         """Default constructor results in default settings"""
 
         # Takeoff settings
-        self.simple_takeoff: bool = False
+        self.simple_takeoff: bool = not False
 
         # EarlyLaps settings
-        self.do_early_laps: bool = True
+        self.do_early_laps: bool = not True
         self.num_early_laps: int = DEFAULT_EARLY_LAPS
 
         # ToMast settings
         self.go_to_mast: bool = True
+
+        # OrbitMast settings
+        self.orbit_the_mast: bool = True
 
         # DetectModule settings
         self.detect_module: bool = False
