@@ -134,8 +134,22 @@ class BenchTextAccuracy:
                 # output BoundingBoxes to text file
                 bbstr = [((b.__repr__()) + "\n") for b in bboxes]
                 bbstr = "".join(bbstr)
-                output_bounding.write(bbstr)
-                output_bounding.write("\n\n")
+
+                output_file_name = os.path.splitext(filename)[0] + ".txt"
+                output_file_path = os.path.join(
+                    self.OUTPUT_RESULTS_DIR, output_file_name
+                )
+
+                if not bbstr:
+                    bbstr = None
+
+                with open(output_file_path, mode="w") as text_data_output:
+                    text_data_output.write(
+                        "BoundingBoxes: " + (str(bbstr) if bbstr else str(None)) + "\n"
+                    )
+                    text_data_output.write("Tesseract Data:" + "\n")
+                    for key, val in tester.text_detector.tessdata.items():
+                        text_data_output.write("\t" + str(key) + ": " + str(val) + "\n")
 
                 file_output.write("Found")
             except:
@@ -149,7 +163,7 @@ class BenchTextAccuracy:
                 image=image,
                 waittime=0,
                 save_img=self.plot_text,
-                path=os.path.join(self.OUTPUT_FIND_DIR, filename),
+                path=os.path.join(self.OUTPUT_IMGS_DIR, filename),
                 quiet_output=True,
             )
 
