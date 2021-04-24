@@ -7,6 +7,7 @@ import sys
 import numpy as np
 import asyncio
 import warnings
+import time
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -245,16 +246,14 @@ class Pipeline:
         self.vision_flags.put(
             (time, flags), self.PUT_TIMEOUT
         )
-        await asyncio.sleep(0.01)
         ##
         self.vision_communication.put(
             (time, bboxes), self.PUT_TIMEOUT
         )
-        await asyncio.sleep(0.01)
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
-
+        print(self.vision_flags.get()[1])
         return state
 
 
@@ -279,7 +278,7 @@ async def init_vision(vision_comm: Queue, flight_comm: Queue, camera: Camera, st
     pipeline = Pipeline(vision_comm, flight_comm, camera)
 
     async for _ in arange(runtime):
-        await pipeline.run(state)
+        await loop.create_task(pipeline.run(state))
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile
@@ -296,8 +295,10 @@ if __name__ == "__main__":
 
     state = "module_detection"
 
+    start_time = time.time()
     loop = asyncio.get_event_loop()
-    asyncio.run(init_vision(vision_comm, flight_comm, video, state))
+    loop.run_until_complete(init_vision(vision_comm, flight_comm, video, state))
+    print("--- %s seconds ---" % (time.time() - start_time))
 
     from time import sleep
 
