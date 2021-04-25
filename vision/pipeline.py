@@ -78,7 +78,12 @@ class Pipeline:
         self.camera = camera.__iter__()
 
         ##
-        prefix = "vision" if os.path.isdir("vision") else ""
+        if os.path.isdir("vision"):
+            prefix = "vision"
+        elif os.path.isdir("integration_tests"):
+            prefix = "../vision"
+        else:
+            prefix = ""
 
         #
         config_filename = os.path.join(prefix, "obstacle", "config.json")
