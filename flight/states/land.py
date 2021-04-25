@@ -31,7 +31,8 @@ class Land(State):
         )
 
         #await asyncio.sleep(config.THINK_FOR_S)
-        await mover.move_to_takeoff(drone, config.takeoff_pos)
+        if not self.state_settings.simple_takeoff:
+            await mover.move_to_takeoff(drone, config.takeoff_pos)
         await asyncio.sleep(config.THINK_FOR_S)
         logging.info("Preparing to land")
         await mover.manual_land(drone)
