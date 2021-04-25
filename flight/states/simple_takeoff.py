@@ -32,7 +32,7 @@ class SimpleTakeoff(State):
         # Sets takeoff location
         async for gps in drone.telemetry.position():
             config.takeoff_pos = LatLon(
-                round(gps.latitude_deg, 8), round(gps.latitude_deg, 8)
+                round(gps.latitude_deg, 8), round(gps.longitude_deg, 8)
             )
             break
 
