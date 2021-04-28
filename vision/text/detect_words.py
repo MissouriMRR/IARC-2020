@@ -21,8 +21,10 @@ class TextDetector:
     """
 
     def __init__(self):
-        self.text = np.array(["модули", "иртибот"]) # Words that will appear on the mast
-        self.tessdata: dict = {} # Text detected by pytesseract
+        self.text = np.array(
+            ["модули", "иртибот"]
+        )  # Words that will appear on the mast
+        self.tessdata: dict = {}  # Text detected by pytesseract
 
     def detect_russian_word(
         self, color_image: np.ndarray, depth_image: np.ndarray
@@ -49,7 +51,7 @@ class TextDetector:
             color_image, depth_image
         )
 
-        if sliced_rotated_image.size == 0: # rotated image was not found
+        if sliced_rotated_image.size == 0:  # rotated image was not found
             return []
 
         # Text detection
@@ -114,17 +116,19 @@ class TextDetector:
 
         # the text is always in a blue rectangle. this finds the rectangle
         # cast to int16 to prevent negative overflow in following steps
-        blur_image = np.int16(cv2.GaussianBlur(src=color_image, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0))
-        
+        blur_image = np.int16(
+            cv2.GaussianBlur(src=color_image, ksize=(BLUR_SIZE, BLUR_SIZE), sigmaX=0)
+        )
+
         # Separate BGR channels
         b_image, g_image, r_image = (
             blur_image[:, :, 0],
             blur_image[:, :, 1],
             blur_image[:, :, 2],
-        )  
+        )
 
         # prevent division by zero
-        r_image = np.where(r_image == 0, 1, r_image)  
+        r_image = np.where(r_image == 0, 1, r_image)
         g_image = np.where(g_image == 0, 1, g_image)
 
         # Find blue pixels
