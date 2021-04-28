@@ -15,7 +15,10 @@ HORIZONTAL_RES = 1920  # p
 #   this should be used to ensure that the region_of_interest is trustworthy despite tilt
 PADDING_CONSTANT = 0.85
 
-def region_of_interest(depth_frame: np.ndarray, depth_val: np.ndarray, center: tuple) -> np.ndarray:
+
+def region_of_interest(
+    depth_frame: np.ndarray, depth_val: np.ndarray, center: tuple
+) -> np.ndarray:
     """
     Finds region of interest of the module in frame
 
@@ -66,7 +69,7 @@ if __name__ == "__main__":
     """
 
     import argparse
-    
+
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
         description='Read .npy file and test for get_module_depth.\

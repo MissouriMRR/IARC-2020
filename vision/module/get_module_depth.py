@@ -6,6 +6,7 @@ import numpy as np
 # Constants
 SEARCH_RADIUS = 20
 
+
 def get_module_depth(depth_image: np.ndarray, coordinates: tuple) -> float:
     """
     Finds relative depth of the module.
@@ -21,9 +22,9 @@ def get_module_depth(depth_image: np.ndarray, coordinates: tuple) -> float:
     -------
     float: Depth of the module (in millimeters).
     """
-    x_pos, y_pos = coordinates # coordinates of center of module
+    x_pos, y_pos = coordinates  # coordinates of center of module
 
-    direct_center_depth = depth_image[y_pos][x_pos] # depth at the center
+    direct_center_depth = depth_image[y_pos][x_pos]  # depth at the center
 
     adjusted_radius = SEARCH_RADIUS
 

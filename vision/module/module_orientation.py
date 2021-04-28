@@ -8,6 +8,7 @@ get_module_roll will calculate the roll of the module in degrees with respect to
 import numpy as np
 import cv2
 
+
 def get_module_orientation(roi: np.ndarray) -> tuple:
     """
     Finds the orientation of the module in degrees.

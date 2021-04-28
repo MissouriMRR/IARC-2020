@@ -31,17 +31,29 @@ def get_module_bounds(dimensions: tuple, center: tuple, depth: float) -> list:
     -------
     list - list of the four tuple vertices.
     """
-    x, y = center # center of module
-    vert_res, horiz_res = dimensions # camera resolution
+    x, y = center  # center of module
+    vert_res, horiz_res = dimensions  # camera resolution
 
-    vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth)) # vertical angle of module from camera
-    horiz_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth)) # horizontal angle of module from camera
+    vert_angle = np.degrees(
+        np.arctan((MODULE_HEIGHT / 2) / depth)
+    )  # vertical angle of module from camera
+    horiz_angle = np.degrees(
+        np.arctan((MODULE_WIDTH / 2) / depth)
+    )  # horizontal angle of module from camera
 
-    vert_ratio = vert_angle / (VERTICAL_FOV / 2) # vertical ratio of angle to field of view
-    horiz_ratio = horiz_angle / (HORIZONTAL_FOV / 2) # horizontal ratio of angle to field of view
+    vert_ratio = vert_angle / (
+        VERTICAL_FOV / 2
+    )  # vertical ratio of angle to field of view
+    horiz_ratio = horiz_angle / (
+        HORIZONTAL_FOV / 2
+    )  # horizontal ratio of angle to field of view
 
-    vert_val = int((vert_ratio * vert_res / 2) * PADDING_CONSTANT) # distance (in pixels) to top of module from center
-    horiz_val = int((horiz_ratio * horiz_res / 2) * PADDING_CONSTANT) # distance (in pixels) to side of module from center
+    vert_val = int(
+        (vert_ratio * vert_res / 2) * PADDING_CONSTANT
+    )  # distance (in pixels) to top of module from center
+    horiz_val = int(
+        (horiz_ratio * horiz_res / 2) * PADDING_CONSTANT
+    )  # distance (in pixels) to side of module from center
 
     # Create vertices
     top_left = (x - horiz_val, y - vert_val)
