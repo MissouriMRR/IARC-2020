@@ -18,9 +18,11 @@ class Obstacle:
     """
 
     def __init__(self, bbox: BoundingBox):
-        self.bounding_box = bbox # bounding box of the obstacle
-        self.center = np.mean(bbox.vertices, axis=0) # center of the bounding box
-        self.frames_persisted = 0 # number of images obstacle has consecutively appeared in
+        self.bounding_box = bbox  # bounding box of the obstacle
+        self.center = np.mean(bbox.vertices, axis=0)  # center of the bounding box
+        self.frames_persisted = (
+            0  # number of images obstacle has consecutively appeared in
+        )
 
 
 class ObstacleTracker:
@@ -91,7 +93,7 @@ class ObstacleTracker:
         -------
         None
         """
-        new_obstacles = np.array([]) # new obstacles converted to instances of Obstacle
+        new_obstacles = np.array([])  # new obstacles converted to instances of Obstacle
 
         # transform the list of bounding boxes into an array of Obstacles
         new_obstacles = np.array([(Obstacle(box)) for box in new_obstacle_boxes])
@@ -104,7 +106,7 @@ class ObstacleTracker:
         # compare new obstacles with previous buffer to find repeat obstacles
         for i in np.arange(new_obstacles.size):
             for j in np.arange(self.obstacles.size):
-                
+
                 if self._is_same_obstacle(
                     new_obstacles[i], self.obstacles[j]
                 ):  # if new obj is within MVMT_TOLERANCE of old obj

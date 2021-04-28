@@ -29,14 +29,16 @@ class ObstacleFinder:
 
     def __init__(self, params: cv2.SimpleBlobDetector_Params = None):
         self.keypoints = []
-        self.params: cv2.SimpleBlobDetector_Params = params # Configuration parameters from config.json
+        self.params: cv2.SimpleBlobDetector_Params = (
+            params  # Configuration parameters from config.json
+        )
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
     @property
     def params(self) -> cv2.SimpleBlobDetector_Params:
         """
         This function is called every time self.params is run.
-        
+
         Returns
         -------
         cv2.SimpleBlobDetector_Params
