@@ -3,6 +3,7 @@ Detects obstacles in images using OpenCV's SimpleBlobDetector
 """
 import os
 import sys
+import json
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
@@ -11,8 +12,8 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 
 import cv2
 import numpy as np
+
 from vision.bounding_box import BoundingBox, ObjectType
-import json
 from vision.common.import_params import import_params
 
 
@@ -26,22 +27,36 @@ class ObstacleFinder:
         SimpleBlobDetector params object
     """
 
-    def __init__(self, params=None):
+    def __init__(self, params: cv2.SimpleBlobDetector_Params = None):
         self.keypoints = []
-        self.params = params
+        self.params: cv2.SimpleBlobDetector_Params = params # Configuration parameters from config.json
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
     @property
-    def params(self):
+    def params(self) -> cv2.SimpleBlobDetector_Params:
         """
         This function is called every time self.params is run.
+        
+        Returns
+        -------
+        cv2.SimpleBlobDetector_Params
+            The blob detection parameters.
         """
         return self._params
 
     @params.setter
-    def params(self, value):
+    def params(self, value: cv2.SimpleBlobDetector_Params) -> None:
         """
         Defines behavior of self.params = value.
+
+        Parameters
+        ----------
+        value: cv2.SimpleBlobDetector_Params
+            The parameters from config.json.
+
+        Returns
+        -------
+        None
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
             raise ValueError(
@@ -51,7 +66,7 @@ class ObstacleFinder:
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
 
-    def find(self, color_image, depth_image):
+    def find(self, color_image: np.ndarray, depth_image: np.ndarray) -> list:
         """
         Detects obstacles in the image provided in the constructor
 
@@ -91,16 +106,14 @@ class ObstacleFinder:
             bottom_right_near = (pos_dx, pos_dy)
             bottom_left_near = (neg_dx, pos_dy)
 
-            # With depth, these will be calculated differently
-
             vertices = [
                 top_left_near,
                 top_right_near,
                 bottom_right_near,
                 bottom_left_near,
-            ]  # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+            ]  # [top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
-            # create Rectangle and add to list of bounding boxes
+            # create BoundingBox and add to list of bounding boxes
             bbox = BoundingBox(vertices, ObjectType.AVOID)
             bounding_boxes.append(bbox)
 

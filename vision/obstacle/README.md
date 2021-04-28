@@ -5,9 +5,9 @@ and classifying objects in images taken by the drone's RealSense cameras.
 
 ## Documentation
 
+### Finding Obstacles
 Obstacle detection is done with the OpenCV SimpleBlobDetector. The SimpleBlobDetector can take a number of parameters that control how the
-blobs are detected, which are interpreted as obstacles. SimpleBlobDetector follows a number of steps in
-order to find blobs:
+blobs are detected, which are interpreted as obstacles. SimpleBlobDetector follows a number of steps in order to find blobs:
 (Summarized from [LearnOpenCV](learnopencv.com/blob-detection-using-opencv-python-c/))
 
 1.  **Thresholding:** Multiple binary images are created from the source image, where binarization is done in the range of `minThreshold` and `maxThreshold` for each image.
@@ -23,6 +23,14 @@ diameter of the blob as a `float size`.
 
 The find_blobs function takes in an image (with optional logging), and returns
 an `np.array` of `Rectangle` objects that define the bounding boxes of the blobs.
+
+### Tracking Obstacles
+
+In order to track detected obstacles between frames of an image, new obstacles are compared with a previous buffer of stored obstacles.
+If an new obstacle is within a certain tolerance of an obstacle from a previous frame, they are said to be the same obstacle.
+The number of frames that an obstacle has been present is tracked. Once an obstacle has been present for at least a certain number of frames,
+it is said to be persisntent, and is thus something that should be avoided. This helps filter out false positives from the obstacle detection phase
+by requiring obstacles to be present for a certain amount of time before it is acted upon.
 
 ## Unit Testing
 
