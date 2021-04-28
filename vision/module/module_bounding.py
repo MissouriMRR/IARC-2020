@@ -4,17 +4,17 @@ Find the region of the image that the module lies within.
 
 import numpy as np
 import cv2
-import argparse
 
 MODULE_HEIGHT = 76.2  # mm
 MODULE_WIDTH = 50.8  # mm
 VERTICAL_FOV = 57  # degrees
 HORIZONTAL_FOV = 86  # degrees
 
+# ratio of the measured bounds, use from >1 to account for tilt
 PADDING_CONSTANT = 1.15
 
 
-def get_module_bounds(dimensions, center, depth):
+def get_module_bounds(dimensions: tuple, center: tuple, depth: float) -> list:
     """
     get_module_bounds will find four coordinates within the module that will be used to create a BoundingBox.
 
@@ -31,18 +31,19 @@ def get_module_bounds(dimensions, center, depth):
     -------
     list - list of the four tuple vertices.
     """
-    x, y = center
-    vert_res, horiz_res = dimensions
+    x, y = center # center of module
+    vert_res, horiz_res = dimensions # camera resolution
 
-    vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth))
-    horiz_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth))
+    vert_angle = np.degrees(np.arctan((MODULE_HEIGHT / 2) / depth)) # vertical angle of module from camera
+    horiz_angle = np.degrees(np.arctan((MODULE_WIDTH / 2) / depth)) # horizontal angle of module from camera
 
-    vert_ratio = vert_angle / (VERTICAL_FOV / 2)
-    horiz_ratio = horiz_angle / (HORIZONTAL_FOV / 2)
+    vert_ratio = vert_angle / (VERTICAL_FOV / 2) # vertical ratio of angle to field of view
+    horiz_ratio = horiz_angle / (HORIZONTAL_FOV / 2) # horizontal ratio of angle to field of view
 
-    vert_val = int((vert_ratio * vert_res / 2) * PADDING_CONSTANT)
-    horiz_val = int((horiz_ratio * horiz_res / 2) * PADDING_CONSTANT)
+    vert_val = int((vert_ratio * vert_res / 2) * PADDING_CONSTANT) # distance (in pixels) to top of module from center
+    horiz_val = int((horiz_ratio * horiz_res / 2) * PADDING_CONSTANT) # distance (in pixels) to side of module from center
 
+    # Create vertices
     top_left = (x - horiz_val, y - vert_val)
     top_right = (x + horiz_val, y - vert_val)
     bottom_right = (x + horiz_val, y + vert_val)
@@ -55,6 +56,8 @@ if __name__ == "__main__":
     """
     Driver for testing module_bounding
     """
+    import argparse
+
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
         description='Read .npy file and test for get_module_depth.\

@@ -1,12 +1,11 @@
 """
 This class is designed to take an image and binarize it based on what colors
 we need to see.
+
+NOTE: Unmaintained, no plans to use in final.
 """
 import numpy as np
 import cv2
-
-
-## NOTE: Unmaintained, no plans to use in final.
 
 
 class ModuleKMeans:

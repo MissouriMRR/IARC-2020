@@ -2,12 +2,11 @@
 Find region of interest for the orientation algorithm.
 """
 import numpy as np
-import argparse
 
 # Constant
 MODULE_HEIGHT = 76.2  # mm
 MODULE_WIDTH = 50.8  # mm
-VERTICAL_FOV = 57  # degrees?
+VERTICAL_FOV = 57  # degrees
 HORIZONTAL_FOV = 86  # degrees
 VERTICAL_RES = 1080  # p
 HORIZONTAL_RES = 1920  # p
@@ -16,8 +15,7 @@ HORIZONTAL_RES = 1920  # p
 #   this should be used to ensure that the region_of_interest is trustworthy despite tilt
 PADDING_CONSTANT = 0.85
 
-
-def region_of_interest(depth_frame, depth_val, center):
+def region_of_interest(depth_frame: np.ndarray, depth_val: np.ndarray, center: tuple) -> np.ndarray:
     """
     Finds region of interest of the module in frame
 
@@ -34,6 +32,7 @@ def region_of_interest(depth_frame, depth_val, center):
     -------
     ndarray: A region of the depth image.
     """
+    # center coordinates
     x_pos, y_pos = center
 
     # vertical angle of the module in the frame, from the center of the module to the top of the module
@@ -46,6 +45,7 @@ def region_of_interest(depth_frame, depth_val, center):
     vertical_angle_ratio = vertical_region_angle / (VERTICAL_FOV / 2)
     horizontal_angle_ratio = horizontal_region_angle / (HORIZONTAL_FOV / 2)
 
+    # distance in pixels
     vertical_image_portion = int(
         (vertical_angle_ratio * VERTICAL_RES / 2) * PADDING_CONSTANT
     )
@@ -53,6 +53,7 @@ def region_of_interest(depth_frame, depth_val, center):
         (horizontal_angle_ratio * HORIZONTAL_RES / 2) * PADDING_CONSTANT
     )
 
+    # return the image sliced along the calculated distances
     return depth_frame[
         y_pos - vertical_image_portion : y_pos + vertical_image_portion,
         x_pos - horizontal_image_portion : x_pos + horizontal_image_portion,
@@ -63,6 +64,9 @@ if __name__ == "__main__":
     """
     Driver for testing region_of_interest
     """
+
+    import argparse
+    
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
         description='Read .npy file and test for get_module_depth.\
