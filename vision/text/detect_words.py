@@ -61,7 +61,7 @@ class TextDetector:
         detected_words = self.tessdata["text"]
         box_obs = []
 
-        rows, columns = color_image.shape[0], color_image.shape[1]
+        rows, columns, _ = color_image.shape
         theta = -rotated_angle  # angle to rotate text boxes back to original position
 
         for i, det_word in enumerate(detected_words):
@@ -84,13 +84,13 @@ class TextDetector:
 
                 # text detection is performed on a rotated image
                 # boxes need to be rotated back to their original position
-                rotated_verts = [ll_pt, ul_pt, ur_pt, lr_pt]
+                rotated_verts = np.array([[ll_pt, ul_pt, ur_pt, lr_pt]])
 
                 # rotate box back to original point on color image
                 rot_mat = cv2.getRotationMatrix2D(
                     center=(x_ul, y_ul), angle=theta, scale=1
                 )
-                verts = cv2.transform(src=np.array([rotated_verts]), m=rot_mat)[0]
+                verts = cv2.transform(src=rotated_verts, m=rot_mat)[0]
                 verts = [
                     (int(row), int(col)) for (row, col) in verts
                 ]  # cast for proper types from ndarray
@@ -200,7 +200,7 @@ class TextDetector:
         else:
             rotation_angle = theta + 90
 
-        rows, columns = color_image.shape[0], color_image.shape[1]
+        rows, columns, _ = color_image.shape
         matrix = cv2.getRotationMatrix2D(
             center=(columns / 2, rows / 2), angle=rotation_angle, scale=1
         )

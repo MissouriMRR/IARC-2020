@@ -303,8 +303,15 @@ class ModuleLocation:
         -------
         np.ndarray - filtered array of circles
         """
-        # Can't filter using text that doesn't exist
-        if not self.text_boxes:
+        MIN_TEXTBOXES = 1  # minimum number of text boxes tolerated
+        MAX_TEXTBOXES = 2  # maximum (or ideal) number of text boxes tolerated
+        PADDING_CONST = (
+            0.5  # amount of padding to apply if only MIN_TEXTBOXES text boxes is found
+        )
+        ROTNEG90 = np.array([[0, 1], [-1, 0]])  # matrix to rotate a vector -90 degrees
+
+        # Too low confidence if too little or too many text boxes found
+        if len(self.text_boxes) < MIN_TEXTBOXES or len(self.text_boxes) > MAX_TEXTBOXES:
             return self.circles
 
         # Filter out rectangles that are not directly below text
@@ -314,19 +321,25 @@ class ModuleLocation:
 
         # get text bounding extreme points of rotated bounding boxes
         ll_x, ll_y = self.text_boxes[0].vertices[0]  # lower left point
-        # ul_x, ul_y = self.text_boxes[0].vertices[1] #NOTE: not needed
-        # ur_x, ur_y = self.text_boxes[-1].vertices[2] #NOTE: not needed
         lr_x, lr_y = self.text_boxes[-1].vertices[3]  # lower right point
 
-        rot_neg90 = np.array([[0, 1], [-1, 0]])  # matrix to rotate a vector -90 degrees
+        # if only minimum text boxes detected, add padding around text box equal to 1/2 the width of text
+        if len(self.text_boxes) == MIN_TEXTBOXES:
+            lb_vect = (lr_x - ll_x, lr_y - ll_y)
+            # lower left bound with extra padded distance = normal lower left point - padding
+            ll_x, ll_y = np.array((ll_x, ll_y)) - np.int0(
+                np.array(lb_vect) * (PADDING_CONST)
+            )
+            # lower right bound with extra padded distance = padding + normal lower right point
+            lr_x, lr_y = np.int0(np.array(lb_vect) * (PADDING_CONST)) + np.array(
+                (lr_x, lr_y)
+            )
 
-        # bounding vectors housing the allowed region
-        lr_vect = (lr_x - ll_x, lr_y - ll_y)  # vector from ll bound to lr bound of text
-        ll_vect = (lr_x - ll_x, lr_y - ll_y)  # vector from lr bound to ll bound of text
+        # vector along lower bound of text
+        lower_vect = (lr_x - ll_x, lr_y - ll_y)
 
-        # horizonal bounding vectors perpendicular to lower bound vectors (pointed downwards)
-        left_vect = tuple(np.dot(lr_vect, rot_neg90).astype(int))  # left bound vector
-        right_vect = tuple(np.dot(ll_vect, rot_neg90).astype(int))  # right bound vector
+        # vector perpendicular to lower_vect used as left and right bounds for circle filter
+        perp_vect = tuple(np.dot(lower_vect, ROTNEG90).astype(int))
 
         # create a vector from the lower-left/lower-right corner of text to all detected circles
         # the cross product tells us what side of the bounding vectors the circle is on
@@ -337,13 +350,13 @@ class ModuleLocation:
             ll_to_circ = (x - ll_x, y - ll_y)  # vector from ll bound to circle
             lr_to_circ = (x - lr_x, y - lr_y)  # vector from lr bound to circle
 
-            lower_cross = np.cross(lr_vect, ll_to_circ)  # <0 = above lower bound
+            lower_cross = np.cross(lower_vect, ll_to_circ)  # <0 = above lower bound
             if lower_cross <= 0:
                 needs_removal = True
-            left_cross = np.cross(left_vect, ll_to_circ)  # >0 = outside left bound
+            left_cross = np.cross(perp_vect, ll_to_circ)  # >0 = outside left bound
             if left_cross >= 0:
                 needs_removal = True
-            right_cross = np.cross(right_vect, lr_to_circ)  # <0 = outside right bound
+            right_cross = np.cross(perp_vect, lr_to_circ)  # <0 = outside right bound
             if right_cross <= 0:
                 needs_removal = True
 
@@ -507,11 +520,11 @@ class ModuleLocation:
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
 
         ## Post-Processing: Circle filtering and grouping ##
-        # Remove circles that aren't directly below text
-        self._filter_text_circles()
-
         # Remove circles that are farther than DEPTH_THRESHOLD millimeters away
         self._filter_distant_circles(DEPTH_THRESH)
+
+        # Remove circles that aren't directly below text
+        self._filter_text_circles()
 
         return self.circles
 
