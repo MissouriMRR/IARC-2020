@@ -30,23 +30,26 @@ class TextDetector:
         """
         Detect words in given image.
 
-        Paramters
+        Parameters
         ------
-        color_image
-            color ndarray from the realsense camera
-        depth_image
-            depth ndarray from the realsense camera
+        color_image: np.ndarray
+            3-channel color image to perform text detection on
+        depth_image: np.ndarray
+            1-channel depth image from the realsense camera
 
         Returns
         -------
-        A list of bounding box objects that contain desired text
+        list[BoundingBox] - A list of rotated bounding box objects that contain desired text
             Note that there may be different bounding boxes for each word
         """
         self.tessdata: dict = {}
 
-        sliced_rotated_image, x_ul, y_ul = self._get_rotated_min_area_rect(
-            color_image, depth_image
-        )
+        (
+            sliced_rotated_image,
+            x_ul,
+            y_ul,
+            rotated_angle,
+        ) = self._get_rotated_min_area_rect(color_image, depth_image)
 
         if len(sliced_rotated_image) == 0:
             return []
@@ -57,6 +60,9 @@ class TextDetector:
 
         detected_words = self.tessdata["text"]
         box_obs = []
+
+        rows, columns = color_image.shape[0], color_image.shape[1]
+        theta = -rotated_angle  # angle to rotate text boxes back to original position
 
         for i, det_word in enumerate(detected_words):
             if not det_word:
@@ -71,7 +77,24 @@ class TextDetector:
                     self.tessdata["width"][i],
                     self.tessdata["height"][i],
                 )
-                verts = [(x, y), (x + w, y), (x, y + h), (x + w, y + h)]
+                ll_pt = (x, y + h)  # lower left point of rotated rectangle
+                ul_pt = (x, y)  # upper left point of rotated rectangle
+                ur_pt = (x + w, y)  # upper right point of rotated rectangle
+                lr_pt = (x + w, y + h)  # lower right point of rotated rectangle
+
+                # text detection is performed on a rotated image
+                # boxes need to be rotated back to their original position
+                rotated_verts = [ll_pt, ul_pt, ur_pt, lr_pt]
+
+                # rotate box back to original point on color image
+                rot_mat = cv2.getRotationMatrix2D(
+                    center=(x_ul, y_ul), angle=theta, scale=1
+                )
+                verts = cv2.transform(src=np.array([rotated_verts]), m=rot_mat)[0]
+                verts = [
+                    (int(row), int(col)) for (row, col) in verts
+                ]  # cast for proper types from ndarray
+
                 box = BoundingBox(verts, ObjectType("text"))
                 box_obs.append(box)
 
@@ -85,21 +108,23 @@ class TextDetector:
 
         Parameters
         -----
-        color_image
+        color_image: np.ndarray
             color ndarray from the realsense camera
-        depth_image
+        depth_image: np.ndarray
             depth ndarray from the realsense camera
 
         Returns
         --------
-        tuple - (minAreaRect, x_ul, y_ul)
+        tuple - (minAreaRect, x_ul, y_ul, angle)
 
-        minAreaRect: np.ndarray
-            rotated ndarray of the largest contour
-        x_ul: int
-            x-coordinate of upper-left corner of minAreaRect relative to color_image
-        y_ul: int
-            y-coordinate of upper-left corner of minAreaRect relative to color_image
+            minAreaRect: np.ndarray
+                rotated ndarray of the largest contour
+            x_ul: int
+                x-coordinate of upper-left corner of minAreaRect relative to color_image
+            y_ul: int
+                y-coordinate of upper-left corner of minAreaRect relative to color_image
+            angle: float
+                angle that the minAreaRect is rotated relative to color_image
         """
         BLUR_SIZE = 5  # size of blur kernel
         MIN_BLUE = 15  # minimum blue value in the image
@@ -149,7 +174,7 @@ class TextDetector:
         )
 
         if hierarchy is None:
-            return np.array([]), 0, 0
+            return (np.array([]), 0, 0, 0)
 
         contourAreas = np.array([cv2.contourArea(c) for c in contours])
         largestContour = contours[np.argmax(contourAreas)]
@@ -160,16 +185,20 @@ class TextDetector:
 
         center, size, theta = rect
 
-        # theta = theta - 90 #NOTE: comment this line out if running code on Windows
+        ## WORKAROUND for potential bug on linux build of opencv library ##
+        # BUG: opencv implements new undocumented implementation of cv2.minAreaRect return value
+        #      where angle is in range (0, 90] on Linux but is in range (-90, 0] on Windows
+        #      GitHub Issue #19472: https://github.com/opencv/opencv/issues/19472
+        theta = theta - 90 if 0 < theta <= 90 else theta
 
-        x_ul = center[0] - (size[0] / 2)
-        y_ul = center[1] - (size[1] / 2)
+        x_ul = int(center[0] - (size[0] / 2))
+        y_ul = int(center[1] - (size[1] / 2))
 
         # adjust angle so the image isn't corrected to a 90 degree angle
-        if abs(theta) > 45:
-            rotation_angle = -(90 - theta)
-        else:
+        if theta > -45:
             rotation_angle = theta
+        else:
+            rotation_angle = theta + 90
 
         rows, columns = color_image.shape[0], color_image.shape[1]
         matrix = cv2.getRotationMatrix2D(
@@ -186,7 +215,7 @@ class TextDetector:
             points[1][1] : points[0][1], points[1][0] : points[2][0]
         ]
 
-        return sliced_rotated_image, x_ul, y_ul
+        return sliced_rotated_image, x_ul, y_ul, rotation_angle
 
     def visualize_min_area_rect(
         self, color_image: np.ndarray, depth_image: np.ndarray
@@ -196,16 +225,16 @@ class TextDetector:
 
         Parameters
         -----
-        color_image
+        color_image: np.ndarray
             color ndarray from the realsense camera
-        depth_image
+        depth_image: np.ndarray
             depth ndarray from the realsense camera
 
         Returns
         -----
         None
         """
-        sliced_rotated_image, _, __ = self._get_rotated_min_area_rect(
+        sliced_rotated_image, _, _, _ = self._get_rotated_min_area_rect(
             color_image, depth_image
         )
 
