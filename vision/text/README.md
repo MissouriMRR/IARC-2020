@@ -6,7 +6,7 @@ Algorithms relating to the text, the mast and the russian words on mast.
 
 Download pytesseract for OCR (optical character recognition)
 
-* IMPORTANT: * Make sure to install extra language pack for Uzbek(Cyrilic)
+* IMPORTANT: * Make sure to install extra language pack for Uzbek Cyrilic
 
 ### Using Linux
 
@@ -14,7 +14,7 @@ Download pytesseract for OCR (optical character recognition)
 
 ```bash
     sudo apt-get install tesseract-ocr
-    sudo apt-get install tesseract-ocr-[rus]
+    sudo apt-get install tesseract-ocr-uzb-cyrl
 ```
 
 ### Using Windows
@@ -40,17 +40,11 @@ Download pytesseract for OCR (optical character recognition)
    brew install tesseract-lang
 ```
 
-<<<<<<< HEAD
+## Using in Python
 1.  Download Python wrapper
-=======
-3.  Download Python wrapper
->>>>>>> 10ff7b0a5d84cd669fbe3ceba3397dbcf4f98d94
 
 ```bash
-    pip install pytesseract
+    pip3 install pytesseract
 ```
-<<<<<<< HEAD
-2.  Include the tesseract in your path
+2.  Include the tesseract in your path if necessary
 3.  Import pytesseract
-=======
->>>>>>> 10ff7b0a5d84cd669fbe3ceba3397dbcf4f98d94
