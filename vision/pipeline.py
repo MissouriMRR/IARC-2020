@@ -40,6 +40,7 @@ from vision.failure_flags import ObstacleDetectionFlags
 from vision.failure_flags import TextDetectionFlags
 from vision.failure_flags import ModuleDetectionFlags
 
+
 async def arange(count: int) -> int:
     """
     Asynchronous loop to iterate over a count
@@ -50,7 +51,8 @@ async def arange(count: int) -> int:
         Amount of times to asynchronously iterate
     """
     for i in range(count):
-        yield(i)
+        yield (i)
+
 
 class Pipeline:
     """
@@ -236,9 +238,7 @@ class Pipeline:
                                 # construct boundingbox for the module
                                 box = BoundingBox(bounds, ObjectType.MODULE)
                                 box.module_depth = depth  # float
-                                box.orientation = orientation + (
-                                    roll,
-                                )  # x, y, z tilt
+                                box.orientation = orientation + (roll,)  # x, y, z tilt
                                 bboxes.append(box)
 
         else:
@@ -247,14 +247,10 @@ class Pipeline:
         time = datetime.datetime.now()
 
         # You need to index vision_flags to see output, "self.vision_flags.get()[1]"
-        self.vision_flags.put(
-            (time, flags), self.PUT_TIMEOUT
-        )
+        self.vision_flags.put((time, flags), self.PUT_TIMEOUT)
         ##
         await asyncio.sleep(0.001)
-        self.vision_communication.put(
-            (time, bboxes), self.PUT_TIMEOUT
-        )
+        self.vision_communication.put((time, bboxes), self.PUT_TIMEOUT)
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)
@@ -262,7 +258,13 @@ class Pipeline:
         return state
 
 
-async def init_vision(vision_comm: Queue, flight_comm: Queue, camera: Camera, state: str, runtime: int = 100) -> None:
+async def init_vision(
+    vision_comm: Queue,
+    flight_comm: Queue,
+    camera: Camera,
+    state: str,
+    runtime: int = 100,
+) -> None:
     """
     Calls Pipeline().run to process a specific frame.
 
@@ -285,6 +287,7 @@ async def init_vision(vision_comm: Queue, flight_comm: Queue, camera: Camera, st
     loop = asyncio.get_event_loop()
     async for _ in arange(runtime):
         await loop.create_task(pipeline.run(state))
+
 
 if __name__ == "__main__":
     from vision.camera.bag_file import BagFile

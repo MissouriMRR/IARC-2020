@@ -8,6 +8,7 @@ import cv2
 
 ## NOTE: Unmaintained, no plans to use in final.
 
+
 class ModuleKMeans:
     """
     Applies the kmeans algorithm to an image and displays a remapped
@@ -21,10 +22,13 @@ class ModuleKMeans:
     """
 
     def __init__(self, channel_weights=None):
-        self.channel_weights = channel_weights if channel_weights is not None else [1., 1., 1.]
+        self.channel_weights = (
+            channel_weights if channel_weights is not None else [1.0, 1.0, 1.0]
+        )
 
-    def applyKMeans(self, image, K, criteria=0, attempts=10,
-                    flags=cv2.KMEANS_RANDOM_CENTERS):
+    def applyKMeans(
+        self, image, K, criteria=0, attempts=10, flags=cv2.KMEANS_RANDOM_CENTERS
+    ):
         """
         Applies the kmeans algorithm to the image
 
@@ -64,23 +68,25 @@ class ModuleKMeans:
             raise ValueError(f"Image cannot be None.")
 
         if len(self.img.shape) == 3 and self.img.shape[-1] != len(self.channel_weights):
-            raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got {self.img.shape[-1]}")
+            raise ValueError(
+                f"Image incorrect shape, expected: {len(self.channel_weights)} got {self.img.shape[-1]}"
+            )
 
         if len(self.img.shape) == 2 and len(self.channel_weights) > 1:
-            raise ValueError(f"Image incorrect shape, expected: {len(self.channel_weights)} got 1")
+            raise ValueError(
+                f"Image incorrect shape, expected: {len(self.channel_weights)} got 1"
+            )
 
         self.pixelData = self.img.reshape((-1, len(self.channel_weights)))
         self.pixelData = np.float32(self.pixelData)
         self.pixelData *= self.channel_weights
 
         if criteria == 0:
-            criteria = (cv2.TERM_CRITERIA_EPS +
-                        cv2.TERM_CRITERIA_MAX_ITER,
-                        10, 1.0)
+            criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
 
-        self.compactness, self.label, self.center = cv2.kmeans(self.pixelData, K,
-                                                             None, criteria,
-                                                             attempts, flags)
+        self.compactness, self.label, self.center = cv2.kmeans(
+            self.pixelData, K, None, criteria, attempts, flags
+        )
 
         return self.compactness, self.label, self.center
 
@@ -93,7 +99,7 @@ class ModuleKMeans:
         self.display = self.center[self.label.flatten()]
         self.display = self.display.reshape((self.img.shape))
 
-        cv2.imshow('display', self.display)
+        cv2.imshow("display", self.display)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -108,16 +114,16 @@ class ModuleKMeans:
         """
 
         self.white = [255, 255, 255]
-        #self.black = [0, 0, 0]
+        # self.black = [0, 0, 0]
 
-        #for i in self.label.reshape(self.img.shape[:2]):
-            #self.img[self.label.reshape(self.img.shape[:2]) == i] = np.array(self.black)
+        # for i in self.label.reshape(self.img.shape[:2]):
+        # self.img[self.label.reshape(self.img.shape[:2]) == i] = np.array(self.black)
         self.img = np.zeros(shape=self.img.shape)
 
         for i in channels:
             self.img[self.label.reshape(self.img.shape[:2]) == i] = np.array(self.white)
 
-        cv2.imshow('img', self.img)
+        cv2.imshow("img", self.img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -130,11 +136,11 @@ if __name__ == "__main__":
     """
     import os
 
-    prefix = 'vision' if os.path.isdir('vision') else ''
+    prefix = "vision" if os.path.isdir("vision") else ""
     filename = os.path.join(prefix, "vision_images", "module", "blocks1.jpg")
     image = cv2.imread(filename)
     if image is None:
-        print(f'Failed to read image: {filename}')
+        print(f"Failed to read image: {filename}")
         exit()
 
     print(image.shape)

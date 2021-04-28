@@ -2,6 +2,7 @@
 Vision pipeline related tests.
 """
 import sys, os
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -28,6 +29,7 @@ class TestPipeline(unittest.TestCase):
     """
     Testing the pipeline class.
     """
+
     @staticmethod
     def _get_pipeline(**kwargs):  ## Patch ReadBag, ObstacleFinder, env, plot_obstacles
         env = Mock()
@@ -40,15 +42,19 @@ class TestPipeline(unittest.TestCase):
 
         pipeline = PIPELINE.Pipeline(Queue(), Queue(), config["camera"])
 
-        #for key, value in config.items():
+        # for key, value in config.items():
         #    setattr(pipeline, key, value)
 
         return pipeline
 
     def patch_pipeline(func):
-        image_generator = ((np.ones((300, 300)), np.ones((300, 300))) for _ in range(1000))
+        image_generator = (
+            (np.ones((300, 300)), np.ones((300, 300))) for _ in range(1000)
+        )
 
-        @patch.object(PIPELINE.ObstacleFinder, '__new__', return_value=FakeObstacleFinder())
+        @patch.object(
+            PIPELINE.ObstacleFinder, "__new__", return_value=FakeObstacleFinder()
+        )
         def patched_function(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -74,13 +80,26 @@ class TestPipeline(unittest.TestCase):
         The bounding boxes generated given to env, and further plot obstacles.
         """
         ## Ensure runs without error
-        flight_communication = type('FlightCommunication', (object,), {'get_state': lambda: 'early_laps'})
+        flight_communication = type(
+            "FlightCommunication", (object,), {"get_state": lambda: "early_laps"}
+        )
 
-        camera = type('Camera', (object,), {'__iter__': lambda: ((np.ones((3, 3, 3), dtype='uint8'), np.ones((3, 3), dtype='uint8')) for _ in range(100))})
+        camera = type(
+            "Camera",
+            (object,),
+            {
+                "__iter__": lambda: (
+                    (np.ones((3, 3, 3), dtype="uint8"), np.ones((3, 3), dtype="uint8"))
+                    for _ in range(100)
+                )
+            },
+        )
 
-        pipeline = self._get_pipeline(flight_communication=flight_communication, camera=camera)
-        pipeline.run('start')
+        pipeline = self._get_pipeline(
+            flight_communication=flight_communication, camera=camera
+        )
+        pipeline.run("start")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

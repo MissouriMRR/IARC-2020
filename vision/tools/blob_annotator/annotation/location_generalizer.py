@@ -20,7 +20,7 @@ def fresh_background():
 
 def generate(img, out_dir):
     img_w, img_h = img.size
-    half_w, half_h = int(img_w/2), int(img_h/2)
+    half_w, half_h = int(img_w / 2), int(img_h / 2)
 
     for x in range(-half_w, BG_W - half_w, half_w * GRANULARITY):
         for y in range(-half_h, BG_H - half_h, half_h * GRANULARITY):
@@ -30,7 +30,9 @@ def generate(img, out_dir):
 
             background.paste(img, offset)
 
-            background.save('{}{}-{}x{}.png'.format(out_dir, img.filename.split('/')[-1], x, y))
+            background.save(
+                "{}{}-{}x{}.png".format(out_dir, img.filename.split("/")[-1], x, y)
+            )
 
 
 def generate_directory(directory, out_dir):
@@ -45,16 +47,26 @@ def clean_directory(directory):
         remove(directory + filename)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
 
-    parser.add_argument("-c", "--clean", dest="clean", action="store_true",\
-                        help="Clean target directory before generating.")
+    parser.add_argument(
+        "-c",
+        "--clean",
+        dest="clean",
+        action="store_true",
+        help="Clean target directory before generating.",
+    )
 
-    parser.add_argument("-d", "--disable-generator", dest="disable_generator", action="store_true",\
-                        help="Disable generator and clean.")
+    parser.add_argument(
+        "-d",
+        "--disable-generator",
+        dest="disable_generator",
+        action="store_true",
+        help="Disable generator and clean.",
+    )
 
     options = parser.parse_args()
 

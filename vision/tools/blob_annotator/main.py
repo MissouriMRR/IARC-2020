@@ -3,6 +3,7 @@ Graphical image annotator.
 """
 import sys
 import os
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 from json import load as jsonload
@@ -12,40 +13,53 @@ import cv2
 from ui.colors import Colors
 from ui.window import Window
 from annotation.annotation import Annotation
-from annotation.generate_annotation import generate_pascvalvoc_annotation_from_image_file, ANNOTATION_DEFAULT_DIR
+from annotation.generate_annotation import (
+    generate_pascvalvoc_annotation_from_image_file,
+    ANNOTATION_DEFAULT_DIR,
+)
 
 
 class PascalVocAnnotator(object):
     """
     Allows a user to annotate images and save data to pascal voc format.
     """
-    WINDOW_TITLE = 'Annotator'
-    TEST_DIRECTORY = 'test_images'
-    CONFIG_PATH = 'config.json'
-    SUPPORTED_FILE_EXTENSIONS = ('.jpg', '.png')
 
+    WINDOW_TITLE = "Annotator"
+    TEST_DIRECTORY = "test_images"
+    CONFIG_PATH = "config.json"
+    SUPPORTED_FILE_EXTENSIONS = (".jpg", ".png")
 
     def __init__(self, path_to_image_folder=TEST_DIRECTORY):
         ## Read config
-        with open(self.CONFIG_PATH, 'r') as configfile:
+        with open(self.CONFIG_PATH, "r") as configfile:
             data = jsonload(configfile)
 
-        self.controls = data['controls']
-        self.labels = list(data['labels'].keys())
-        self.color_map = {key: value['color'] for key, value in data['labels'].items()}
+        self.controls = data["controls"]
+        self.labels = list(data["labels"].keys())
+        self.color_map = {key: value["color"] for key, value in data["labels"].items()}
 
         ## Read image
         if not os.path.isdir(path_to_image_folder):
-            raise ValueError(f"The path \'{path_to_image_folder}\' is not a valid directory!")
+            raise ValueError(
+                f"The path '{path_to_image_folder}' is not a valid directory!"
+            )
 
         self._path_to_image_folder = path_to_image_folder
-        self._paths = [os.path.join(path_to_image_folder, filename) for filename in os.listdir(self.path_to_image_folder)
-                       if os.path.splitext(filename)[1] in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS]
+        self._paths = [
+            os.path.join(path_to_image_folder, filename)
+            for filename in os.listdir(self.path_to_image_folder)
+            if os.path.splitext(filename)[1]
+            in PascalVocAnnotator.SUPPORTED_FILE_EXTENSIONS
+        ]
         self._paths.sort(key=os.path.getmtime)
 
         self._current_image = None
 
-        self._saved_annotations = Annotation.load_annotations(self.path_to_image_folder, self.color_map, annotation_dir=ANNOTATION_DEFAULT_DIR)
+        self._saved_annotations = Annotation.load_annotations(
+            self.path_to_image_folder,
+            self.color_map,
+            annotation_dir=ANNOTATION_DEFAULT_DIR,
+        )
         self._window = None
         self.tag_index = 0
         self._annotations = []
@@ -55,15 +69,16 @@ class PascalVocAnnotator(object):
         self.index = 0
 
         self._key_events = {
-            self.controls['NEXT']: self._next,
-            self.controls['PREV']: self._prev,
-            self.controls['UNDO']: self._undo,
-            self.controls['CLEAR']: self._clear
+            self.controls["NEXT"]: self._next,
+            self.controls["PREV"]: self._prev,
+            self.controls["UNDO"]: self._undo,
+            self.controls["CLEAR"]: self._clear,
         }
 
-
     def __enter__(self):
-        self._window = Window(PascalVocAnnotator.WINDOW_TITLE, cv2.WND_PROP_FULLSCREEN).__enter__()
+        self._window = Window(
+            PascalVocAnnotator.WINDOW_TITLE, cv2.WND_PROP_FULLSCREEN
+        ).__enter__()
 
         self._window.set_property(cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         self._window.set_mouse_callback(self.on_mouse_event)
@@ -102,7 +117,9 @@ class PascalVocAnnotator(object):
 
     @current_image.setter
     def current_image(self, value):
-        assert value is not None, 'Cannot read the image at "{}"!'.format(self.current_path)
+        assert value is not None, 'Cannot read the image at "{}"!'.format(
+            self.current_path
+        )
         self._current_image = value
 
     def _next(self):
@@ -122,8 +139,12 @@ class PascalVocAnnotator(object):
             self._changed = True
 
     def _remove_annotation_file_when_empty(self):
-        if hasattr(self, '_index'):
-            annotation_file_path = os.path.join(self.path_to_image_folder, self.annotation_dir, os.path.basename(os.path.splitext(self.current_path)[0]) + '.xml')
+        if hasattr(self, "_index"):
+            annotation_file_path = os.path.join(
+                self.path_to_image_folder,
+                self.annotation_dir,
+                os.path.basename(os.path.splitext(self.current_path)[0]) + ".xml",
+            )
             if (not self._annotations) and os.path.isfile(annotation_file_path):
                 os.remove(annotation_file_path)
 
@@ -131,8 +152,16 @@ class PascalVocAnnotator(object):
     def index(self, value):
         if self.current_image is not None and (self._annotations or self._changed):
             current_labels = [annotation.label for annotation in self._annotations]
-            generate_pascvalvoc_annotation_from_image_file(os.path.abspath(self.current_path), current_labels, self._annotations, self.annotation_dir, True)
-            self._saved_annotations[os.path.basename(self.current_path)] = self._annotations.copy()
+            generate_pascvalvoc_annotation_from_image_file(
+                os.path.abspath(self.current_path),
+                current_labels,
+                self._annotations,
+                self.annotation_dir,
+                True,
+            )
+            self._saved_annotations[
+                os.path.basename(self.current_path)
+            ] = self._annotations.copy()
 
         self._remove_annotation_file_when_empty()
 
@@ -159,19 +188,29 @@ class PascalVocAnnotator(object):
         Display controls in use on top of screen.
         """
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 1/2
+        font_scale = 1 / 2
         thickness = 1
         margin = 5
         outline_thickness = 3
 
-        text = ''
+        text = ""
         for key, value in self._key_events.items():
             text = text + f"{value.__name__}: {key}" + "   "
             (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
             origin = (margin, margin + text_h)
-            cv2.putText(img, text, origin, font, font_scale, Colors.BLACK.value,
-                        thickness+outline_thickness, True)
-            cv2.putText(img, text, origin, font, font_scale, Colors.WHITE.value, thickness, True)
+            cv2.putText(
+                img,
+                text,
+                origin,
+                font,
+                font_scale,
+                Colors.BLACK.value,
+                thickness + outline_thickness,
+                True,
+            )
+            cv2.putText(
+                img, text, origin, font, font_scale, Colors.WHITE.value, thickness, True
+            )
 
     def update(self):
         """
@@ -220,7 +259,7 @@ class PascalVocAnnotator(object):
         self._changed |= bool(self._annotation_in_progress)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     DATASET_PATH = os.path.join("..", "..", "vision_images", "obstacle")
 
     with PascalVocAnnotator(DATASET_PATH) as annotator:

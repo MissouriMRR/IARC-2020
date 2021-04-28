@@ -41,5 +41,6 @@ class Camera:
         """
         Guarantees that child classes have the display_in_window method
         """
-        raise NotImplementedError(f"display_in_window is not implemented for {type(self)}")
-
+        raise NotImplementedError(
+            f"display_in_window is not implemented for {type(self)}"
+        )

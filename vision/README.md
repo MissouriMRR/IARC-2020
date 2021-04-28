@@ -115,7 +115,7 @@ The vision team is responsible for processing images in order to extract informa
                 bench_module.py  <- Follows Benchmarking Guides
                 ...
                 runall.py
-            common.py 
+            common.py
             README.md  <- Instructions for Benchmarks
 
         unit_tests/

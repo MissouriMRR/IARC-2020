@@ -6,10 +6,11 @@ import cv2
 
 class Window(object):
     """Abstracts OpenCV's high-level QT functionality."""
-    QUIT_KEY = 'q'
-    QUIT_KEY2 = ''
 
-    def __init__(self, title='', flags=None, quit_key=QUIT_KEY, quit_key2=QUIT_KEY2):
+    QUIT_KEY = "q"
+    QUIT_KEY2 = ""
+
+    def __init__(self, title="", flags=None, quit_key=QUIT_KEY, quit_key2=QUIT_KEY2):
         self.title = title
         self._flags = [] if flags is None else [flags]
         self.destroyed = False

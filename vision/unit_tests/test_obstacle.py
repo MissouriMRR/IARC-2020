@@ -2,6 +2,7 @@
 Obstacle detector unit tests.
 """
 import os, sys
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -20,6 +21,7 @@ class TestObstacleDetection(unittest.TestCase):
     """
     Testing obstacle detection.
     """
+
     @staticmethod
     def _get_params(**kwargs):
         """
@@ -30,7 +32,7 @@ class TestObstacleDetection(unittest.TestCase):
             "maxThreshold": 300,
             "filterByArea": True,
             "minArea": 100,
-            "maxArea": 200000
+            "maxArea": 200000,
         }
         config.update(kwargs)
 
@@ -67,7 +69,9 @@ class TestObstacleDetection(unittest.TestCase):
         with self.subTest(i="3 Channel {0..255} Image"):
             detector = ObstacleFinder(params=self._get_params())
 
-            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.random.randint(
+                0, 255, size=(*IMAGE_SIZE, 3), dtype="uint8"
+            )
 
             detector.find(color_image, None)
 
@@ -76,8 +80,14 @@ class TestObstacleDetection(unittest.TestCase):
             detector = ObstacleFinder(params=self._get_params())
 
             for i in range(1, 9):
-                color_image = np.zeros((1000, 1000, 3), dtype='uint8')
-                cv2.rectangle(color_image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
+                color_image = np.zeros((1000, 1000, 3), dtype="uint8")
+                cv2.rectangle(
+                    color_image,
+                    (200, 200),
+                    (200 + (i * 100), 200 + (i * 100)),
+                    (255, 255, 255),
+                    2,
+                )
 
                 output = detector.find(color_image, None)
 
@@ -109,8 +119,14 @@ class TestObstacleDetection(unittest.TestCase):
         ## Ensure does not modify original image
         detector = ObstacleFinder(params=self._get_params())
 
-        color_image = np.zeros((1000, 1000, 3), dtype='uint8')
-        cv2.rectangle(color_image, (200, 200), (200 + (i * 100), 200 + (i * 100)), (255, 255, 255), 2)
+        color_image = np.zeros((1000, 1000, 3), dtype="uint8")
+        cv2.rectangle(
+            color_image,
+            (200, 200),
+            (200 + (i * 100), 200 + (i * 100)),
+            (255, 255, 255),
+            2,
+        )
 
         color_parameter = np.copy(color_image)
 
@@ -119,5 +135,5 @@ class TestObstacleDetection(unittest.TestCase):
         np.testing.assert_array_equal(color_image, color_parameter)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

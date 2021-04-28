@@ -7,18 +7,18 @@ import os
 import pyrealsense2 as rs
 
 
-if __name__ == '__main__':
-    FILENAME = 'realsense_video'
+if __name__ == "__main__":
+    FILENAME = "realsense_video"
 
     number = -1
 
-    for filename in os.listdir('.'):
+    for filename in os.listdir("."):
         if FILENAME in filename:
-            file_number = int(filename.replace(FILENAME, '').replace('.bag', ''))
+            file_number = int(filename.replace(FILENAME, "").replace(".bag", ""))
 
             number = max(number, file_number)
 
-    FILENAME += f'{number + 1}.bag'
+    FILENAME += f"{number + 1}.bag"
 
     ##
     pipeline = rs.pipeline()

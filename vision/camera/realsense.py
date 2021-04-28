@@ -2,6 +2,7 @@
 The Realsense class is a child class of the camera, designed to be used for realsense depth cameras
 """
 import sys, os
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -10,6 +11,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import cv2
 import numpy as np
 import pyrealsense2 as rs
+
 try:
     from vision.camera.template import Camera
 except ImportError:
@@ -36,6 +38,7 @@ class Realsense(Camera):
         Serial number of the realsense camera to stream from
         Defaults to empty, which reads if only one realsense is plugged in
     """
+
     def __init__(self, screen_width, screen_height, frame_rate, serial_no="", **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
 
@@ -50,8 +53,12 @@ class Realsense(Camera):
         if self.serialNumber:
             self.config.enable_device(self.serialNumber)
 
-        self.config.enable_stream(rs.stream.depth, self.width, self.height, rs.format.z16, self.framerate)
-        self.config.enable_stream(rs.stream.color, self.width, self.height, rs.format.bgr8, self.framerate)
+        self.config.enable_stream(
+            rs.stream.depth, self.width, self.height, rs.format.z16, self.framerate
+        )
+        self.config.enable_stream(
+            rs.stream.color, self.width, self.height, rs.format.bgr8, self.framerate
+        )
 
     def __iter__(self):
         """
@@ -66,8 +73,8 @@ class Realsense(Camera):
         profile = self.pipeline.start(self.config)
 
         # Getting the depth sensor's depth scale (see rs-align example for explanation)
-        #depth_sensor = profile.get_device().first_depth_sensor()
-        #depth_scale = depth_sensor.get_depth_scale()
+        # depth_sensor = profile.get_device().first_depth_sensor()
+        # depth_scale = depth_sensor.get_depth_scale()
 
         align_to = rs.stream.color
         align = rs.align(align_to)
@@ -105,8 +112,8 @@ class Realsense(Camera):
 
             # Render images
             depth_colormap = cv2.applyColorMap(
-                cv2.convertScaleAbs(depth_image, alpha=0.03),
-                cv2.COLORMAP_JET)
+                cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET
+            )
 
             if clipping:
                 bg_removed = np.where((depth_image_3d <= 0), grey_color, color_image)
@@ -114,20 +121,25 @@ class Realsense(Camera):
             else:
                 images = np.hstack((color_image, depth_colormap))
 
-            cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
-            cv2.imshow('Depth/Color Stream', images)
+            cv2.namedWindow("Depth/Color Stream", cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Depth/Color Stream", images)
 
             key = cv2.waitKey(1)
 
-            if key == ord('c'):
+            if key == ord("c"):
                 save_camera_frame(depth_image, color_image)
 
             # Press esc or 'q' to close the image window
-            if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
+            if (
+                key == ord("q")
+                or key == 27
+                or cv2.getWindowProperty("Depth/Color Stream", 0) == -1
+            ):
                 cv2.destroyAllWindows()
                 break
 
         self.pipeline.stop()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     Realsense(0, 0, 0).display_in_window()

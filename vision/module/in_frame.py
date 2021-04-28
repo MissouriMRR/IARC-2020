@@ -110,6 +110,7 @@ if __name__ == "__main__":
     Also note that in_frame, must be in the same file location,
     or a path must be specified
     """
+
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
         description='Read image file and display depth and test for ModuleInFrame.\

@@ -10,14 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-if __name__ == '__main__':
-    FOLDER = '.'
+if __name__ == "__main__":
+    FOLDER = "."
 
     for filename in os.listdir(FOLDER):
-        if '.npy' not in filename:
+        if ".npy" not in filename:
             continue
 
-        with open(os.path.join(FOLDER, filename), 'rb') as file:
+        with open(os.path.join(FOLDER, filename), "rb") as file:
             nd = np.load(file)
 
         plt.imshow(nd)

@@ -2,6 +2,7 @@
 Flight-vision interface related tests.
 """
 import sys, os
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -15,6 +16,7 @@ class TestEnvironment(unittest.TestCase):
     """
     Testing the environment class.
     """
+
     def setUp(self):
         self.target = [
             BoundingBox(4, ","),
@@ -22,7 +24,7 @@ class TestEnvironment(unittest.TestCase):
             BoundingBox(2, ","),
             BoundingBox(6, ","),
             BoundingBox(7, ","),
-            BoundingBox(5, ',')
+            BoundingBox(5, ","),
         ]
 
     def test_iter(self):
@@ -37,7 +39,7 @@ class TestEnvironment(unittest.TestCase):
                 break
         else:
             self.fail()
-        #values changing in tuple
+        # values changing in tuple
         env.rects = (1, 2)
         iterator = iter(env)
         x = next(iterator)
@@ -48,12 +50,11 @@ class TestEnvironment(unittest.TestCase):
         x = next(iterator)
         self.assertEqual(x, env.bounding_boxes[2])
 
-
     def test_update(self):
         env1 = Environment()
         env1.update(self.target)
         self.assertEqual(env1.bounding_boxes, self.target)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

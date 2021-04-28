@@ -1,46 +1,51 @@
-'''
+"""
 Utility functions for creating Pascal VOC style annotations
 
 Multi-Rotor Robot Design Team
 Missouri University of Science and Technology
 Fall 2017
 Christopher O'Toole
-'''
+"""
 import os
 import cv2
 import numpy as np
 from lxml import etree
 
 
-ROOT_NAME = 'annotation'
-OBJECT_ELEMENT_NAME = 'object'
-ANNOTATION_DEFAULT_DIR = 'Annotations'
+ROOT_NAME = "annotation"
+OBJECT_ELEMENT_NAME = "object"
+ANNOTATION_DEFAULT_DIR = "Annotations"
+
 
 def _generate_xml_element_with_text(name, text):
-    '''generate a xml element with a text value'''
+    """generate a xml element with a text value"""
     element = etree.Element(name)
     element.text = str(text)
     return element
 
+
 def _generate_object_annotation(obj_name, bbox, width, height):
-    '''generate an object annotation Pascal VOC style'''
+    """generate an object annotation Pascal VOC style"""
     xmin, ymin, xmax, ymax = bbox
 
     obj = etree.Element(OBJECT_ELEMENT_NAME)
-    obj.append(_generate_xml_element_with_text('name', obj_name))
-    obj.append(_generate_xml_element_with_text('truncated', 0))
-    obj.append(_generate_xml_element_with_text('difficult', 0))
+    obj.append(_generate_xml_element_with_text("name", obj_name))
+    obj.append(_generate_xml_element_with_text("truncated", 0))
+    obj.append(_generate_xml_element_with_text("difficult", 0))
 
-    bndbox = etree.Element('bndbox')
-    bndbox.append(_generate_xml_element_with_text('xmin', min(max(0, xmin), width)))
-    bndbox.append(_generate_xml_element_with_text('ymin', min(max(0, ymin), height)))
-    bndbox.append(_generate_xml_element_with_text('xmax', min(max(0, xmax), width)))
-    bndbox.append(_generate_xml_element_with_text('ymax', min(max(0, ymax), height)))
+    bndbox = etree.Element("bndbox")
+    bndbox.append(_generate_xml_element_with_text("xmin", min(max(0, xmin), width)))
+    bndbox.append(_generate_xml_element_with_text("ymin", min(max(0, ymin), height)))
+    bndbox.append(_generate_xml_element_with_text("xmax", min(max(0, xmax), width)))
+    bndbox.append(_generate_xml_element_with_text("ymax", min(max(0, ymax), height)))
     obj.append(bndbox)
 
     return obj
 
-def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, img_path, overwrite=False):
+
+def generate_pascalvoc_annotation_from_image(
+    img, obj_names, bboxes, file_path, img_path, overwrite=False
+):
     """
     Generates a Pascal VOC annotation file for `img` with the specified parameters
 
@@ -62,14 +67,14 @@ def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, 
 
     root = etree.Element(ROOT_NAME)
 
-    size = etree.Element('size')
-    size.append(_generate_xml_element_with_text('width', width))
-    size.append(_generate_xml_element_with_text('height', height))
-    size.append(_generate_xml_element_with_text('depth', depth))
+    size = etree.Element("size")
+    size.append(_generate_xml_element_with_text("width", width))
+    size.append(_generate_xml_element_with_text("height", height))
+    size.append(_generate_xml_element_with_text("depth", depth))
     root.append(size)
 
-    path = etree.Element('path')
-    path.append(_generate_xml_element_with_text('value', os.path.basename(img_path)))
+    path = etree.Element("path")
+    path.append(_generate_xml_element_with_text("value", os.path.basename(img_path)))
     root.append(path)
 
     for obj_name, bbox in zip(obj_names, bboxes):
@@ -78,12 +83,19 @@ def generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, file_path, 
         root.append(_generate_object_annotation(obj_name, compat_bbox, width, height))
 
     if not overwrite:
-        assert not os.path.exists(file_path), 'generate_pascalvoc_annotation_from_image(): %s already exists!' % (file_path,)
+        assert not os.path.exists(
+            file_path
+        ), "generate_pascalvoc_annotation_from_image(): %s already exists!" % (
+            file_path,
+        )
 
-    with open(file_path, 'wb') as out_file:
+    with open(file_path, "wb") as out_file:
         out_file.write(etree.tostring(root, pretty_print=True))
 
-def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, annotation_dir=None, overwrite=False):
+
+def generate_pascvalvoc_annotation_from_image_file(
+    img_path, obj_names, bboxes, annotation_dir=None, overwrite=False
+):
     """
     Generates a Pascal VOC annotation file for `img_path` with the specified parameters
     Parameters
@@ -102,10 +114,20 @@ def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, 
 
     img_file_name, _ = os.path.splitext(img_path)
     img = cv2.imread(img_path)
-    assert img is not None, 'generate_pascvalvoc_annotation_from_image_file(): could not read image at %s' % (img_path,)
+    assert img is not None, (
+        "generate_pascvalvoc_annotation_from_image_file(): could not read image at %s"
+        % (img_path,)
+    )
 
     if annotation_dir is None:
-        generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, img_file_name + '.xml', img_path='', overwrite=overwrite)
+        generate_pascalvoc_annotation_from_image(
+            img,
+            obj_names,
+            bboxes,
+            img_file_name + ".xml",
+            img_path="",
+            overwrite=overwrite,
+        )
     else:
         img_folder = os.path.dirname(img_file_name)
         img_name = os.path.basename(img_file_name)
@@ -114,12 +136,21 @@ def generate_pascvalvoc_annotation_from_image_file(img_path, obj_names, bboxes, 
         if not os.path.exists(annotation_folder):
             os.mkdir(annotation_folder)
 
-        generate_pascalvoc_annotation_from_image(img, obj_names, bboxes, os.path.join(annotation_folder, img_name) + '.xml', img_path, overwrite=overwrite)
+        generate_pascalvoc_annotation_from_image(
+            img,
+            obj_names,
+            bboxes,
+            os.path.join(annotation_folder, img_name) + ".xml",
+            img_path,
+            overwrite=overwrite,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # unit test
-    TEST_IMG_NAME = ''
-    obj_names = ['red roomba', 'green roomba']
+    TEST_IMG_NAME = ""
+    obj_names = ["red roomba", "green roomba"]
     bboxes = np.array([[548, 472, 878, 753], [697, 293, 982, 531]])
-    generate_pascvalvoc_annotation_from_image_file(TEST_IMG_NAME, obj_names, bboxes, annotation_dir=ANNOTATION_DEFAULT_DIR)
+    generate_pascvalvoc_annotation_from_image_file(
+        TEST_IMG_NAME, obj_names, bboxes, annotation_dir=ANNOTATION_DEFAULT_DIR
+    )

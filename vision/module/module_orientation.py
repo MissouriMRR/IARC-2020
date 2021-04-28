@@ -86,7 +86,7 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     #         crashing the algorithm and logging the failure flag
     try:
         angles = np_rectangles[:, 2]
-        
+
         roll = np.mean(angles)
     except:
         roll = 0

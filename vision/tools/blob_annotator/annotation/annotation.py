@@ -8,7 +8,8 @@ from ui.geometry import ResizableBox
 
 
 class Annotation(object):
-    '''Represents a particular object annotation'''
+    """Represents a particular object annotation"""
+
     detector = None
 
     def __init__(self, x, y, color, label, w=1, h=1):
@@ -32,7 +33,9 @@ class Annotation(object):
 
     def scale_by(self, scale):
         bounds = self.box.scale_by(scale)
-        return Annotation(bounds.x, bounds.y, self.color, self.label, w=bounds.w, h=bounds.h)
+        return Annotation(
+            bounds.x, bounds.y, self.color, self.label, w=bounds.w, h=bounds.h
+        )
 
     def draw(self, img):
         self._resizable_box.draw(img, self.color)
@@ -43,15 +46,20 @@ class Annotation(object):
         root = tree.getroot()
         annotations = []
 
-        path = root.find('path').find('value').text
+        path = root.find("path").find("value").text
 
-        for obj in root.findall('object'):
-            label = obj.find('name').text
-            bbox = obj.find('bndbox')
-            x, y, x1, y1 = (int(bbox.find('xmin').text), int(bbox.find('ymin').text), int(bbox.find('xmax').text), int(bbox.find('ymax').text))
+        for obj in root.findall("object"):
+            label = obj.find("name").text
+            bbox = obj.find("bndbox")
+            x, y, x1, y1 = (
+                int(bbox.find("xmin").text),
+                int(bbox.find("ymin").text),
+                int(bbox.find("xmax").text),
+                int(bbox.find("ymax").text),
+            )
 
-            color = (color_map["blob"])
-            annotations.append(Annotation(x, y, color, label, x1-x, y1-y))
+            color = color_map["blob"]
+            annotations.append(Annotation(x, y, color, label, x1 - x, y1 - y))
 
         return annotations, path
 
@@ -66,7 +74,9 @@ class Annotation(object):
         if os.path.isdir(path):
             for file in os.listdir(path):
                 annotation_file_path = os.path.join(path, file)
-                annotations, key = Annotation.parse_annotation(annotation_file_path, color_map)
+                annotations, key = Annotation.parse_annotation(
+                    annotation_file_path, color_map
+                )
                 saved_annotations[key] = annotations
 
         return saved_annotations

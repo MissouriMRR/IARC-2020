@@ -25,6 +25,7 @@ class ObstacleFinder:
     params: SimpleBlobDetector_Params
         SimpleBlobDetector params object
     """
+
     def __init__(self, params=None):
         self.keypoints = []
         self.params = params
@@ -43,7 +44,9 @@ class ObstacleFinder:
         Defines behavior of self.params = value.
         """
         if not isinstance(value, cv2.SimpleBlobDetector_Params):
-            raise ValueError(f"Requires instance of SimpleBlobDetector_Params, got {type(value)}")
+            raise ValueError(
+                f"Requires instance of SimpleBlobDetector_Params, got {type(value)}"
+            )
 
         self._params = value
         self.blob_detector = cv2.SimpleBlobDetector_create(self.params)
@@ -90,7 +93,12 @@ class ObstacleFinder:
 
             # With depth, these will be calculated differently
 
-            vertices = [top_left_near, top_right_near, bottom_right_near, bottom_left_near] # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
+            vertices = [
+                top_left_near,
+                top_right_near,
+                bottom_right_near,
+                bottom_left_near,
+            ]  # , top_left_far, top_right_far, bottom_right_far, bottom_left_far]
 
             # create Rectangle and add to list of bounding boxes
             bbox = BoundingBox(vertices, ObjectType.AVOID)
@@ -99,18 +107,18 @@ class ObstacleFinder:
         return bounding_boxes
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from vision.common.box_plotter import plot_box
 
-    prefix = 'vision' if os.path.isdir("vision") else ''
-    img_folder = os.path.join(prefix, 'vision_images', 'obstacle')
-    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+    prefix = "vision" if os.path.isdir("vision") else ""
+    img_folder = os.path.join(prefix, "vision_images", "obstacle")
+    config_filename = os.path.join(prefix, "obstacle", "config.json")
 
-    with open(config_filename, 'r') as config_file:
+    with open(config_filename, "r") as config_file:
         config = json.load(config_file)
 
     for img in os.listdir(img_folder):
-        if img[-4:] not in ['.png', '.jpg']:
+        if img[-4:] not in [".png", ".jpg"]:
             continue
 
         image = cv2.imread(os.path.join(img_folder, os.fsdecode(img)))

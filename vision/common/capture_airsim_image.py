@@ -25,11 +25,11 @@ while True:  # runs as long as the simulator is running, ideally
         sceneCameraImage = client.simGetImage("0", airsim.ImageType.Scene)
         depthCameraImage = client.simGetImage("3", airsim.ImageType.Scene)
 
-        time = str(datetime.datetime.now()).replace(' ', '_').replace(':', '.')
+        time = str(datetime.datetime.now()).replace(" ", "_").replace(":", ".")
 
         cv2.imwrite(f"{time}-colorImage.jpg", sceneCameraImage)
 
-        with open(f"{time}-depthImage.npy", 'wb') as file:
+        with open(f"{time}-depthImage.npy", "wb") as file:
             np.save(file, depthCameraImage)
 
     if key == "e":

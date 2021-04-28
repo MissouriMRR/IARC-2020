@@ -17,5 +17,5 @@ STATES = {
     "final": Final,
     "to_mast": ToMast,
     "detect_module": DetectModule,
-    "simple_takeoff": SimpleTakeoff
+    "simple_takeoff": SimpleTakeoff,
 }

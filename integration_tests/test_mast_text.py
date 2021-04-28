@@ -27,7 +27,9 @@ if __name__ == "__main__":
         state_settings.set_vision_test("text")
 
         state_settings.set_run_title("Mast Text Detection Test")
-        state_settings.set_run_description("Simple takeoff followed immediately by text detection, then land")
+        state_settings.set_run_description(
+            "Simple takeoff followed immediately by text detection, then land"
+        )
 
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()

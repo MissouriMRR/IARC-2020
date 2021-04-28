@@ -7,6 +7,7 @@ class Environment:
     """
     The percieved environment.
     """
+
     def __init__(self):
         self.bounding_boxes = []
 

@@ -33,38 +33,34 @@ class TestParamsImport(unittest.TestCase):
             whether each configuration matches the expected value
         """
         sample_config = {
-            "filterByArea": {
-                "enable": True,
-                "minArea": 200
-            },
-            "filterByColor": {
-                "enable": False,
-                "blobColor": 100
-            }
+            "filterByArea": {"enable": True, "minArea": 200},
+            "filterByColor": {"enable": False, "blobColor": 100},
         }
         params = import_params(sample_config)
 
         for category, settings in sample_config.items():
             with self.subTest(i=category):
-                enabled = sample_config[category]['enable']
+                enabled = sample_config[category]["enable"]
 
                 for param, value in settings.items():
-                    if param == 'enable':
-                        self.assertEqual(getattr(params, category), value, msg=f"Expected attribute '{category}' to have value '{value}', got '{getattr(params, category)}' instead")
+                    if param == "enable":
+                        self.assertEqual(
+                            getattr(params, category),
+                            value,
+                            msg=f"Expected attribute '{category}' to have value '{value}', got '{getattr(params, category)}' instead",
+                        )
 
                     elif enabled:
-                        self.assertEqual(getattr(params, param), value, msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead")
+                        self.assertEqual(
+                            getattr(params, param),
+                            value,
+                            msg=f"Expected attribute '{param}' to have value '{value}', got '{getattr(params, param)}' instead",
+                        )
 
         ## Ensure does not modify original parameter
         config_original = {
-            "filterByArea": {
-                "enable": True,
-                "minArea": 200
-            },
-            "filterByColor": {
-                "enable": False,
-                "blobColor": 100
-            }
+            "filterByArea": {"enable": True, "minArea": 200},
+            "filterByColor": {"enable": False, "blobColor": 100},
         }
 
         config_parameter = deepcopy(config_original)
@@ -74,5 +70,5 @@ class TestParamsImport(unittest.TestCase):
         self.assertDictEqual(config_original, config_parameter)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -2,36 +2,41 @@ import struct
 import usb.core
 import time
 
+
 class LAC:
-    SET_ACCURACY                = 0x01
-    SET_RETRACT_LIMIT           = 0x02
-    SET_EXTEND_LIMIT            = 0x03
-    SET_MOVEMENT_THRESHOLD      = 0x04
-    SET_STALL_TIME              = 0x05
-    SET_PWM_THRESHOLD           = 0x06
-    SET_DERIVATIVE_THRESHOLD    = 0x07
-    SET_MAX_DERIVATIVE          = 0x08
-    SET_MIN_DERIVATIVE          = 0x09
-    SET_MAX_PWM_VALUE           = 0x0A
-    SET_MIN_PWM_VALUE           = 0x0B
-    SET_Kp                      = 0x0C
-    SET_Kd                      = 0x0D
-    SET_AVERAGE_RC              = 0x0E
-    SET_AVERAGE_ADC             = 0x0F
+    SET_ACCURACY = 0x01
+    SET_RETRACT_LIMIT = 0x02
+    SET_EXTEND_LIMIT = 0x03
+    SET_MOVEMENT_THRESHOLD = 0x04
+    SET_STALL_TIME = 0x05
+    SET_PWM_THRESHOLD = 0x06
+    SET_DERIVATIVE_THRESHOLD = 0x07
+    SET_MAX_DERIVATIVE = 0x08
+    SET_MIN_DERIVATIVE = 0x09
+    SET_MAX_PWM_VALUE = 0x0A
+    SET_MIN_PWM_VALUE = 0x0B
+    SET_Kp = 0x0C
+    SET_Kd = 0x0D
+    SET_AVERAGE_RC = 0x0E
+    SET_AVERAGE_ADC = 0x0F
 
-    GET_FEEDBACK                = 0x10
+    GET_FEEDBACK = 0x10
 
-    SET_POSITION                = 0x20
-    SET_SPEED                   = 0x21
+    SET_POSITION = 0x20
+    SET_SPEED = 0x21
 
-    DISABLE_MANUAL              = 0x30
+    DISABLE_MANUAL = 0x30
 
-    RESET                       = 0xFF
+    RESET = 0xFF
 
     def __init__(self, vendorID=0x4D8, productID=0xFC5F):
-        self.device = usb.core.find(idVendor=vendorID, idProduct=productID)  # Defaults for our LAC; give yours a test
+        self.device = usb.core.find(
+            idVendor=vendorID, idProduct=productID
+        )  # Defaults for our LAC; give yours a test
         if self.device is None:
-            raise Exception("No board found, ensure board is connected and powered and matching the IDs provided")
+            raise Exception(
+                "No board found, ensure board is connected and powered and matching the IDs provided"
+            )
 
         self.device.set_configuration()
 
@@ -40,12 +45,18 @@ class LAC:
         if value < 0 or value > 1023:
             raise ValueError("Value is OOB. Must be 2-byte integer in rage [0, 1023]")
 
-        data = struct.pack(b'BBB', function, value & 0xFF, (value & 0xFF00) >> 8)  # Low byte masked in, high byte masked and moved down
+        data = struct.pack(
+            b"BBB", function, value & 0xFF, (value & 0xFF00) >> 8
+        )  # Low byte masked in, high byte masked and moved down
         self.device.write(1, data, 100)  # Magic numbers from the PyUSB tutorial
-        time.sleep(.05)  # Just to be sure it's all well and sent
-        response = self.device.read(0x81, 3, 100)  # 3 because there's three bytes to a packet
-        return (response[2] << 8) + response[1]  # High byte moved left, then tack on the low byte
-  
+        time.sleep(0.05)  # Just to be sure it's all well and sent
+        response = self.device.read(
+            0x81, 3, 100
+        )  # 3 because there's three bytes to a packet
+        return (response[2] << 8) + response[
+            1
+        ]  # High byte moved left, then tack on the low byte
+
     # How close to target distance is accepted
     # value/1024 * stroke gives distance, where stroke is max
     # extension length (all values in mm). Round to nearest
@@ -132,13 +143,11 @@ class LAC:
     def set_average_adc(self, value):
         self.send_data(self.SET_AVERAGE_ADC, value)
 
-
     # Causes actuator to send a feedback packet containing its
     # current position. This is read directly from ADC and might
     # not be equal to the set point if yet unreached
     def get_feedback(self):
         return self.send_data(self.GET_FEEDBACK)
-
 
     # Set the LAC's position. This shouldn't be shocking, given
     # like ya know the name of the function? Note that this will
@@ -155,14 +164,12 @@ class LAC:
     def set_speed(self, value):
         self.send_data(self.SET_SPEED, value)
 
-
     # Saves current config to EEPROM and disables all four
     # potentiometers. On reboot, these values will continue being used
     # instead of the potentiometer values. Analog inputs function
     # as normal either way
     def disable_manual(self):
         self.send_data(self.DISABLE_MANUAL)
-
 
     # Enables manual control potentiometers and resets config
     # to factory default

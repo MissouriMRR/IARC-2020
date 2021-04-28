@@ -7,20 +7,20 @@ MIS_TAKEOFF_ALT: 0 > 80 (.5), 2.5, m
           Comment: This is the minimum altitude the system will take off to.
 
 MPC_CRUISE_90: 1.0 > 20.0 (1), 3.0, m/s
-          Description: Cruise speed when angle prev-current/current-next 
+          Description: Cruise speed when angle prev-current/current-next
             setpoint is 90 degrees. It should be lower than MPC_XY_CRUISE
           Comment: Applies only in AUTO modes (includes also RTL / hold / etc.)
- 
+
 MPC_XY_VEL_MAX: 0.0 > 20.0 (1), 12.0, m/s
           Description: Maximum horizontal velocity
           Comment: Maximum horizontal velocity in AUTO mode. If higher speeds
             are commanded in a mission they will be capped to this velocity.
- 
+
 MPC_XY_CRUISE: 3.0 > 20.0, 5.0, m/s
           Description: Maximum horizontal velocity in mission
           Comment: Normal horizontal velocity in AUTO modes
             (includes also RTL / hold / etc.) and endpoint for position stabilized mode (POSCTRL).
- 
+
 MC_AIRMODE: None, 0, None
           Description: Multicopter air-mode
           Comment: he air-mode enables the mixer to increase the total thrust
@@ -48,7 +48,7 @@ MAV_0_MODE: None, 0, None
             7: Minimal
             8: External Vision
           Reboot required: True
- 
+
 MAV_0_RATE: 0 > ?, 1200, B/s
           Description: Maximum MAVLink sending rate for instance 0
           Comment: Configure the maximum sending rate for the MAVLink streams
@@ -117,7 +117,7 @@ COM_OBL_RC_ACT: None, 0, None
 COM_RC_OVERRIDE: None, 0, None
           Description: Enable RC stick override of auto modes
           Comment:
- 
+
 COM_POSCTL_NAVL: None, 0, None
           Description: Position control navigation loss response
           Comment: This sets the flight mode that will be used if navigation
@@ -136,23 +136,23 @@ LNDMC_ALT_MAX: -1 > 10000, -1.0, m
           Comment: The system will obey this limit as a hard altitude limit.
             This setting will be consolidated with the GF_MAX_VER_DIST
             parameter. A negative value indicates no altitude limitation.
- 
+
 LNDMC_FFALL_THR: 0.1 > 10, 2.0, m/s^2
           Description: Multicopter specific force threshold
           Comment: Multicopter threshold on the specific force measured by
             accelerometers in m/s^2 for free-fall detection
- 
+
 LNDMC_FFALL_TTRI: 0.02 > 5, 0.3, s
           Description: Multicopter free-fall trigger time
           Comment: Seconds (decimal) that freefall conditions have to met
             before triggering a freefall. Minimal value is limited by
             LAND_DETECTOR_UPDATE_RATE=50Hz in landDetector.h
- 
+
 LNDMC_XY_VEL_MAX: None, 1.5, m/s
           Description: Multicopter max horizontal velocity
-          Comment: Maximum horizontal velocity allowed in the 
+          Comment: Maximum horizontal velocity allowed in the
             landed state (m/s)
- 
+
 LNDMC_Z_VEL_MAX: None, 0.50, m/s
           Description: Multicopter max climb rate
           Comment: Maximum vertical velocity allowed in the landed state
@@ -166,7 +166,7 @@ LNDMC_LOW_T_THR: 0.1 > 0.9, 0.3, norm
             contact state. The value is calculated as
             val = (MPC_THR_HOVER - MPC_THR_MIN) * LNDMC_LOW_T_THR + MPC_THR_MIN
             Increase this value if the system takes long time to detect landing.
- 
+
 
 GPS_DUMP_COMM: 0 > 1, 0, None
           Description: Dump GPS communication to a file

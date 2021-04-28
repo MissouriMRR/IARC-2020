@@ -12,6 +12,7 @@ sys.path += [parent_dir, gparent_dir, ggparent_dir]
 import cv2
 import numpy as np
 import airsim
+
 try:
     from vision.camera.template import Camera
 except ImportError:
@@ -22,8 +23,11 @@ class SimCamera(Camera):
     """
     Creates an airsim camera object
     """
+
     def __init__(self, **kwargs):
-        super().__init__(-1, -1, -1)  # for screen_width, screen_height, and framerate, unnecessary
+        super().__init__(
+            -1, -1, -1
+        )  # for screen_width, screen_height, and framerate, unnecessary
         self.client = airsim.MultirotorClient()
 
     def __iter__(self):
@@ -38,17 +42,25 @@ class SimCamera(Camera):
             in RGB format
         """
         while True:
-            depth_responses = self.client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.DepthVis, False, False)])
+            depth_responses = self.client.simGetImages(
+                [airsim.ImageRequest("0", airsim.ImageType.DepthVis, False, False)]
+            )
             depth_response = depth_responses[0]
 
-            scene_responses = self.client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)])
+            scene_responses = self.client.simGetImages(
+                [airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)]
+            )
             scene_response = scene_responses[0]
 
             depth_np_1d = np.frombuffer(depth_response.image_data_uint8, dtype=np.uint8)
             color_np_1d = np.frombuffer(scene_response.image_data_uint8, dtype=np.uint8)
 
-            depth_np = depth_np_1d.reshape(depth_response.height, depth_response.width, 3)
-            color_np = color_np_1d.reshape(scene_response.height, scene_response.width, 3)
+            depth_np = depth_np_1d.reshape(
+                depth_response.height, depth_response.width, 3
+            )
+            color_np = color_np_1d.reshape(
+                scene_response.height, scene_response.width, 3
+            )
 
             yield depth_np, color_np
 
@@ -59,23 +71,27 @@ class SimCamera(Camera):
         for depth_image, color_image in self:
             # Render images
             depth_colormap = cv2.applyColorMap(
-                cv2.convertScaleAbs(depth_image, alpha=0.03),
-                cv2.COLORMAP_JET)
+                cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET
+            )
 
             images = np.hstack((color_image, depth_colormap))
 
-            cv2.namedWindow('Depth/Color Stream', cv2.WINDOW_AUTOSIZE)
-            cv2.imshow('Depth/Color Stream', images)
+            cv2.namedWindow("Depth/Color Stream", cv2.WINDOW_AUTOSIZE)
+            cv2.imshow("Depth/Color Stream", images)
 
             key = cv2.waitKey(0)
 
             # Press esc or 'q' to close the image window
-            if key == ord('q') or key == 27 or cv2.getWindowProperty('Depth/Color Stream', 0) == -1:
+            if (
+                key == ord("q")
+                or key == 27
+                or cv2.getWindowProperty("Depth/Color Stream", 0) == -1
+            ):
                 cv2.destroyAllWindows()
                 break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ## Display algorithm output on simulator
     import json
     from vision.obstacle.obstacle_finder import ObstacleFinder
@@ -83,10 +99,10 @@ if __name__ == '__main__':
 
     camera = SimCamera()
 
-    prefix = 'vision' if os.path.isdir("vision") else ''
-    config_filename = os.path.join(prefix, 'obstacle', 'config.json')
+    prefix = "vision" if os.path.isdir("vision") else ""
+    config_filename = os.path.join(prefix, "obstacle", "config.json")
 
-    with open(config_filename, 'r') as config_file:
+    with open(config_filename, "r") as config_file:
         config = json.load(config_file)
 
     obstacle_finder = ObstacleFinder(params=import_params(config))
@@ -97,4 +113,5 @@ if __name__ == '__main__':
         bboxes = obstacle_finder.find(color_image, depth_image)
 
         from vision.common.blob_plotter import plot_blobs
+
         plot_blobs(obstacle_finder.keypoints, color_image)

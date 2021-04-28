@@ -2,6 +2,7 @@
 Text related unit tests.
 """
 import sys, os
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -19,6 +20,7 @@ class TestDetectRussianWord(unittest.TestCase):
     """
     Testing the text detector.
     """
+
     def test_detect_russian(self):
         """
         Testing text_detector.
@@ -43,14 +45,18 @@ class TestDetectRussianWord(unittest.TestCase):
 
         ## 3 Channel {0..255} Image
         with self.subTest(i="3 Channel {0..255} Image"):
-            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.random.randint(
+                0, 255, size=(*IMAGE_SIZE, 3), dtype="uint8"
+            )
 
             TextDetector().detect_russian_word(color_image, None)
 
         ### Ensure returns correct type of BoundingBox
         with self.subTest(i="Object type"):
-            color_image = np.zeros((1000, 1000, 3), dtype='uint8')
-            cv2.putText(color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+            color_image = np.zeros((1000, 1000, 3), dtype="uint8")
+            cv2.putText(
+                color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255
+            )
 
             output = TextDetector().detect_russian_word(color_image, None)
 
@@ -78,8 +84,10 @@ class TestDetectRussianWord(unittest.TestCase):
                 self.assertEqual(box.object_type, ObjectType.TEXT)
 
         ## Ensure does not modify original image
-        color_image = np.zeros((1000, 1000, 3), dtype='uint8')
-        cv2.putText(color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255)
+        color_image = np.zeros((1000, 1000, 3), dtype="uint8")
+        cv2.putText(
+            color_image, "Read Me", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, 255
+        )
 
         color_parameter = np.copy(color_image)
 
@@ -88,5 +96,5 @@ class TestDetectRussianWord(unittest.TestCase):
         np.testing.assert_array_equal(color_image, color_parameter)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

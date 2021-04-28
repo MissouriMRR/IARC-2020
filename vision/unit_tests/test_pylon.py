@@ -2,6 +2,7 @@
 Runs through images and determines which have the pylon
 """
 import os, sys
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -36,7 +37,9 @@ class TestPylonClassifier(unittest.TestCase):
 
         ## 3 Channel {0..255} Image
         with self.subTest(i="3 Channel {0..255} Image"):
-            color_image = np.random.randint(0, 255, size=(*IMAGE_SIZE, 3), dtype='uint8')
+            color_image = np.random.randint(
+                0, 255, size=(*IMAGE_SIZE, 3), dtype="uint8"
+            )
 
             result = detect_red(color_image, None)
 
@@ -72,7 +75,9 @@ class TestPylonClassifier(unittest.TestCase):
         """
         ##
         for i in range(1, 6):
-            color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+            color_image = np.random.randint(
+                0, 255, size=(i * 100, i * 200, 3), dtype="uint8"
+            )
 
             result = detect_red(color_image, None)
 
@@ -86,7 +91,9 @@ class TestPylonClassifier(unittest.TestCase):
             self.fail("Failed to detect pylon in any sample image.")
 
         ## Ensure does not modify original image
-        color_image = np.random.randint(0, 255, size=(i * 100, i * 200, 3), dtype='uint8')
+        color_image = np.random.randint(
+            0, 255, size=(i * 100, i * 200, 3), dtype="uint8"
+        )
 
         color_parameter = np.copy(color_image)
 
@@ -95,5 +102,5 @@ class TestPylonClassifier(unittest.TestCase):
         np.testing.assert_array_equal(color_image, color_parameter)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

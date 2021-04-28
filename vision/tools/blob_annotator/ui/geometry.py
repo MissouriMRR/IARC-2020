@@ -11,20 +11,29 @@ from colors import Colors
 
 class ShapeFill(Enum):
     """Defines how a shape may be drawn"""
+
     FILLED = -1
     OUTLINE = 0
 
 
 class Shape(object):
     """Generic shape base class"""
+
     DEFAULT_THICKNESS = 2
     DEFAULT_COLOR = Colors.GREEN
 
     def _draw(self, img, color, thickness):
         raise NotImplementedError(f"_draw not implemented for {type(self)}!")
 
-    def draw(self, img, color=DEFAULT_COLOR, thickness=DEFAULT_THICKNESS, alpha=1., fill=ShapeFill.OUTLINE):
-        color = color.value if hasattr(color, 'value') else color
+    def draw(
+        self,
+        img,
+        color=DEFAULT_COLOR,
+        thickness=DEFAULT_THICKNESS,
+        alpha=1.0,
+        fill=ShapeFill.OUTLINE,
+    ):
+        color = color.value if hasattr(color, "value") else color
 
         if fill == ShapeFill.FILLED:
             thickness = ShapeFill.FILLED.value
@@ -64,16 +73,18 @@ class Rectangle(Shape):
 
     @property
     def midpoint(self):
-        return int((self.x+self.x1)//2), int((self.y + self.y1)//2)
+        return int((self.x + self.x1) // 2), int((self.y + self.y1) // 2)
 
     def get_bounds(self):
         return self
 
     def scale_by(self, scale):
-        return Rectangle(self.x//scale, self.y//scale, self.w//scale, self.h//scale)
+        return Rectangle(
+            self.x // scale, self.y // scale, self.w // scale, self.h // scale
+        )
 
     def get_roi(self, img):
-        return img[self.y:self.y1, self.x:self.x1]
+        return img[self.y : self.y1, self.x : self.x1]
 
     def _draw(self, img, color, thickness):
         cv2.rectangle(img, (self.x, self.y), (self.x1, self.y1), color, thickness)
@@ -81,6 +92,7 @@ class Rectangle(Shape):
 
 class Circle(Shape):
     """A class which represents a circle"""
+
     DEFAULT_RADIUS = 5
 
     def __init__(self, x, y, radius=DEFAULT_RADIUS):
@@ -95,10 +107,12 @@ class Circle(Shape):
         return self.radius * 2
 
     def is_inside(self, x, y):
-        return (self.x-x)**2+(self.y-y)**2<=self.radius**2
+        return (self.x - x) ** 2 + (self.y - y) ** 2 <= self.radius ** 2
 
     def get_bounds(self):
-        return Rectangle(self.x-self.radius, self.y-self.radius, self.diameter, self.diameter)
+        return Rectangle(
+            self.x - self.radius, self.y - self.radius, self.diameter, self.diameter
+        )
 
     def _draw(self, img, color, thickness):
         cv2.circle(img, (self.x, self.y), self.radius, color, thickness)
@@ -106,15 +120,16 @@ class Circle(Shape):
 
 class ResizableBox(object):
     """A resizable bounding box useful for making annotations or selecting ROIs."""
+
     HANDLE_RADIUS = 5
-    OPACITY = .2
-    HANDLE_OPACITY = .8
-    DARKEN_HANDLE_BY = .5
+    OPACITY = 0.2
+    HANDLE_OPACITY = 0.8
+    DARKEN_HANDLE_BY = 0.5
 
     def __init__(self, x, y, w, h):
         self._box = Rectangle(x, y, w, h)
         self._circles = []
-        self._corners = [(x, y), (x+w, y), (x+w, y+h), (x, y+h)]
+        self._corners = [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
         self._is_moving_box = False
         self._where_was_lbutton_pressed = None
         self._is_resizing_box = False
@@ -130,8 +145,10 @@ class ResizableBox(object):
         self._darker_handle_color = Colors.BLACK
         self._handle_colors = {circle: Colors.GRAY for circle in self._circles}
         self._righthand_circles = self._circles[1:3]
-        self._lefthand_circles = self._circles[0:len(self._circles):len(self._circles)-1]
-        self._bottom_circles = self._circles[2:len(self._circles)]
+        self._lefthand_circles = self._circles[
+            0 : len(self._circles) : len(self._circles) - 1
+        ]
+        self._bottom_circles = self._circles[2 : len(self._circles)]
 
     def draw(self, img, color=Shape.DEFAULT_COLOR):
         self._box.draw(img, color, alpha=ResizableBox.OPACITY, fill=ShapeFill.FILLED)
@@ -229,7 +246,10 @@ class ResizableBox(object):
                     # Top
                     self.h = self.y1 - y
 
-            elif (self._selected_handle is not None and not self._selected_handle.is_inside(x, y)) or self._selected_handle is None:
+            elif (
+                self._selected_handle is not None
+                and not self._selected_handle.is_inside(x, y)
+            ) or self._selected_handle is None:
                 if self._selected_handle is not None:
                     self._handle_colors[self._selected_handle] = self._handle_color
                     self._selected_handle = None
@@ -252,7 +272,10 @@ class ResizableBox(object):
         elif event == cv2.EVENT_LBUTTONDOWN:
             if self._selected_handle is not None:
                 self._is_resizing_box = True
-                self._where_was_lbutton_pressed = (self._selected_handle.x, self._selected_handle.y)
+                self._where_was_lbutton_pressed = (
+                    self._selected_handle.x,
+                    self._selected_handle.y,
+                )
             if self._box.is_inside(x, y) and not self._is_resizing_box:
                 self._where_was_lbutton_pressed = (self.x - x, self.y - y)
                 self._is_moving_box = True
@@ -265,17 +288,17 @@ class ResizableBox(object):
         self.changed = self._is_moving_box or self._is_resizing_box
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from window import Window
 
     # create a white canvas
     w, h = (512, 512)
-    canvas = np.ones((w, h, 3), dtype=np.uint8)*255
+    canvas = np.ones((w, h, 3), dtype=np.uint8) * 255
 
     # create a resizable box
-    box = ResizableBox(int(w/2)-25, int(h/2)-25, 50, 50)
+    box = ResizableBox(int(w / 2) - 25, int(h / 2) - 25, 50, 50)
 
-    with Window('test') as window:
+    with Window("test") as window:
         window.set_mouse_callback(box.on_mouse_event)
 
         while not window.should_quit:

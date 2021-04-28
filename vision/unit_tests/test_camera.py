@@ -2,6 +2,7 @@
 Vision camera related tests.
 """
 import sys, os
+
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 gparent_dir = os.path.dirname(parent_dir)
 ggparent_dir = os.path.dirname(gparent_dir)
@@ -18,7 +19,11 @@ from vision.camera import realsense
 from vision.camera import sim_camera
 
 
-COLOR_IMAGE = np.arange(0, 10).reshape(-1, 1, 1) + np.arange(0, 10).reshape(1, -1, 1) + np.arange(0, 3).reshape(1, 1, -1)
+COLOR_IMAGE = (
+    np.arange(0, 10).reshape(-1, 1, 1)
+    + np.arange(0, 10).reshape(1, -1, 1)
+    + np.arange(0, 3).reshape(1, 1, -1)
+)
 DEPTH_IMAGE = np.arange(0, 20).reshape(-1, 1) + np.arange(0, 20).reshape(1, -1)
 
 
@@ -43,6 +48,7 @@ class FakeRSAlign:
     """
     Mocking pyrealsense2 align.
     """
+
     def process(self, frame):
         return frame
 
@@ -51,6 +57,7 @@ class FakeRSPipeline:
     """
     Mocking pyrealsense2 pipeline.
     """
+
     def start(self, *args, **kwargs):
         pass
 
@@ -78,9 +85,9 @@ class FakeAirsimResponse:
     @property
     def image_data_uint8(self):
         if self.depth == 1:
-            return np.array(np.dstack([self.data] * 3), dtype='uint8')
+            return np.array(np.dstack([self.data] * 3), dtype="uint8")
 
-        return np.array(self.data, dtype='uint8')
+        return np.array(self.data, dtype="uint8")
 
 
 class FakeAirsimClient:
@@ -100,13 +107,19 @@ class TestCamera(unittest.TestCase):
     """
     Testing the camera class.
     """
+
     def patch_camera(func):
         """
         Patch all necessary camera core components.
         """
-        @patch.object(bag_file.rs.pipeline, '__new__', return_value=FakeRSPipeline())
-        @patch.object(bag_file.rs.align, '__new__', return_value=FakeRSAlign())
-        @patch.object(sim_camera.airsim.MultirotorClient, '__new__', return_value=FakeAirsimClient())
+
+        @patch.object(bag_file.rs.pipeline, "__new__", return_value=FakeRSPipeline())
+        @patch.object(bag_file.rs.align, "__new__", return_value=FakeRSAlign())
+        @patch.object(
+            sim_camera.airsim.MultirotorClient,
+            "__new__",
+            return_value=FakeAirsimClient(),
+        )
         def patched_function(*args, **kwargs):
             return func(*args, **kwargs)
 
@@ -116,6 +129,7 @@ class TestCamera(unittest.TestCase):
         """
         Wrapper creating subtest for every type of object.
         """
+
         def run_all(self, *mocks):
             for obj in [bag_file.BagFile, realsense.Realsense, sim_camera.SimCamera]:
                 with self.subTest(i=obj.__name__):
@@ -129,13 +143,14 @@ class TestCamera(unittest.TestCase):
         """
         Create generator that will render only specific object.
         """
+
         def _get_camera(**kwargs):
             config = {
-                'screen_width': 0,
-                'screen_height': 0,
-                'frame_rate': 0,
-                'filename': '',
-                }
+                "screen_width": 0,
+                "screen_height": 0,
+                "frame_rate": 0,
+                "filename": "",
+            }
             config.update(kwargs)
 
             camera = obj(**config)
@@ -184,5 +199,5 @@ class TestCamera(unittest.TestCase):
                 break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
