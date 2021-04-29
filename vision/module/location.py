@@ -75,7 +75,7 @@ class ModuleLocation:
 
         best_slope_heights = self.best_grouped_slopes[0]
 
-        return np.any(best_slope_heights > MIN_SLOPES_IN_BUCKET)
+        return np.any(best_slope_heights >= MIN_SLOPES_IN_BUCKET)
 
     ## Finding the Center
 
