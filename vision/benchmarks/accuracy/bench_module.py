@@ -16,6 +16,7 @@ import cv2
 from vision.bounding_box import BoundingBox, ObjectType
 
 from vision.module.location import ModuleLocation
+from vision.text.detect_words import TextDetector
 from vision.module.get_module_depth import get_module_depth
 from vision.module.region_of_interest import region_of_interest
 from vision.module.module_bounding import get_module_bounds
@@ -33,6 +34,7 @@ class AccuracyModule:
 
     def __init__(self):
         self.location = ModuleLocation()
+        self.text_detector = TextDetector()
 
     def accuracy_is_in_frame(
         self, color_image: np.ndarray, depth_image: np.ndarray
@@ -52,6 +54,9 @@ class AccuracyModule:
         bool - whether the module was detected in color_image.
         """
         self.location.set_img(color_image, depth_image)
+        self.location.set_text(
+            self.text_detector.detect_russian_word(color_image, depth_image)
+        )
         return self.location.is_in_frame()
 
     def accuracy_get_center(
@@ -77,6 +82,9 @@ class AccuracyModule:
 
         if set_img:
             self.location.set_img(color_image, depth_image)
+            self.location.set_text(
+                self.text_detector.detect_russian_word(color_image, depth_image)
+            )
         return self.location.get_center()
 
     def accuracy_get_module_depth(
