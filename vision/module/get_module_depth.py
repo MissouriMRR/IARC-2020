@@ -57,9 +57,11 @@ def get_module_depth(depth_image: np.ndarray, coordinates: tuple) -> float:
     # Gets rid of 0 depth values
     depth_values_in_radius = depth_values_in_radius[depth_values_in_radius != 0]
 
-    avg = np.mean(depth_values_in_radius)
-    if np.isnan(avg):
+    if depth_values_in_radius.size == 0:  # no depth values in radius = no avg
         return 0
+
+    avg = np.mean(depth_values_in_radius)
+
     return avg
 
 
