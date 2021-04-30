@@ -59,7 +59,7 @@ class ModuleDetectionFlags(FailureFlags):
         self.is_in_frame = True
         self.get_center = True
         self.get_module_depth = True
-        self.region_of_interest = True
+        self.get_region_of_interest = True
         self.get_module_orientation = True
         self.get_module_bounds = True
         self.get_module_roll = True
@@ -78,8 +78,8 @@ class ModuleDetectionFlags(FailureFlags):
             + ("OK" if self.get_center else "ERROR")
             + ", get_module_depth: "
             + ("OK" if self.get_module_depth else "ERROR")
-            + ", region_of_interest: "
-            + ("OK" if self.region_of_interest else "ERROR")
+            + ", get_region_of_interest: "
+            + ("OK" if self.get_region_of_interest else "ERROR")
             + ", get_module_orientation: "
             + ("OK" if self.get_module_orientation else "ERROR")
             + ", get_module_bounds: "

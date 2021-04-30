@@ -17,8 +17,8 @@ from vision.bounding_box import BoundingBox, ObjectType
 
 from vision.module.location import ModuleLocation
 from vision.text.detect_words import TextDetector
-from vision.module.get_module_depth import get_module_depth
-from vision.module.region_of_interest import region_of_interest
+from vision.module.module_depth import get_module_depth
+from vision.module.region_of_interest import get_region_of_interest
 from vision.module.module_bounding import get_module_bounds
 from vision.module.module_orientation import get_module_orientation
 from vision.module.module_orientation import get_module_roll
@@ -106,11 +106,11 @@ class AccuracyModule:
         """
         return get_module_depth(depth_image, center)
 
-    def accuracy_region_of_interest(
+    def accuracy_get_region_of_interest(
         self, depth_image: np.ndarray, depth_val: np.ndarray, center: tuple
     ) -> np.ndarray:
         """
-        Measuring accuracy of region_of_interest().
+        Measuring accuracy of get_region_of_interest().
 
         Parameters
         ----------
@@ -125,7 +125,7 @@ class AccuracyModule:
         -------
         ndarray - Region of depth image.
         """
-        return region_of_interest(depth_image, depth_val, center)
+        return get_region_of_interest(depth_image, depth_val, center)
 
     def accuracy_get_module_orientation(self, roi: np.ndarray) -> tuple:
         """
@@ -134,7 +134,7 @@ class AccuracyModule:
         Parameters
         ----------
         roi: ndarray
-            The module region of interest calculated by region_of_interest().
+            The module region of interest calculated by get_region_of_interest().
 
         Returns
         -------
@@ -289,11 +289,11 @@ class BenchModuleAccuracy:
                 crash = True
         file_output.write(",")
 
-        # region_of_interest
+        # get_region_of_interest
         roi = np.ndarray([])
         if depth_val != 0 and not crash:
             try:
-                roi = tester.accuracy_region_of_interest(depth, depth_val, center)
+                roi = tester.accuracy_get_region_of_interest(depth, depth_val, center)
                 file_output.write("Found")
             except:
                 file_output.write("Crash")

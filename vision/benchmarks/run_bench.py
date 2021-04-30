@@ -77,7 +77,7 @@ def run_set(
         )
         tester: AccuracyModule = AccuracyModule()
         file_output.write(
-            "image,read color,read depth,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s),total image time (s)\n"
+            "image,read color,read depth,is_in_frame(),get_center(),get_module_depth(),get_region_of_interest(),get_module_orientation(),get_module_bounds(),get_module_roll(),exec time (s),total image time (s)\n"
         )
     elif bench_name == "obstacle":
         benchmark: BenchObstacleAccuracy = BenchObstacleAccuracy(plot_obs=plot_boxes)
@@ -251,7 +251,7 @@ def run_bag_stream(
         )
         tester: AccuracyModule = AccuracyModule()
         file_output.write(
-            "image,isInFrame(),getCenter(),get_module_depth(),region_of_interest(),get_module_orientation(),getModuleBounds(),get_module_roll(),exec time (s)\n"
+            "image,is_in_frame(),get_center(),get_module_depth(),get_region_of_interest(),get_module_orientation(),get_module_bounds(),get_module_roll(),exec time (s)\n"
         )
     elif bench_name == "obstacle":
         benchmark: BenchObstacleAccuracy = BenchObstacleAccuracy(plot_obs=plot_boxes)
