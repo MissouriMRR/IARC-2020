@@ -8,6 +8,8 @@ The vision team is responsible for processing images in order to extract informa
 
 [Directory Structure](#directory-structure)
 
+[Competition Algorithms](#competition-algorithms)
+
 [Storing Images](#storing-images)
 
 [Documentation](#documentation)
@@ -124,6 +126,18 @@ The vision team is responsible for processing images in order to extract informa
             ...
             runall.sh  <- Runs every unit test
 ```
+
+## Competition Algorithms
+
+There are 3 main branches of vision code that can be used for competition: obstacle, text, and module.
+The goal of obstacle algorithms is to identify obstacles as the drone flies around the pylons.
+The goal of text algorithms is to detect the cyrillic text located on the mast.
+The goal of module algorithms is to identify the module located on the mast, including its location, depth, and orientation.
+
+Vision algorithms are run from `pipeline.py`. The pipeline will be called from flight in order to retrieve
+bounding boxes obtained by vision algorithms.
+
+Vision algorithms can also be run from `benchmarks/run_bench.py` for testing purposes.
 
 ## Storing Images
 
