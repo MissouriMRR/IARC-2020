@@ -22,7 +22,7 @@ def get_module_orientation(roi: np.ndarray) -> tuple:
     -------
     tuple(float) - degrees in coordinates of the tilt on the x and y axes, respectively
     """
-    
+
     # Get x orientation
     if roi.size == 0:
         return 0.0, 0.0

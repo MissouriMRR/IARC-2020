@@ -47,9 +47,12 @@ class TextDetector:
         self.tessdata: dict = {}
 
         # Get the sliced image to attempt text detection on
-        sliced_rotated_image, x_ul, y_ul, rotated_angle = self._get_rotated_min_area_rect(
-            color_image, depth_image
-        )
+        (
+            sliced_rotated_image,
+            x_ul,
+            y_ul,
+            rotated_angle,
+        ) = self._get_rotated_min_area_rect(color_image, depth_image)
 
         if sliced_rotated_image.size == 0:  # rotated image was not found
             return []
@@ -64,7 +67,7 @@ class TextDetector:
 
         rows, columns, _ = color_image.shape
         theta = -rotated_angle  # angle to rotate text boxes back to original position
-        
+
         # Search for words that will appear on mast in detected text
         for i, det_word in enumerate(detected_words):
             if not det_word:
