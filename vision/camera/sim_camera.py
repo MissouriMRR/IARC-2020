@@ -30,16 +30,17 @@ class SimCamera(Camera):
         )  # for screen_width, screen_height, and framerate, unnecessary
         self.client = airsim.MultirotorClient()
 
-    def __iter__(self):
+    def __iter__(self) -> tuple:
         """
         Iterate through each frame in the airsim cameras
         NOTE: The airsim must be running currently for __iter__ to work
 
         Returns
         -------
-        depth image[1 channel]: numpy array
-        color image[3 channel]: numpy array
-            in RGB format
+        tuple<np.ndarray> - depth, color
+            depth image[1 channel]: numpy array
+            color image[3 channel]: numpy array
+                in RGB format
         """
         while True:
             depth_responses = self.client.simGetImages(
@@ -64,9 +65,13 @@ class SimCamera(Camera):
 
             yield depth_np, color_np
 
-    def display_in_window(self):
+    def display_in_window(self) -> None:
         """
         Displays the depth/color image streams, separately, in one window
+
+        Returns
+        -------
+        None
         """
         for depth_image, color_image in self:
             # Render images

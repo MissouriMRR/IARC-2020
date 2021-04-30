@@ -1,6 +1,7 @@
 """
 The Realsense class is a child class of the camera, designed to be used for realsense depth cameras
 """
+
 import sys, os
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +40,7 @@ class Realsense(Camera):
         Defaults to empty, which reads if only one realsense is plugged in
     """
 
-    def __init__(self, screen_width, screen_height, frame_rate, serial_no="", **kwargs):
+    def __init__(self, screen_width: int, screen_height: int, frame_rate: int, serial_no: str = "", **kwargs):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.serialNumber = serial_no
@@ -60,14 +61,15 @@ class Realsense(Camera):
             rs.stream.color, self.width, self.height, rs.format.bgr8, self.framerate
         )
 
-    def __iter__(self):
+    def __iter__(self) -> tuple:
         """
         Iterates through each depth/color frame in the object
 
         Returns
-        -----------
-        depth image: np array, 1 channel
-        color image: np array, 3 channels (in RGB format)
+        -------
+        tuple<np.ndarray> - depth, color
+            depth image: np array, 1 channel
+            color image: np array, 3 channels (in RGB format)
         """
         # Start streaming from file
         profile = self.pipeline.start(self.config)
@@ -96,12 +98,12 @@ class Realsense(Camera):
 
             yield depth_image, color_image
 
-    def display_in_window(self, clipping=False):
+    def display_in_window(self, clipping: bool = False) -> None:
         """
         Displays the depth/color image streams on repeat, separately, in one window
 
         Parameters
-        -------
+        ----------
         clipping: boolean
             defaults to false, can be set true to remove data from the images
             beyond a given distance from the camera

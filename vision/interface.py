@@ -2,6 +2,11 @@
 A model of the environment around the drone.
 """
 
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+gparent_dir = os.path.dirname(parent_dir)
+ggparent_dir = os.path.dirname(gparent_dir)
+
+from vision.bounding_box import BoundingBox
 
 class Environment:
     """
@@ -11,13 +16,13 @@ class Environment:
     def __init__(self):
         self.bounding_boxes = []
 
-    def __iter__(self):
+    def __iter__(self) -> BoundingBox:
         """
         Iterate over all bounding boxes.
 
         Yields
         ------
-        BoundingBox
+        BoundingBox - The next bounding box.
         """
         i = 0
         while True:
@@ -28,7 +33,7 @@ class Environment:
             except ZeroDivisionError:
                 yield None
 
-    def update(self, bounding_boxes):
+    def update(self, bounding_boxes: BoundingBox) -> None:
         """
         Update environment.
 

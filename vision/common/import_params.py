@@ -1,10 +1,10 @@
 """
 Helper function for OpenCV parameters.
 """
+
 import cv2
 
-
-def import_params(config):
+def import_params(config: dict) -> cv2.SimpleBlobDetector_Params:
     """
     OpenCV parameter importing.
 
@@ -15,14 +15,14 @@ def import_params(config):
 
     Returns
     -------
-    OpenCV blob detector parameter object.
+    cv2.SimpleBlobDetector_Params - OpenCV blob detector parameter object.
     """
     if not isinstance(config, dict):
         raise ValueError(
             f"When importing params, config should be a dictionary, got {type(config)} instead"
         )
 
-    params = cv2.SimpleBlobDetector_Params()
+    params: cv2.SimpleBlobDetector_Params = cv2.SimpleBlobDetector_Params()
 
     for category in config:
         if "enable" not in config[category]:

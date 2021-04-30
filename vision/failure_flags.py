@@ -10,7 +10,7 @@ class FailureFlags:
     def __init__(self):
         pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "INVALID STATE"
 
 
@@ -24,7 +24,7 @@ class ObstacleDetectionFlags(FailureFlags):
         self.obstacle_finder = True
         self.obstacle_tracker = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             "obstacle_finder: "
             + ("OK" if self.obstacle_finder else "ERROR")
@@ -42,7 +42,7 @@ class TextDetectionFlags(FailureFlags):
     def __init__(self):
         self.detect_russian_word = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "detect_russian_word: " + ("OK" if self.detect_russian_word else "ERROR")
 
 
@@ -64,7 +64,7 @@ class ModuleDetectionFlags(FailureFlags):
         self.get_module_bounds = True
         self.get_module_roll = True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             "setImg: "
             + ("OK" if self.set_img else "ERROR")

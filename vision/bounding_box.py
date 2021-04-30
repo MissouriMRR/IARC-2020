@@ -1,8 +1,8 @@
 """
 Bounding boxes to convey information to flight code.
 """
-from enum import Enum
 
+from enum import Enum
 
 class ObjectType(Enum):
     """
@@ -16,7 +16,6 @@ class ObjectType(Enum):
     UNKNOWN = "unknown"
     TEXT = "text"
 
-
 class BoundingBox:
     """
     The bounding box around an object, a method of conveying information
@@ -26,17 +25,16 @@ class BoundingBox:
     ----------
     verticies: list[tuple[int]]
         Four verticies as corners of box.
-    object_type: Enum
+    object_type: ObjectType
         Type of object.
     """
 
-    def __init__(self, vertices, object_type):
-        self.vertices = vertices
-        self.object_type = object_type
+    def __init__(self, vertices: list, object_type: ObjectType):
+        self.vertices: list = vertices
+        self.object_type: ObjectType = object_type
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"BoundingBox[{id(self)}, {self.object_type}]: {str(self.vertices)}"
-
 
 if __name__ == "__main__":
     verts = [(1, 3), (2, 4)]

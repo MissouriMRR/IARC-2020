@@ -7,18 +7,18 @@ certain behaviors for child classes
 
 
 class Camera:
-    def __init__(self, screen_width, screen_height, frame_rate):
+    def __init__(self, screen_width: int, screen_height: int, frame_rate: int):
         """
         Creates a camera object (only to be used by children classes)
 
         Parameters
         ----------
-        screen_width: number
-            Resolution width of the pre-recorded .bag file
-        screen_height: number
-            Resolution height of the pre-recorded .bag file
-        frame_rate: number
-            Framerate of the pre-recorded .bag file
+        screen_width: int
+            Resolution width of the stream
+        screen_height: int
+            Resolution height of the stream
+        frame_rate: int
+            Framerate of the stream
         """
         self.width = screen_width
         self.height = screen_height
