@@ -4,6 +4,7 @@ Bounding boxes to convey information to flight code.
 
 from enum import Enum
 
+
 class ObjectType(Enum):
     """
     All possible object types.
@@ -15,6 +16,7 @@ class ObjectType(Enum):
     BOAT = "boat"
     UNKNOWN = "unknown"
     TEXT = "text"
+
 
 class BoundingBox:
     """
@@ -35,6 +37,7 @@ class BoundingBox:
 
     def __repr__(self) -> str:
         return f"BoundingBox[{id(self)}, {self.object_type}]: {str(self.vertices)}"
+
 
 if __name__ == "__main__":
     verts = [(1, 3), (2, 4)]

@@ -8,6 +8,7 @@ ggparent_dir = os.path.dirname(gparent_dir)
 
 from vision.bounding_box import BoundingBox
 
+
 class Environment:
     """
     The percieved environment.

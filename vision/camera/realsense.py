@@ -40,7 +40,14 @@ class Realsense(Camera):
         Defaults to empty, which reads if only one realsense is plugged in
     """
 
-    def __init__(self, screen_width: int, screen_height: int, frame_rate: int, serial_no: str = "", **kwargs):
+    def __init__(
+        self,
+        screen_width: int,
+        screen_height: int,
+        frame_rate: int,
+        serial_no: str = "",
+        **kwargs
+    ):
         super().__init__(screen_width, screen_height, frame_rate)
 
         self.serialNumber = serial_no

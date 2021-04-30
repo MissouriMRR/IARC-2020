@@ -36,7 +36,12 @@ from vision.module.module_orientation import get_module_orientation, get_module_
 from vision.module.module_bounding import get_module_bounds
 
 # Vision Flags
-from vision.failure_flags import FailureFlags, ObstacleDetectionFlags, TextDetectionFlags, ModuleDetectionFlags
+from vision.failure_flags import (
+    FailureFlags,
+    ObstacleDetectionFlags,
+    TextDetectionFlags,
+    ModuleDetectionFlags,
+)
 
 
 async def arange(count: int) -> int:
@@ -73,7 +78,9 @@ class Pipeline:
 
     PUT_TIMEOUT = 1  # Expected time for results to be irrelevant.
 
-    def __init__(self, vision_communication: Queue, flight_communication: Queue, camera: Camera):
+    def __init__(
+        self, vision_communication: Queue, flight_communication: Queue, camera: Camera
+    ):
         ##
         self.vision_communication = vision_communication
         self.flight_communication = flight_communication
@@ -137,12 +144,12 @@ class Pipeline:
         except Empty:
             state = prev_state
 
-        bboxes: list = [] # bounding boxes found
-        flags = FailureFlags() # flags for the current state
+        bboxes: list = []  # bounding boxes found
+        flags = FailureFlags()  # flags for the current state
 
         if state == "early_laps":  # navigation around the pylons
             flags: ObstacleDetectionFlags = ObstacleDetectionFlags()
-            
+
             # Obstacle Finder
             try:
                 bboxes = self.obstacle_finder.find(color_image, depth_image)
@@ -259,7 +266,7 @@ class Pipeline:
                                 flags.get_module_bounds = False
 
                             if flags.get_module_bounds:
-                                
+
                                 # Module roll
                                 try:
                                     roll = get_module_roll(
@@ -276,7 +283,9 @@ class Pipeline:
                                 ## NOTE: Module box will have module_depth and orientation attributes
                                 box = BoundingBox(bounds, ObjectType.MODULE)
                                 box.module_depth: float = depth  # depth of module
-                                box.orientation: tuple = orientation + (roll,)  # x, y, z tilt
+                                box.orientation: tuple = orientation + (
+                                    roll,
+                                )  # x, y, z tilt
                                 bboxes.append(box)
 
         else:
@@ -289,7 +298,7 @@ class Pipeline:
         self.vision_flags.put((time, flags), self.PUT_TIMEOUT)
         await asyncio.sleep(0.001)
         self.vision_communication.put((time, bboxes), self.PUT_TIMEOUT)
-        
+
         # uncomment to visualize blobs
         # from vision.common.blob_plotter import plot_blobs
         # plot_blobs(self.obstacle_finder.keypoints, color_image)

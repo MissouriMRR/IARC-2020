@@ -4,6 +4,7 @@ Helper function for OpenCV parameters.
 
 import cv2
 
+
 def import_params(config: dict) -> cv2.SimpleBlobDetector_Params:
     """
     OpenCV parameter importing.
