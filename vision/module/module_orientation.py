@@ -20,9 +20,13 @@ def get_module_orientation(roi: np.ndarray) -> tuple:
 
     Returns
     -------
-    tuple<float> - the tilt on the x and y axes in degrees
+    tuple(float) - degrees in coordinates of the tilt on the x and y axes, respectively
     """
+    
     # Get x orientation
+    if roi.size == 0:
+        return 0.0, 0.0
+
     x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
 
@@ -46,10 +50,13 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
         region of the image with the module, calculated by module_bounding
 
     Returns
-    -------
+    -----------
     float - module roll with respect to the positive y axis in degrees
     """
-    # Grayscale
+    if enclosing_region.size == 0:
+        return 0.0
+
+    # contours only work on grey images
     enclosing_region = cv2.cvtColor(enclosing_region, cv2.COLOR_BGR2GRAY)
 
     # Canny edge detection
@@ -68,7 +75,7 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     # finds minimum area rectangles to enclose the contours
     # presumably, since the module contours (or module edge contours) will rectangles at some angle,
     #   the min area rectangles will be at or around that same angle
-    rectangles = np.array([cv2.minAreaRect(c) for c in simple_contours])
+    rectangles = np.asarray([cv2.minAreaRect(c) for c in simple_contours], dtype=object)
 
     # NOTE: this try block exists such that the [:, 2] slice of
     #         np_rectangles can be attempted without risking
