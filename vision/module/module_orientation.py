@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 
 
-def get_module_orientation(roi):
+def get_module_orientation(roi: np.ndarray) -> tuple:
     """
     Finds the orientation of the module in degrees
 
@@ -19,9 +19,11 @@ def get_module_orientation(roi):
 
     Returns
     -----------
-    tuple of floating point values, degrees in coordinates of
-        the tilt on the x and y axes, respectively
+    tuple(float) - degrees in coordinates of the tilt on the x and y axes, respectively
     """
+    if roi.size == 0:
+        return 0.0, 0.0
+
     x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
 
@@ -43,9 +45,11 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
 
     Returns
     -----------
-    roll
-        module roll with respect to the positive y axis in degrees
+    float - module roll with respect to the positive y axis in degrees
     """
+    if enclosing_region.size == 0:
+        return 0.0
+
     # contours only work on grey images
     enclosing_region = cv2.cvtColor(enclosing_region, cv2.COLOR_BGR2GRAY)
 
@@ -79,14 +83,14 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     #     box = np.int0(box)
     #     cv2.drawContours(colorImage, [box], 0, (0, 0, 255), 2)
 
-    np_rectangles = np.asarray(rectangles)
+    np_rectangles = np.asarray(rectangles, dtype=object)
 
     # NOTE: this try block exists such that the [:, 2] slice of
     #         np_rectangles can be attempted without risking
     #         crashing the algorithm and logging the failure flag
     try:
         angles = np_rectangles[:, 2]
-        
+
         roll = np.mean(angles)
     except:
         roll = 0

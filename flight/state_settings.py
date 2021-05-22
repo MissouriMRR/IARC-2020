@@ -19,7 +19,7 @@ class StateSettings:
         self.num_early_laps: int = DEFAULT_EARLY_LAPS
 
         # ToMast settings
-        self.go_to_mast: bool = True
+        self.go_to_mast: bool = False
 
         # DetectModule settings
         self.detect_module: bool = False

@@ -75,7 +75,7 @@ class ModuleLocation:
 
         best_slope_heights = self.best_grouped_slopes[0]
 
-        return np.any(best_slope_heights > MIN_SLOPES_IN_BUCKET)
+        return np.any(best_slope_heights >= MIN_SLOPES_IN_BUCKET)
 
     ## Finding the Center
 
@@ -297,38 +297,70 @@ class ModuleLocation:
 
     def _filter_text_circles(self) -> np.ndarray:
         """
-        Filters out circles that are to the left of, right of, or above text.
+        Filters out circles that are to the left of, right of, or above set text.
 
         Returns
         -------
         np.ndarray - filtered array of circles
         """
-        # Return if no text boxes
-        if not self.text_boxes:
+        MIN_TEXTBOXES = 1  # minimum number of text boxes tolerated
+        MAX_TEXTBOXES = 2  # maximum (or ideal) number of text boxes tolerated
+        PADDING_CONST = (
+            0.5  # amount of padding to apply if only MIN_TEXTBOXES text boxes is found
+        )
+        ROTNEG90 = np.array([[0, 1], [-1, 0]])  # matrix to rotate a vector -90 degrees
+
+        # Too low confidence if too little or too many text boxes found
+        if len(self.text_boxes) < MIN_TEXTBOXES or len(self.text_boxes) > MAX_TEXTBOXES:
             return self.circles
-
-        # Convert BoundingBoxes to list of values per axis
-        vertices = np.array(
-            [vertex for bbox in self.text_boxes for vertex in bbox.vertices]
-        )  # unravel into list of vertices
-        axes_vals = vertices.transpose()  # axis_vals[0] = x, axis_vals[1] = y
-
-        # Find max and min values for each axis
-        x_ubound = np.max(axes_vals[0])  # horizontal upper bound of text
-        x_lbound = np.min(axes_vals[0])  # horizontal lower bound of text
-        y_lbound = np.max(axes_vals[1])  # vertical lower bound of text
 
         # Filter out rectangles that are not directly below text
         circle_filter = np.array(
             [], dtype=np.uint16
         )  # array of indices of circles out of bounds
 
+        # get text bounding extreme points of rotated bounding boxes
+        ll_x, ll_y = self.text_boxes[0].vertices[0]  # lower left point
+        lr_x, lr_y = self.text_boxes[-1].vertices[3]  # lower right point
+
+        # if only minimum text boxes detected, add padding around text box equal to 1/2 the width of text
+        if len(self.text_boxes) == MIN_TEXTBOXES:
+            lb_vect = (lr_x - ll_x, lr_y - ll_y)
+            # lower left bound with extra padded distance = normal lower left point - padding
+            ll_x, ll_y = np.array((ll_x, ll_y)) - np.int0(
+                np.array(lb_vect) * (PADDING_CONST)
+            )
+            # lower right bound with extra padded distance = padding + normal lower right point
+            lr_x, lr_y = np.int0(np.array(lb_vect) * (PADDING_CONST)) + np.array(
+                (lr_x, lr_y)
+            )
+
+        # vector along lower bound of text
+        lower_vect = (lr_x - ll_x, lr_y - ll_y)
+
+        # vector perpendicular to lower_vect used as left and right bounds for circle filter
+        perp_vect = tuple(np.dot(lower_vect, ROTNEG90).astype(int))
+
+        # create a vector from the lower-left/lower-right corner of text to all detected circles
+        # the cross product tells us what side of the bounding vectors the circle is on
         for i, (x, y, _) in enumerate(self.circles):
-            if y <= y_lbound:  # remove if above lower bound of text
-                circle_filter = np.append(circle_filter, i)
-            elif (
-                x <= x_lbound or x >= x_ubound
-            ):  # remove if horizontally outside text bounds
+            needs_removal = False  # assume the circle is safely below the text
+
+            # create two vectors
+            ll_to_circ = (x - ll_x, y - ll_y)  # vector from ll bound to circle
+            lr_to_circ = (x - lr_x, y - lr_y)  # vector from lr bound to circle
+
+            lower_cross = np.cross(lower_vect, ll_to_circ)  # <0 = above lower bound
+            if lower_cross <= 0:
+                needs_removal = True
+            left_cross = np.cross(perp_vect, ll_to_circ)  # >0 = outside left bound
+            if left_cross >= 0:
+                needs_removal = True
+            right_cross = np.cross(perp_vect, lr_to_circ)  # <0 = outside right bound
+            if right_cross <= 0:
+                needs_removal = True
+
+            if needs_removal:
                 circle_filter = np.append(circle_filter, i)
 
         self.circles = np.delete(self.circles, circle_filter, axis=0)
@@ -369,31 +401,46 @@ class ModuleLocation:
         """
         MIN_CIRCLES = 5  # minimum number of total circles to require clusting
         CLSTR_CRITERIA = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-        COMPACT_THRESH = 40000  # NOTE: May need scaling up for higher res, only tested with 480p data
+        MAX_COMPACTNESS = 40000  # NOTE: May need scaling up for higher res, only tested with 480p Data
+        MIN_COMPACTNESS = (
+            1000  # At this level, we're likely splitting up a potentially good cluster
+        )
         MAX_CLUSTERS = 30
 
         if self.circles.shape[0] < 5:  # not enough circles for clustering
-            return self.circles
+            # place all circles into one cluster
+            num_clusters = 1
+            labels = np.zeros(self.circles.shape[0], dtype=np.ushort)
+        else:
+            num_clusters = 2
+            kmeans_circles = self.circles.astype(
+                np.float32
+            )  # kmeans requires float32 data
 
-        kmeans_circles = self.circles.astype(np.float32)  # kmeans requires float32 data
+            compactness = MAX_COMPACTNESS + 1  # init compactness to enter while loop
+            while compactness > MAX_COMPACTNESS:  # ensure low variance within clusters
+                # perform clustring with current num_clusters
+                compactness, labels, _ = cv2.kmeans(
+                    data=kmeans_circles,
+                    K=num_clusters,
+                    bestLabels=None,
+                    criteria=CLSTR_CRITERIA,
+                    attempts=30,
+                    flags=cv2.KMEANS_PP_CENTERS,
+                )
 
-        num_clusters = 2
-        compactness = COMPACT_THRESH + 1  # init compactness to enter while loop
-        while compactness > COMPACT_THRESH:  # ensure low variance within clusters
-            compactness, labels, _ = cv2.kmeans(
-                data=kmeans_circles,
-                K=num_clusters,
-                bestLabels=None,
-                criteria=CLSTR_CRITERIA,
-                attempts=30,
-                flags=cv2.KMEANS_PP_CENTERS,
-            )
-            if num_clusters > MAX_CLUSTERS:
-                return self.circles
-            if compactness > COMPACT_THRESH:
-                num_clusters += 1  # try higher K value
+                # too many clusters = too low confidence for further clustering
+                if num_clusters > MAX_CLUSTERS:
+                    return
+                # or circles are already super compact = likely overlapping
+                if compactness < MIN_COMPACTNESS:
+                    self.clusters = [self.circles]
+                    return
+                # attempt more clusters if clusters too spread out
+                if compactness > MAX_COMPACTNESS:
+                    num_clusters += 1  # try higher K value
 
-        labels = np.ravel(labels)  # flatten column vector
+            labels = np.ravel(labels)  # flatten column vector of labels
 
         # Organize circles into a list of clusters
         self.clusters = [[] for x in np.arange(num_clusters)]
@@ -473,11 +520,11 @@ class ModuleLocation:
         self.circles = np.reshape(self.circles, (np.shape(self.circles)[1], 3))
 
         ## Post-Processing: Circle filtering and grouping ##
-        # Remove circles that aren't directly below text
-        self._filter_text_circles()
-
         # Remove circles that are farther than DEPTH_THRESHOLD millimeters away
         self._filter_distant_circles(DEPTH_THRESH)
+
+        # Remove circles that aren't directly below text
+        self._filter_text_circles()
 
         return self.circles
 
@@ -567,11 +614,11 @@ class ModuleLocation:
 
             # draw clusters over self.circles
             for cluster in self.clusters:
-                color = np.random.choice(range(256), size=3)
+                color = np.random.choice(256, size=3)
                 color = (int(color[0]), int(color[1]), int(color[2]))
                 thickness = 1
-                if np.all(
-                    cluster == self.best_cluster
+                if np.array_equal(
+                    cluster, self.best_cluster
                 ):  # make the best_cluster white and filled in
                     color = (255, 255, 255)
                     thickness = -1
@@ -666,11 +713,11 @@ class ModuleLocation:
 
             # draw clusters over self.circles
             for cluster in self.clusters:
-                color = np.random.choice(range(256), size=3)
+                color = np.random.choice(256, size=3)
                 color = (int(color[0]), int(color[1]), int(color[2]))
                 thickness = 1
-                if np.all(
-                    cluster == self.best_cluster
+                if np.array_equal(
+                    cluster, self.best_cluster
                 ):  # make the best_cluster white and filled in
                     color = (255, 255, 255)
                     thickness = -1

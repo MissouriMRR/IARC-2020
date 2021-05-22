@@ -160,10 +160,14 @@ def run_set(
                     image_time = (
                         end_time - start_time
                     )  # time to read in images and execute algorithms
-                    file_output.write(str(algorithms_time) + ",")
-                    file_output.write(str(image_time))
                     total_algorithms_time += algorithms_time
                     total_time += image_time
+                else:
+                    algorithms_time = -1
+                    image_time = -1
+
+                file_output.write(str(algorithms_time) + ",")
+                file_output.write(str(image_time))
 
                 file_output.write("\n")
 
