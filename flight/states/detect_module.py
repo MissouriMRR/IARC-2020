@@ -8,7 +8,7 @@ import asyncio
 
 from flight import config
 from .state import State
-from .land import Land
+from .return_laps import ReturnLaps
 
 from vision.camera.realsense import Realsense
 from vision.pipeline import Pipeline
@@ -77,4 +77,4 @@ class DetectModule(State):
                     )
 
         logging.info("DetectModule state finished")
-        return Land(self.state_settings)
+        return ReturnLaps(self.state_settings)

@@ -21,7 +21,7 @@ class ReturnLaps(State):
 
     async def run(self, drone):
         """"""
-        if config.run_states["return_laps"]:
+        if self.state_settings.do_return_laps:
             mover: MovementController = MovementController()
             # Go to pylon 1
             logging.info("Moving to pylon 1")
@@ -48,6 +48,6 @@ class ReturnLaps(State):
 
                 logging.debug("Lap %d: Turn two", i)
                 await mover.turn_right(drone, 180)  # turn around pylon 1
-            return ExitReturnLap()
+            return ExitReturnLap(self.state_settings)
         else:
-            return ExitReturnLap()
+            return ExitReturnLap(self.state_settings)

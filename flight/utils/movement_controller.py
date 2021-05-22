@@ -16,15 +16,15 @@ class MovementController:
     """
 
     async def move_to(
-        self, drone: System, pylon: LatLon, offset: {float, int}, fly_at: int
+        self, drone: System, pylon: LatLon, offset: {float, int}, fly_at: float
     ) -> bool:
         """
         Function to calculate movement velocity:
         Parameters:
-            Drone(System): Our drone object
-            Pylon(LatLon): Targets for the drone found using GPS Latitude and Longitude
-            Offset(bool): offset the move to position to avoid colllision
-            Fly At(int): desired altitude to fly at
+            drone (System): Our drone object
+            pylon (LatLon): Targets for the drone found using GPS Latitude and Longitude
+            offset (bool): offset the move to position to avoid colllision
+            fly_at (float): desired altitude to fly at
         Return:
             bool: True or false if the target is within range
             None: If we don't reach the target

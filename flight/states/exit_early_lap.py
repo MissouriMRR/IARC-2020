@@ -34,6 +34,6 @@ class ExitEarlyLap(State):
 
             logging.debug("Final Lap: Turn two")
             await mover.turn(drone, -90)  # turn around pylon 1
-            return ToMast()
+            return ToMast(self.state_settings)
         else:
-            return ToMast()
+            return ToMast(self.state_settings)

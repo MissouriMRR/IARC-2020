@@ -6,7 +6,7 @@ import mavsdk as sdk
 from flight import config
 
 from flight.utils.movement_controller import MovementController
-from .return_laps import ReturnLaps
+from .detect_module import DetectModule
 from .state import State
 
 
@@ -28,6 +28,6 @@ class ToMast(State):
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, -0.01, 0.0)
             )
             await asyncio.sleep(5)
-            return ReturnLaps(self.state_settings)
+            return DetectModule(self.state_settings)
         else:
-            return ReturnLaps(self.state_settings)
+            return DetectModule(self.state_settings)
