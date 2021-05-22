@@ -14,7 +14,7 @@ HORIZONTAL_RES = 1920  # p
 
 # ratio of the measured region_of_interest, use from 0 to 1
 #   this should be used to ensure that the region_of_interest is trustworthy despite tilt
-PADDING_CONSTANT = .85
+PADDING_CONSTANT = 0.85
 
 
 def region_of_interest(depth_frame, depth_val, center):
@@ -46,10 +46,17 @@ def region_of_interest(depth_frame, depth_val, center):
     vertical_angle_ratio = vertical_region_angle / (VERTICAL_FOV / 2)
     horizontal_angle_ratio = horizontal_region_angle / (HORIZONTAL_FOV / 2)
 
-    vertical_image_portion = int((vertical_angle_ratio * VERTICAL_RES / 2) * PADDING_CONSTANT)
-    horizontal_image_portion = int((horizontal_angle_ratio * HORIZONTAL_RES / 2) * PADDING_CONSTANT)
+    vertical_image_portion = int(
+        (vertical_angle_ratio * VERTICAL_RES / 2) * PADDING_CONSTANT
+    )
+    horizontal_image_portion = int(
+        (horizontal_angle_ratio * HORIZONTAL_RES / 2) * PADDING_CONSTANT
+    )
 
-    return depth_frame[y_pos - vertical_image_portion:y_pos + vertical_image_portion, x_pos - horizontal_image_portion:x_pos + horizontal_image_portion]
+    return depth_frame[
+        y_pos - vertical_image_portion : y_pos + vertical_image_portion,
+        x_pos - horizontal_image_portion : x_pos + horizontal_image_portion,
+    ]
 
 
 if __name__ == "__main__":
@@ -57,8 +64,10 @@ if __name__ == "__main__":
     Driver for testing region_of_interest
     """
     # # Create object for parsing command-line options
-    parser = argparse.ArgumentParser(description="Read .npy file and test for get_module_depth.\
-                                            To read a .npy file, type \"python get_module_depth.py --i (image name).npy)\"")
+    parser = argparse.ArgumentParser(
+        description='Read .npy file and test for get_module_depth.\
+                                            To read a .npy file, type "python get_module_depth.py --i (image name).npy)"'
+    )
     # # Add argument which takes path to a bag file as an input
     parser.add_argument("-i", "--input", type=str, help="Path to the .npy file")
     # # Parse the command line arguments to an object
@@ -67,10 +76,14 @@ if __name__ == "__main__":
     if args.input:
         depthImage = np.load(args.input)
     else:
-        raise FileNotFoundError("No input parameter has been given. For help type --help")
+        raise FileNotFoundError(
+            "No input parameter has been given. For help type --help"
+        )
 
     # gets rid of outliers, should be done before the arguments are calculated at all
-    depthImage = np.clip(depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90))
+    depthImage = np.clip(
+        depthImage, np.percentile(depthImage, 10), np.percentile(depthImage, 90)
+    )
 
     # test values, should be replaced with values found using other vision tools
     roi = region_of_interest(depthImage, depthImage[690][830], (830, 690))

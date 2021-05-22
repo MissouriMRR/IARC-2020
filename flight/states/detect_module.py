@@ -32,7 +32,11 @@ class DetectModule(State):
             )
 
             logging.info("Initializing Realsense...")
-            camera: Realsense = Realsense(config.REALSENSE_WIDTH, config.REALSENSE_HEIGHT, config.REALSENSE_FRAMERATE)
+            camera: Realsense = Realsense(
+                config.REALSENSE_WIDTH,
+                config.REALSENSE_HEIGHT,
+                config.REALSENSE_FRAMERATE,
+            )
             logging.info("Realsense set up successfully")
 
             logging.info("Starting vision pipeline...")

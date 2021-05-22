@@ -33,10 +33,11 @@ if __name__ == "__main__":
         state_settings.set_number_of_return_laps(2)
 
         state_settings.set_run_title("All-Stage Mission 9 Test")
-        state_settings.set_run_description("Takeoff, early laps, mast, return laps, and land")
+        state_settings.set_run_description(
+            "Takeoff, early laps, mast, return laps, and land"
+        )
 
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()
     except:
         logging.exception("Unfixable error detected")
-

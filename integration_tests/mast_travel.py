@@ -25,7 +25,9 @@ if __name__ == "__main__":
         state_settings.enable_module_detection(False)
 
         state_settings.set_run_title("Mast Travel Test")
-        state_settings.set_run_description("Test traveling to mast GPS after completing early laps")
+        state_settings.set_run_description(
+            "Test traveling to mast GPS after completing early laps"
+        )
 
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()

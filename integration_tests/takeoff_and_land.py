@@ -27,7 +27,9 @@ if __name__ == "__main__":
         state_settings.enable_return_laps(False)
 
         state_settings.set_run_title("Takeoff-Landing Test")
-        state_settings.set_run_description("Simple takeoff followed by hovering, then land")
+        state_settings.set_run_description(
+            "Simple takeoff followed by hovering, then land"
+        )
 
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()

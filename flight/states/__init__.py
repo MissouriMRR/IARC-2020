@@ -8,6 +8,8 @@ from flight.states.early_laps import EarlyLaps
 from flight.states.to_mast import ToMast
 from flight.states.detect_module import DetectModule
 from flight.states.simple_takeoff import SimpleTakeoff
+from flight.states.exit_early_lap import ExitEarlyLap
+from flight.states.exit_return_lap import ExitReturnLap
 
 STATES = {
     "start": Start,
@@ -17,5 +19,7 @@ STATES = {
     "final": Final,
     "to_mast": ToMast,
     "detect_module": DetectModule,
-    "simple_takeoff": SimpleTakeoff
+    "simple_takeoff": SimpleTakeoff,
+    "exit_early_lap": ExitEarlyLap,
+    "exit_return_lap": ExitReturnLap,
 }
