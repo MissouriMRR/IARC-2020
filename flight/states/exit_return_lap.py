@@ -15,7 +15,7 @@ class ExitReturnLap(State):
 
     async def run(self, drone):
         """Runs the final lap"""
-        if config.run_states["return_laps"]:
+        if self.state_settings.do_return_laps:
             mover: MovementController = MovementController()
 
             logging.info("Starting final lap")
