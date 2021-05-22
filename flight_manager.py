@@ -59,6 +59,10 @@ class FlightManager:
 
         logging.debug(f"Title: {self.state_settings.run_title}")
         logging.debug(f"Description: {self.state_settings.run_description}")
+        logging.debug(f">>> EarlyLaps: {self.state_settings.do_early_laps}")
+        logging.debug(f">>> ToMast: {self.state_settings.go_to_mast}")
+        logging.debug(f">>> DetectModule: {self.state_settings.detect_module}")
+        logging.debug(f">>> ReturnLaps: {self.state_settings.do_return_laps}")
 
         try:
             while comm_obj.get_state() != "final":
