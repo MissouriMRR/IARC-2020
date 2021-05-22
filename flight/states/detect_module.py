@@ -32,7 +32,7 @@ class DetectModule(State):
             )
 
             logging.info("Initializing Realsense...")
-            camera: Realsense = Realsense(0, 0, config.REALSENSE_FRAMERATE)
+            camera: Realsense = Realsense(config.REALSENSE_WIDTH, config.REALSENSE_HEIGHT, config.REALSENSE_FRAMERATE)
             logging.info("Realsense set up successfully")
 
             logging.info("Starting vision pipeline...")
@@ -43,7 +43,7 @@ class DetectModule(State):
             if self.state_settings.vision_test_type == "module":
 
                 logging.info("Preparing to run module detection...")
-                pipeline.run("module_detection")
+                await pipeline.run("module_detection")
                 logging.info("Running module detection")
 
                 await asyncio.sleep(5)
@@ -58,7 +58,7 @@ class DetectModule(State):
             elif self.state_settings.vision_test_type == "text":
 
                 logging.info("Preparing to run mast text detection...")
-                pipeline.run("text_detection")
+                await pipeline.run("text_detection")
                 logging.info("Running text detection")
 
                 await asyncio.sleep(5)
