@@ -3,8 +3,6 @@ from flight.utils.latlon import LatLon, Latitude, Longitude
 
 from mavsdk import System
 
-NUM_LAPS: int = 2
-
 # Typical Sparky flight test speed: 6.352 m/s
 MAX_SPEED: float = 3  # m/s
 
