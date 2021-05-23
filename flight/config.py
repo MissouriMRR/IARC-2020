@@ -5,17 +5,16 @@ from mavsdk import System
 
 NUM_LAPS: int = 2
 
-run_states = {"early_laps": True, "to_mast": True, "return_laps": True}
-
-MAX_SPEED: float = 6.352  # m/s
+# Typical Sparky flight test speed: 6.352 m/s
+MAX_SPEED: float = 3  # m/s
 
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
-MAX_ALT: float = 9.0  # m
+MAX_ALT: float = 8.0  # m
 TAKEOFF_ALT: float = 1.0  # m
 MAST_ALT: float = 1.3  # m
-FLYING_ALT: float = 6.0  # m
+FLYING_ALT: float = 5.0  # m
 
-# What percentage of the hight can we loos/gain before unsafe
+# What percentage of the height can we lose/gain before unsafe
 ALT_PERCENT_ACCURACY: float = 0.15
 ALT_RANGE_MAX: float = FLYING_ALT + (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
 ALT_RANGE_MIN: float = FLYING_ALT - (FLYING_ALT * ALT_PERCENT_ACCURACY)  # m
@@ -54,6 +53,7 @@ OFFSET_NONE = {"KM": 0, "DEG": 0}
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
+MAST_WAIT_TIME: float = 5
 
 REALSENSE_WIDTH: int = 1920
 REALSENSE_HEIGHT: int = 1080

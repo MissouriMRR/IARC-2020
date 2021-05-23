@@ -37,6 +37,9 @@ if __name__ == "__main__":
             "Takeoff, early laps, mast, return laps, and land"
         )
 
+        # Wait between state transitions
+        state_settings.set_transition_timeout(1)
+
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()
     except:

@@ -34,6 +34,8 @@ class ExitEarlyLap(State):
 
             logging.debug("Final Lap: Turn two")
             await mover.turn(drone, -90)  # turn around pylon 1
+
+            await asyncio.sleep(self.state_settings.transition_timeout)
             return ToMast(self.state_settings)
         else:
             return ToMast(self.state_settings)

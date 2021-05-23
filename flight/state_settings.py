@@ -33,6 +33,7 @@ class StateSettings:
         # Other settings
         self.run_title: str = DEFAULT_RUN_TITLE
         self.run_description: str = DEFAULT_RUN_DESCRIPTION
+        self.transition_timeout: float = 0
 
     # ---- Takeoff settings ---- #
 
@@ -99,3 +100,7 @@ class StateSettings:
     def set_run_description(self, description: str) -> None:
         """Set a description for the run/test to be output in logging"""
         self.run_description = description
+
+    def set_transition_timeout(self, timeout: float) -> None:
+        """Set how long to wait when transitioning between states"""
+        self.transition_timeout = timeout

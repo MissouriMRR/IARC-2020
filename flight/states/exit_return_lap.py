@@ -32,6 +32,7 @@ class ExitReturnLap(State):
                 drone, config.pylon1, config.OFFSET_LEFT, config.FLYING_ALT
             )  # move to pylon 1
 
+            await asyncio.sleep(self.state_settings.transition_timeout)
             return Land(self.state_settings)
         else:
             return Land(self.state_settings)

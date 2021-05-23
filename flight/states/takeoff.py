@@ -52,5 +52,8 @@ class Takeoff(State):
 
         await mover.takeoff(drone)
         # Takes off vertically until a desired altitude constant TAKEOFF_ALT
+
+        await asyncio.sleep(self.state_settings.transition_timeout)
+
         # Then moves onto EarlyLaps, were the wait_pos function moves the drone towards the first pylon
         return EarlyLaps(self.state_settings)  # Return the next state, EarlyLaps

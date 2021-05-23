@@ -27,7 +27,7 @@ class ToMast(State):
             await drone.offboard.set_velocity_ned(
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, -0.01, 0.0)
             )
-            await asyncio.sleep(5)
+            await asyncio.sleep(config.MAST_WAIT_TIME)
             return DetectModule(self.state_settings)
         else:
             return DetectModule(self.state_settings)

@@ -30,7 +30,7 @@ class ReturnLaps(State):
             )
 
             logging.info("Arrived at pylon 1")
-            async for i in arange(config.NUM_LAPS - 1):
+            async for i in arange(self.state_settings.num_return_laps):
 
                 logging.info("Starting lap: %d", i)
                 logging.debug("Lap %d: Straight one", i)
