@@ -14,7 +14,7 @@ import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
 from vision.module.location import ModuleLocation
-from vision.module.region_of_interest import region_of_interest
+from vision.module.region_of_interest import get_region_of_interest
 from vision.module.module_orientation import get_module_roll, get_module_orientation
 
 
@@ -236,7 +236,7 @@ class TestModuleOrientation(unittest.TestCase):
             current_center = estimates[current_file][0]
 
             # get region of interest
-            roi = region_of_interest(
+            roi = get_region_of_interest(
                 current_depth,
                 current_depth[current_center[1]][current_center[0]],
                 current_center,
@@ -275,7 +275,7 @@ class TestModuleOrientation(unittest.TestCase):
 
 class TestRegionOfInterest(unittest.TestCase):
     """
-    Testing module.region_of_interest for validity.
+    Testing module.get_region_of_interest for validity.
     """
 
     def test_params(self):
@@ -298,14 +298,14 @@ class TestRegionOfInterest(unittest.TestCase):
         depth_image = np.zeros(IMAGE_SIZE, dtype=int)
         depth_val = 300.0
         center = (300, 300)
-        roi = region_of_interest(depth_image, depth_val, center)
+        roi = get_region_of_interest(depth_image, depth_val, center)
 
         self.assertIs(type(depth_image), np.ndarray)
         self.assertIs(type(depth_val), float)
         self.assertIs(type(center), tuple)
         self.assertIs(type(roi), np.ndarray)
 
-    def test_region_of_interest(self):
+    def test_get_region_of_interest(self):
         img_dir = os.path.join(gparent_dir, "vision_images/module/Feb29")
         files = os.listdir(img_dir)
 
@@ -329,7 +329,7 @@ class TestRegionOfInterest(unittest.TestCase):
             current_center = estimates[current_file][0]
 
             # get region of interest
-            roi = region_of_interest(
+            roi = get_region_of_interest(
                 current_depth_image,
                 current_depth_image[current_center[1]][current_center[0]],
                 current_center,
@@ -361,7 +361,7 @@ class TestRegionOfInterest(unittest.TestCase):
         #   and arbitrary center value
         depth_image = np.zeros(IMAGE_SIZE, dtype=int)
         arbitrary_value = 300
-        roi = region_of_interest(
+        roi = get_region_of_interest(
             depth_image, arbitrary_value, (arbitrary_value, arbitrary_value)
         )
 

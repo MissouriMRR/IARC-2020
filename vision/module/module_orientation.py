@@ -15,7 +15,7 @@ def get_module_orientation(roi: np.ndarray) -> tuple:
     Parameters
     ----------
     roi: numpy array
-        module region of interest calculated by region_of_interest
+        module region of interest calculated by get_region_of_interest
 
     Returns
     -----------
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     Also note that region_of_interest should be in the same folder as module_orientation
     """
     import argparse
-    from region_of_interest import region_of_interest
+    from region_of_interest import get_region_of_interest
 
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
@@ -133,6 +133,6 @@ if __name__ == "__main__":
 
     # values for the test depth image
     center = (650, 560)
-    roi = region_of_interest(depthImage, depthImage[560][650], center)
+    roi = get_region_of_interest(depthImage, depthImage[560][650], center)
 
     get_module_orientation(roi)
