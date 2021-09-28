@@ -1,0 +1,14 @@
+name: Build Feature
+on:
+  push:
+    branches:
+      - 'feature/*'
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Sleep for 10 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '10s'
