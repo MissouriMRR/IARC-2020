@@ -18,6 +18,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
+          python -v
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
