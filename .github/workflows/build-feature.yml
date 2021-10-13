@@ -25,5 +25,4 @@ jobs:
           pip install pylint
       - name: Analyze code with linter
         run: |
-#          find . -name '*.py' -exec pylint {} \;
           pylint `ls -R|grep .py$|xargs`
