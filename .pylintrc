@@ -1,0 +1,4 @@
+[DEVELOP]
+
+disable=no-self-use,
+        missing-function-docstring
