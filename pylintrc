@@ -60,7 +60,9 @@ symbols=no
 disable=missing-module-docstring,
         missing-function-docstring,
         missing-class-docstring,
-        line-too-long
+        line-too-long,
+        logging-fstring-interpolation,
+        no-self-use
 
 
 [REPORTS]
