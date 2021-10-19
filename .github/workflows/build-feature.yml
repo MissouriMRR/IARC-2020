@@ -23,6 +23,7 @@ jobs:
           pip install poetry
           poetry install
           pip install pylint
+          pip install mavsdk
       - name: Analyze code with linter
         run: |
           pylint $(find . -name "*.py" | xargs)

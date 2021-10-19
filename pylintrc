@@ -62,7 +62,8 @@ disable=missing-module-docstring,
         missing-class-docstring,
         line-too-long,
         logging-fstring-interpolation,
-        no-self-use
+        no-self-use,
+        wrong-import-order
 
 
 [REPORTS]
