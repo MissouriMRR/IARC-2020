@@ -2,6 +2,8 @@
 import logging
 from mavsdk import System
 
+from ..state_settings import StateSettings
+
 
 class State:
     """
@@ -11,8 +13,9 @@ class State:
         drone (System): The drone object; used for flight.
     """
 
-    def __init__(self):
+    def __init__(self, state_settings: StateSettings):
         logging.info('State "%s" has begun', self.name)
+        self.state_settings = state_settings
 
     async def run(self, drone: System):
         """

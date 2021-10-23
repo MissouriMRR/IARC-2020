@@ -8,6 +8,7 @@ MAX_SPEED: float = 6.352  # m/s
 ALT_CORRECTION_SPEED: float = 0.25  # m/s down
 MAX_ALT: float = 9.0  # m
 TAKEOFF_ALT: float = 1.0  # m
+MAST_ALT: float = 1.3  # m
 FLYING_ALT: float = 6.0  # m
 # What percentage of the hight can we loos/gain before unsafe
 ALT_PERCENT_ACCURACY: float = 0.15
@@ -48,6 +49,10 @@ NUM_LAPS: int = 2
 
 THINK_FOR_S: float = 2.0
 FAST_THINK_S: float = 1.0
+
+REALSENSE_WIDTH: int = 0
+REALSENSE_HEIGHT: int = 0
+REALSENSE_FRAMERATE: int = 60
 
 run_states = {"early_laps": True, "to_mast": True}
 

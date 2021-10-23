@@ -14,8 +14,8 @@ import cv2
 
 from vision.module.in_frame import ModuleInFrame as mif
 from vision.module.location import ModuleLocation
-from vision.module.region_of_interest import region_of_interest
-from vision.module.module_orientation import get_module_orientation
+from vision.module.region_of_interest import get_region_of_interest
+from vision.module.module_orientation import get_module_roll, get_module_orientation
 
 
 class TestModuleInFrame(unittest.TestCase):
@@ -117,7 +117,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -141,7 +141,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -157,7 +157,7 @@ class TestModuleLocation(unittest.TestCase):
 
             locator = ModuleLocation()
             locator.img, locator.depth = color_image, depth_image
-            result = locator.getCenter()
+            result = locator.get_center()
 
             self.assertIsInstance(result, tuple)
             self.assertEqual(len(result), 2)
@@ -172,7 +172,7 @@ class TestModuleLocation(unittest.TestCase):
 
         locator = ModuleLocation()
         locator.img, locator.depth = color_parameter, depth_parameter
-        result = locator.getCenter()
+        result = locator.get_center()
 
         np.testing.assert_array_equal(color_image, color_parameter)
         np.testing.assert_array_equal(depth_image, depth_parameter)
@@ -192,7 +192,7 @@ class TestModuleOrientation(unittest.TestCase):
         roi: ndarray
             module region of interest calculated by region_of_interest
         """
-        IMAGE_SIZE = [1920, 1080]
+        IMAGE_SIZE = [1920, 1080, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
@@ -232,11 +232,11 @@ class TestModuleOrientation(unittest.TestCase):
             # get center
             # loc = ModuleLocation()
             # loc.setImg(current_color, current_depth)
-            # current_center = loc.getCenter(); #BROKEN
+            # current_center = loc.get_center(); #BROKEN
             current_center = estimates[current_file][0]
 
             # get region of interest
-            roi = region_of_interest(
+            roi = get_region_of_interest(
                 current_depth,
                 current_depth[current_center[1]][current_center[0]],
                 current_center,
@@ -264,13 +264,181 @@ class TestModuleOrientation(unittest.TestCase):
         -------
         tuple
         """
-        IMAGE_SIZE = [1920, 1080]
+        IMAGE_SIZE = [1920, 1080, 3]
 
         # testing with ndarray of all zeroes
         image = np.zeros(IMAGE_SIZE, dtype=int)
         result = get_module_orientation(image)
 
         self.assertIs(type(result), tuple)
+
+
+class TestRegionOfInterest(unittest.TestCase):
+    """
+    Testing module.get_region_of_interest for validity.
+    """
+
+    def test_params(self):
+        """
+        Verify can handle input types
+
+        Parameters
+        ----------
+        depth_frame: ndarray
+            The depth image.
+        depth_val: float
+            Measured value for the depth of the module from the camera.
+        center: integer tuple
+            Coordinates of the center of the module.
+        """
+        IMAGE_SIZE = [1920, 1080]
+
+        # testing with ndarray of all zeroes, arbitrary depth value,
+        #   and arbitrary center value
+        depth_image = np.zeros(IMAGE_SIZE, dtype=int)
+        depth_val = 300.0
+        center = (300, 300)
+        roi = get_region_of_interest(depth_image, depth_val, center)
+
+        self.assertIs(type(depth_image), np.ndarray)
+        self.assertIs(type(depth_val), float)
+        self.assertIs(type(center), tuple)
+        self.assertIs(type(roi), np.ndarray)
+
+    def test_get_region_of_interest(self):
+        img_dir = os.path.join(gparent_dir, "vision_images/module/Feb29")
+        files = os.listdir(img_dir)
+
+        # hand-picked images for unit test, only depth image is necessary
+        estimates = {
+            # FORMAT: "name_of_file_without_color-depth_tail" : [estimated_center (x, y), estimated_size{x,y)]
+            "2020-02-29_15.48.10.480039": [(990, 600), (150, 200)],
+            "2020-02-29_15.35.41.406247": [(830, 690), (120, 150)],
+            "2020-02-29_15.35.57.551331": [(1228, 653), (90, 120)],
+            "2020-02-29_15.35.56.436446": [(1170, 644), (145, 180)],
+            "2020-02-29_15.40.42.462549": [(948, 620), (60, 70)]
+            # NOTE: The center tuples are estimated because center function does not work at the moment
+        }
+
+        for current_file in estimates.keys():
+            # grabs and loads depth file (assumes all files are in order of color1, depth1, color2, depth2, etc.)
+            current_depth_file = os.path.join(img_dir, current_file) + "-depthImage.npy"
+            current_depth_image = np.load(current_depth_file)
+
+            # get center
+            current_center = estimates[current_file][0]
+
+            # get region of interest
+            roi = get_region_of_interest(
+                current_depth_image,
+                current_depth_image[current_center[1]][current_center[0]],
+                current_center,
+            )
+
+            estimated_height = estimates[current_file][1][1]
+            estimated_width = estimates[current_file][1][0]
+            calculated_height = roi.shape[0]
+            calculated_width = roi.shape[1]
+
+            self.assertTrue(
+                estimated_height * 0.8 <= calculated_height <= estimated_height * 1.2
+            )  # within ±20%
+            self.assertTrue(
+                estimated_width * 0.8 <= calculated_width <= estimated_width * 1.2
+            )  # within ±20%
+
+    def test_return(self):
+        """
+        Verify returns only expected output
+
+        Returns
+        -------
+        ndarray
+        """
+        IMAGE_SIZE = [1920, 1080]
+
+        # testing with ndarray of all zeroes, arbitrary depth value,
+        #   and arbitrary center value
+        depth_image = np.zeros(IMAGE_SIZE, dtype=int)
+        arbitrary_value = 300
+        roi = get_region_of_interest(
+            depth_image, arbitrary_value, (arbitrary_value, arbitrary_value)
+        )
+
+        self.assertIs(type(roi), np.ndarray)
+
+
+class TestModuleRoll(unittest.TestCase):
+    """
+    Testing module.get_module_roll for validity.
+    """
+
+    def test_params(self):
+        """
+        Verify can handle input types
+
+        Parameters
+        ----------
+        enclosing_region: ndarray
+            The depth image.
+        module_roll: np.float64
+            Calculated float angle.
+        """
+
+        IMAGE_SIZE = [1080, 1920, 3]
+
+        enclosing_region = np.zeros(IMAGE_SIZE, dtype=np.uint8)
+        module_roll = get_module_roll(enclosing_region)
+
+        self.assertIs(type(enclosing_region), np.ndarray)
+        self.assertIs(type(module_roll), np.float64)
+
+    def test_module_roll(self):
+        img_dir = os.path.join(gparent_dir, "vision_images/module/Feb29")
+        files = os.listdir(img_dir)
+
+        estimates = {
+            # FORMAT: "name_of_file" : [estimated degrees (roll value), (estimated center)]
+            "2020-02-29_15.36.15.167565": [20, (1180, 300)],
+            "2020-02-29_15.40.46.652448": [14, (700, 550)],
+            "2020-02-29_15.40.48.862847": [10, (1300, 630)],
+            "2020-02-29_15.40.40.444538": [5, (830, 670)],
+            "2020-02-29_15.40.54.564617": [8, (435, 650)],
+        }
+
+        for current_file in estimates.keys():
+            # Selects image
+            color_file = os.path.join(img_dir, current_file) + "-colorImage.jpg"
+            # Loads images
+            color_image = cv2.imread(color_file)
+
+            center = estimates[current_file][1]
+
+            # Sets a rough boundary around the module (angles are similar using get_module_bounds)
+            bound = [center[1] - 250, center[1] + 250, center[0] - 180, center[0] + 180]
+            bounded_image = color_image[bound[0] : bound[1], bound[2] : bound[3], :]
+
+            calculated_degrees = get_module_roll(bounded_image)
+            estimated_degrees = estimates[current_file][0]
+
+            self.assertTrue(
+                estimated_degrees * 0.9 <= calculated_degrees <= estimated_degrees * 1.1
+            )  # within ±10%
+
+    def test_return(self):
+        """
+        Verify returns only expected output
+
+        Returns
+        -------
+        np.float64
+        """
+        IMAGE_SIZE = [1080, 1920, 3]
+
+        enclosing_region = np.zeros(IMAGE_SIZE, dtype=np.uint8)
+        module_roll = get_module_roll(enclosing_region)
+
+        self.assertIs(type(module_roll), np.float64)
 
 
 if __name__ == "__main__":

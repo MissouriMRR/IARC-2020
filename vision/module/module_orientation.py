@@ -8,20 +8,22 @@ import numpy as np
 import cv2
 
 
-def get_module_orientation(roi):
+def get_module_orientation(roi: np.ndarray) -> tuple:
     """
     Finds the orientation of the module in degrees
 
     Parameters
     ----------
     roi: numpy array
-        module region of interest calculated by region_of_interest
+        module region of interest calculated by get_region_of_interest
 
     Returns
     -----------
-    tuple of floating point values, degrees in coordinates of
-        the tilt on the x and y axes, respectively
+    tuple(float) - degrees in coordinates of the tilt on the x and y axes, respectively
     """
+    if roi.size == 0:
+        return 0.0, 0.0
+
     x_avg_diff = np.mean(roi[:, -1] / 1000 - roi[:, 0] / 1000)
     x_tilt = np.degrees(np.arctan(x_avg_diff))
 
@@ -43,9 +45,11 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
 
     Returns
     -----------
-    roll
-        module roll with respect to the positive y axis in degrees
+    float - module roll with respect to the positive y axis in degrees
     """
+    if enclosing_region.size == 0:
+        return 0.0
+
     # contours only work on grey images
     enclosing_region = cv2.cvtColor(enclosing_region, cv2.COLOR_BGR2GRAY)
 
@@ -79,14 +83,17 @@ def get_module_roll(enclosing_region: np.ndarray) -> float:
     #     box = np.int0(box)
     #     cv2.drawContours(colorImage, [box], 0, (0, 0, 255), 2)
 
-    np_rectangles = np.asarray(rectangles)
-    angles = np_rectangles[:, 2]
+    np_rectangles = np.asarray(rectangles, dtype=object)
 
-    # if the angle is absurd, it won't be taken
-    #   if the module is truly rolled at over 45 degrees, minAreaRect
-    #   should simply choose a different rectangle or axis
-    mask = np.where(abs(angles) < 45)
-    roll = np.mean(angles[mask])
+    # NOTE: this try block exists such that the [:, 2] slice of
+    #         np_rectangles can be attempted without risking
+    #         crashing the algorithm and logging the failure flag
+    try:
+        angles = np_rectangles[:, 2]
+
+        roll = np.mean(angles)
+    except:
+        roll = 0
 
     return roll
 
@@ -101,7 +108,7 @@ if __name__ == "__main__":
     Also note that region_of_interest should be in the same folder as module_orientation
     """
     import argparse
-    from region_of_interest import region_of_interest
+    from region_of_interest import get_region_of_interest
 
     # # Create object for parsing command-line options
     parser = argparse.ArgumentParser(
@@ -126,6 +133,6 @@ if __name__ == "__main__":
 
     # values for the test depth image
     center = (650, 560)
-    roi = region_of_interest(depthImage, depthImage[560][650], center)
+    roi = get_region_of_interest(depthImage, depthImage[560][650], center)
 
     get_module_orientation(roi)

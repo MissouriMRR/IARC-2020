@@ -6,7 +6,7 @@ import mavsdk as sdk
 from flight import config
 
 from flight.utils.movement_controller import MovementController
-from .land import Land
+from .detect_module import DetectModule
 from .state import State
 
 
@@ -15,7 +15,7 @@ class ToMast(State):
 
     async def run(self, drone):
         """Sends the drone from the first pylon to the mast"""
-        if config.run_states["to_mast"]:
+        if self.state_settings.go_to_mast:
             mover: MovementController = MovementController()
             # Go to the mast
             logging.info("Moving to mast")
@@ -25,7 +25,7 @@ class ToMast(State):
             await drone.offboard.set_velocity_ned(
                 sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
             )
-            await asyncio.sleep(20)
-            return Land()
+            await asyncio.sleep(10)
+            return DetectModule(self.state_settings)
         else:
-            return Land()
+            return DetectModule(self.state_settings)

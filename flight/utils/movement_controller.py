@@ -200,6 +200,7 @@ class MovementController:
             await drone.offboard.set_velocity_ned(
                 sdk.offboard.VelocityNedYaw(dy, dx, alt, deg)
             )
+            count += 1
             # if the x and y values are close enough (2m) to the original position * precision
             # if inside the circle, move on to the next
             # if outside of the circle, keep running to you get inside
@@ -227,7 +228,7 @@ class MovementController:
                 await drone.offboard.set_velocity_body(
                     sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.7, 0.0)
                 )
-            elif 1.0 > current_altitude > 0.3:
+            elif 1.0 > current_altitude > 0.5:
                 # Descends at 0.35 m/s at altitudes < 1 m && > 0.3 m
                 await drone.offboard.set_velocity_body(
                     sdk.offboard.VelocityBodyYawspeed(0.0, 0.0, 0.35, 0.0)

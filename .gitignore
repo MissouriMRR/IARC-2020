@@ -116,3 +116,9 @@ venv.bak/
 .vim/
 # Visual Studio Code
 .vscode/
+
+# Spreadsheets
+*.csv
+
+# Vision Benchmark Ouputs
+results/*.txt
