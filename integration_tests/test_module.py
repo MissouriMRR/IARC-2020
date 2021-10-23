@@ -27,7 +27,9 @@ if __name__ == "__main__":
         state_settings.set_vision_test("module")
 
         state_settings.set_run_title("Module Detection Test")
-        state_settings.set_run_description("Simple takeoff followed immediately by module detection, then land")
+        state_settings.set_run_description(
+            "Simple takeoff followed immediately by module detection, then land"
+        )
 
         flight_manager: FlightManager = FlightManager(state_settings)
         flight_manager.main()

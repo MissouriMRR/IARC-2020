@@ -30,7 +30,7 @@ class Land(State):
             sdk.offboard.VelocityBodyYawspeed(0, 0, 0, 0)
         )
 
-        #await asyncio.sleep(config.THINK_FOR_S)
+        # await asyncio.sleep(config.THINK_FOR_S)
         if not self.state_settings.simple_takeoff:
             await mover.move_to_takeoff(drone, config.takeoff_pos)
         await asyncio.sleep(config.THINK_FOR_S)

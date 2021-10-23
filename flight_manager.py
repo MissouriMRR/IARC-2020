@@ -81,7 +81,9 @@ class FlightManager:
                 flight_process: Process = self.init_flight(flight_args)
                 flight_process.start()
             except EOFError:
-                logging.info("Additional EOF error detected - lack of inputs on restart")
+                logging.info(
+                    "Additional EOF error detected - lack of inputs on restart"
+                )
                 comm_obj.set_state("hold")
                 comm_obj.set_state("land")
                 flight_process: Process = self.init_flight(flight_args)
