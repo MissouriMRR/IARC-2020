@@ -70,14 +70,26 @@ class FlightManager:
                     logging.error("Flight process terminated, restarting")
                     flight_process: Process = self.init_flight(flight_args)
                     flight_process.start()
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, AttributeError) as error:
             # Ctrl-C was pressed
             # TODO send a message to the flight process to land instead of
             # basically overwriting the process
-            logging.info("Ctrl-C Pressed, forcing drone to land")
-            comm_obj.set_state("land")
-            flight_process: Process = self.init_flight(flight_args)
-            flight_process.start()
+            try:
+                logging.info("Ctrl-C Pressed, forcing drone to land")
+                comm_obj.set_state("land")
+                logging.info("Non-fatal AttributeError occurs, land still possible")
+                flight_process: Process = self.init_flight(flight_args)
+                flight_process.start()
+            except EOFError:
+                logging.info(
+                    "Additional EOF error detected - lack of inputs on restart"
+                )
+                comm_obj.set_state("hold")
+                comm_obj.set_state("land")
+                flight_process: Process = self.init_flight(flight_args)
+                flight_process.start()
+            except (TimeoutError, flight.DroneNotFoundError) as connection_issue:
+                logging.info(connection_issue, ", cannot connect")
 
         # Join flight process before exiting function
         flight_process.join()

@@ -39,7 +39,7 @@ class SimpleTakeoff(State):
         mover: MovementController = MovementController()
         await self._check_arm_or_arm(drone)  # Arms the drone if not armed
         logging.info("Taking off")
- 
+
         # (NSm/s, EWm/s, DUm/s, Ydeg)
         await drone.offboard.set_velocity_ned(
             sdk.offboard.VelocityNedYaw(0.0, 0.0, 0.0, 0.0)
